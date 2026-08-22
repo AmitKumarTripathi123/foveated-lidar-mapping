@@ -43,19 +43,39 @@ RANGE_BANDS = [
 ]
 
 
-def build_file_list(root, sequences):
-    """Collect matched (bin, label) file paths for the given sequence IDs."""
+def build_file_list(root, sequences, max_frames=None):
+    """Collect matched (bin, label) file paths for the given sequence IDs using stem matching."""
+    from pathlib import Path
     bin_paths, label_paths = [], []
     for seq in sequences:
-        seq_dir = os.path.join(root, "sequences", seq)
-        bins = sorted(glob.glob(os.path.join(seq_dir, "velodyne", "*.bin")))
-        labels = sorted(glob.glob(os.path.join(seq_dir, "labels", "*.label")))
-        assert len(bins) == len(labels), (
-            f"Mismatch in sequence {seq}: {len(bins)} bin files vs "
-            f"{len(labels)} label files"
-        )
-        bin_paths += bins
-        label_paths += labels
+        seq_dir = os.path.join(root, "sequences", str(seq))
+        if not os.path.exists(seq_dir):
+            seq_dir = os.path.join(root, str(seq))
+        if not os.path.exists(seq_dir):
+            continue
+
+        velo_dir = os.path.join(seq_dir, "velodyne")
+        if not os.path.exists(velo_dir):
+            velo_dir = os.path.join(seq_dir, "scans")
+        if not os.path.exists(velo_dir):
+            velo_dir = seq_dir
+
+        lbl_dir = os.path.join(seq_dir, "labels")
+        if not os.path.exists(lbl_dir):
+            lbl_dir = seq_dir
+
+        bin_map = {Path(p).stem: p for p in glob.glob(os.path.join(velo_dir, "*.bin"))}
+        lbl_map = {Path(p).stem: p for p in glob.glob(os.path.join(lbl_dir, "*.label"))}
+        common_stems = sorted(set(bin_map.keys()) & set(lbl_map.keys()))
+
+        for stem in common_stems:
+            bin_paths.append(bin_map[stem])
+            label_paths.append(lbl_map[stem])
+
+    if max_frames is not None and max_frames > 0:
+        bin_paths = bin_paths[:max_frames]
+        label_paths = label_paths[:max_frames]
+
     return bin_paths, label_paths
 
 

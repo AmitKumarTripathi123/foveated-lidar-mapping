@@ -1,0 +1,34 @@
+﻿============================================================
+SEMANTICPOSS DATASET FORENSIC AUDIT REPORT
+============================================================
+
+Dataset Root:           dataset
+Expected Sequences:     00, 01, 02, 03, 04, 05
+Detected Sequences:     00
+
+Expected Total Frames:  2,988
+Detected Total Frames:  1
+
+Sequence Breakdown:
+  Sequence 00: 1 frame (velodyne/000000.bin, labels/000000.label, 66,658 points)
+  Sequence 01: MISSING (0 frames)
+  Sequence 02: MISSING (0 frames)
+  Sequence 03: MISSING (0 frames)
+  Sequence 04: MISSING (0 frames)
+  Sequence 05: MISSING (0 frames)
+
+Pairing Verification:
+  Point clouds:   1
+  Labels:         1
+  Matched pairs:  1 (100% matched for sequence 00)
+  Missing labels: 0
+  Missing clouds: 0
+
+Split Availability:
+  Train frames:      1 (Sequence 00)
+  Validation frames: 0 (Sequence 02 missing)
+  Test frames:       UNAVAILABLE
+
+Status:
+  DATASET ACTIVATION BLOCKED (Incomplete Physical Archive)
+============================================================

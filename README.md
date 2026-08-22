@@ -1,4 +1,4 @@
-# Foveated 2.5D LiDAR Mapping & Semantic Segmentation for Autonomous Navigation
+﻿# Foveated 2.5D LiDAR Mapping & Semantic Segmentation for Autonomous Navigation
 
 **Project**: Smart India Hackathon  
 **Target System**: Real-time Distance-Aware (Foveated) 3D LiDAR Data Pipeline & Semantic Segmentation  
@@ -19,45 +19,62 @@ This repository implements an end-to-end LiDAR perception pipeline for autonomou
    - `2 = static_obstacle` (Buildings, poles, fences, vegetation, trees)
    - `3 = dynamic_object` (Pedestrians, cars, riders, bicycles, trucks)
    - `255 = IGNORE_LABEL` (Outliers, unlabeled points)
-3. **`FoveatedPointSegNet` AI Model**:
-   - Lightweight neural point segmentation model (~450k parameters)
+3. **PointNet++ & FoveatedPointSegNet Architectures**:
+   - Standardized 3D neural point segmentation networks
    - Distance-conditioned embedding & multi-scale residual spatial feature extraction
-   - Generates per-point class probabilities, predicted class, and confidence scores
+   - Predicts per-point classes and calibrated confidence scores
 4. **Interface Contract for Phase 3 2.5D Mapping**:
-   - Standardized `SemanticPrediction` dataclass for seamless costmap integration.
+   - Standardized `GridMap25D` output layers: `elevation_mean`, `semantic_layer`, `traversability_layer`, and `confidence_layer`.
 
 ---
 
-## Directory Structure
+## Dataset Setup & Activation Guide
 
+To activate the full multi-frame SemanticPOSS dataset (6 sequences, 2,988 frame pairs):
+
+### 1. Download & Directory Layout
+Download the SemanticPOSS dataset from the official repository and extract it under `dataset/` or an external directory:
 ```text
-3D Lidar/
-├── configs/
-│   ├── foveation_default.yaml     # Foveation bands & voxel resolutions
-│   ├── phase2.yaml                # AI model & training hyperparameters
-│   └── semanticposs_mapping.yaml  # SemanticPOSS raw -> super-class mapping
-├── data/
-│   └── semanticposs_sequence/     # 40-beam SemanticPOSS sequence scans
-├── phase2/
-│   ├── dataset.py                 # PyTorch Phase2Dataset adapter (sequence-split)
-│   ├── models/
-│   │   └── point_seg_net.py       # FoveatedPointSegNet architecture
-│   ├── training/
-│   │   └── trainer.py             # Model training with class-weighted loss
-│   ├── inference/
-│   │   └── predictor.py           # Phase2Predictor & SemanticPrediction interface
-│   └── metrics/
-│       └── semantic_evaluator.py  # mIoU, confusion matrix, & calibration evaluator
-├── reports/
-│   ├── phase1/                    # Phase 1 verification & benchmarks
-│   ├── terrain/                   # SemanticPOSS terrain validation & review tables
-│   └── phase2/                    # Phase 2 audit, training, & comparison reports
-├── src/                           # Phase 1 LiDAR data foundation & foveation engine
-├── tests/                         # Full unit & regression test suite (52 tests)
-├── checkpoints/
-│   └── best_model.pth             # Trained AI model weights
-├── run_phase1_pipeline.py         # Phase 1 end-to-end runner
-└── run_phase2_pipeline.py         # Phase 2 end-to-end runner
+dataset/
+└── sequences/
+    ├── 00/
+    │   ├── velodyne/*.bin
+    │   └── labels/*.label
+    ├── 01/
+    ├── 02/
+    ├── 03/
+    ├── 04/
+    └── 05/
+```
+
+### 2. Set Environment Variable (Optional)
+If stored outside `dataset/`, set `DATASET_ROOT`:
+```bash
+export DATASET_ROOT="/path/to/SemanticPOSS"
+```
+
+### 3. Run Dataset Forensic Audit Tool
+Audit all 6 sequences, file integrity, and 1:1 point-label alignment:
+```bash
+python scripts/audit_semanticposs.py --root dataset
+```
+
+### 4. Verify Pipeline
+Run the multi-stage foveated mapping verifier:
+```bash
+python verify_pipeline.py --dataset-root dataset
+```
+
+### 5. Run Preprocessing Cache
+Generate the preprocessed voxelized cache:
+```bash
+python preprocess.py --dataset-root dataset --train-sequences 00 01 03 04 05 --val-sequences 02
+```
+
+### 6. Run Automated Test Suite
+Verify all unit and regression tests:
+```bash
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 ---

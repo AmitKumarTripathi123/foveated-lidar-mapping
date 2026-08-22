@@ -1,12 +1,17 @@
-"""
+﻿"""
 verify_pipeline.py
 ==================
 Verification script to test the complete 3D LiDAR Foveated Mapping Data Pipeline:
   1. Verifies raw sequence loading and label remapping.
   2. Tests PyTorch DataLoader batch collation (collate_fn_foveated).
   3. Verifies preprocessed .npy files and metadata outputs.
+
+Usage:
+    python verify_pipeline.py
+    python verify_pipeline.py --dataset-root /path/to/SemanticPOSS --sequences 00 01
 """
 
+import argparse
 import os
 import json
 import torch
@@ -15,14 +20,20 @@ import numpy as np
 from class_map import PROJECT_CLASSES, POSS_RAW_CLASSES, get_class_colors, compute_class_weights
 from dataset import build_file_list, FoveatedLidarDataset, create_dataloader
 
-DATASET_ROOT = "dataset"
-OUTPUT_DIR = "processed"
+DEFAULT_DATASET_ROOT = os.environ.get("DATASET_ROOT", "dataset")
+DEFAULT_OUTPUT_DIR = "processed"
 
 
-def verify_raw_and_dataloader():
+def verify_raw_and_dataloader(dataset_root=DEFAULT_DATASET_ROOT, sequences=None, max_frames=None):
+    if sequences is None:
+        sequences = ["00"]
     print("--- 1. Testing Raw Dataset & DataLoader Batching ---")
-    bin_paths, label_paths = build_file_list(DATASET_ROOT, ["00"])
-    print(f"Found {len(bin_paths)} frames in Sequence 00.")
+    bin_paths, label_paths = build_file_list(dataset_root, sequences, max_frames=max_frames)
+    print(f"Found {len(bin_paths)} frames across sequences {sequences}.")
+
+    if len(bin_paths) == 0:
+        print("  WARNING: 0 frames found. Skipping DataLoader batch check.\n")
+        return False
 
     # Create dataset instance
     ds = FoveatedLidarDataset(bin_paths, label_paths, train=True, downsample=True)
@@ -30,21 +41,23 @@ def verify_raw_and_dataloader():
     print(f"Sample frame 0: Points shape={sample_pts.shape}, Labels shape={sample_lbls.shape}")
     print(f"Unique project class IDs in frame 0: {torch.unique(sample_lbls).tolist()}")
 
-    # Test DataLoader
-    loader = create_dataloader(bin_paths[:8], label_paths[:8], batch_size=4, shuffle=True, train=True)
+    # Test DataLoader with dynamic batch size
+    batch_size = min(4, len(bin_paths))
+    loader = create_dataloader(bin_paths, label_paths, batch_size=batch_size, shuffle=True, train=True)
     for batch_idx, (pts_list, lbls_list, batch_indices) in enumerate(loader):
         print(f"Batch {batch_idx}: {len(pts_list)} frames, Total points across batch: {batch_indices.shape[0]}")
-        assert len(pts_list) == 4, "Expected batch size of 4"
-        assert len(lbls_list) == 4, "Expected batch size of 4"
+        assert len(pts_list) == batch_size, f"Expected batch size of {batch_size}, got {len(pts_list)}"
+        assert len(lbls_list) == batch_size, f"Expected batch size of {batch_size}, got {len(lbls_list)}"
         break
     print("DataLoader batching & collation check PASSED!\n")
+    return True
 
 
-def verify_cached_outputs():
+def verify_cached_outputs(output_dir=DEFAULT_OUTPUT_DIR):
     print("--- 2. Testing Preprocessed Metadata & Cache Files ---")
-    meta_path = os.path.join(OUTPUT_DIR, "dataset_metadata.json")
+    meta_path = os.path.join(output_dir, "dataset_metadata.json")
     if not os.path.exists(meta_path):
-        print(f"WARNING: {meta_path} not found yet. Run preprocess.py first.")
+        print(f"WARNING: {meta_path} not found yet. Run preprocess.py first.\n")
         return False
 
     with open(meta_path, "r") as f:
@@ -65,13 +78,12 @@ def verify_cached_outputs():
         cls_id = int(cls_id_str)
         weight = meta['train']['class_weights'][cls_id]
         print(f"  Class {cls_id} ({cls_name:20s}): {weight:.4f}")
-
+    print()
     return True
 
 
 def test_obstacle_preserving_voxel_priority():
     print("--- 3. Testing Obstacle-Preserving Voxel Label Priority ---")
-    # Construct 5 synthetic points inside the EXACT same 3D voxel cell in near-field (0-10m, 5cm voxel size)
     pts = np.array([
         [2.01, 2.01, 0.01, 0.5],
         [2.02, 2.02, 0.01, 0.6],
@@ -93,11 +105,22 @@ def test_obstacle_preserving_voxel_priority():
     print("Obstacle-Preserving Voxel Priority Test PASSED! (dynamic_object > static > non-drivable > drivable > ignore)\n")
 
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description="Verify 3D LiDAR Foveated Mapping Data Pipeline.")
+    parser.add_argument("--dataset-root", type=str, default=DEFAULT_DATASET_ROOT)
+    parser.add_argument("--output-dir", type=str, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--sequences", nargs="+", default=["00"])
+    parser.add_argument("--max-frames", type=int, default=None)
+
+    args = parser.parse_args()
+
     print("==================================================")
     print(" 3D LiDAR Foveated Mapping Data Pipeline Verifier ")
     print("==================================================\n")
     test_obstacle_preserving_voxel_priority()
-    verify_raw_and_dataloader()
-    verify_cached_outputs()
+    verify_raw_and_dataloader(dataset_root=args.dataset_root, sequences=args.sequences, max_frames=args.max_frames)
+    verify_cached_outputs(output_dir=args.output_dir)
 
+
+if __name__ == "__main__":
+    main()

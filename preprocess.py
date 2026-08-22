@@ -1,4 +1,4 @@
-"""
+﻿"""
 preprocess.py
 =============
 Run the pipeline once over every frame in the chosen train/val sequences,
@@ -8,12 +8,10 @@ front whether you need class-weighted loss.
 
 Usage:
     python3 preprocess.py
-
-Output:
-    processed/train/000000_pts.npy, 000000_lbl.npy, ...
-    processed/val/000000_pts.npy,   000000_lbl.npy, ...
+    python3 preprocess.py --dataset-root /path/to/SemanticPOSS --max-frames 10
 """
 
+import argparse
 import os
 import json
 import numpy as np
@@ -21,20 +19,29 @@ import numpy as np
 from dataset import FoveatedLidarDataset, build_file_list
 from class_map import PROJECT_CLASSES, compute_class_weights
 
-DATASET_ROOT = "dataset"
-OUTPUT_DIR = "processed"
+DEFAULT_DATASET_ROOT = os.environ.get("DATASET_ROOT", "dataset")
+DEFAULT_OUTPUT_DIR = "processed"
+DEFAULT_TRAIN_SEQUENCES = ["00", "01", "03", "04", "05"]
+DEFAULT_VAL_SEQUENCES = ["02"]
 
-TRAIN_SEQUENCES = ["00", "01", "03", "04", "05"]
-VAL_SEQUENCES = ["02"]
 
-
-def process_split(split_name, sequences):
-    bin_paths, label_paths = build_file_list(DATASET_ROOT, sequences)
+def process_split(split_name, sequences, dataset_root=DEFAULT_DATASET_ROOT, output_dir=DEFAULT_OUTPUT_DIR, max_frames=None):
+    bin_paths, label_paths = build_file_list(dataset_root, sequences, max_frames=max_frames)
     print(f"[{split_name}] {len(bin_paths)} frames from sequences {sequences}")
+
+    if len(bin_paths) == 0:
+        print(f"  [{split_name}] WARNING: 0 frames found for sequences {sequences}")
+        return {
+            "num_frames": 0,
+            "total_points": 0,
+            "class_counts": [0] * (len(PROJECT_CLASSES) + 1),
+            "class_weights": [1.0] * len(PROJECT_CLASSES),
+            "distribution": {},
+        }
 
     ds = FoveatedLidarDataset(bin_paths, label_paths, train=False)
 
-    out_dir = os.path.join(OUTPUT_DIR, split_name)
+    out_dir = os.path.join(output_dir, split_name)
     os.makedirs(out_dir, exist_ok=True)
 
     num_classes = len(PROJECT_CLASSES)
@@ -81,25 +88,38 @@ def process_split(split_name, sequences):
     }
 
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description="Preprocess LiDAR dataset.")
+    parser.add_argument("--dataset-root", type=str, default=DEFAULT_DATASET_ROOT)
+    parser.add_argument("--output-dir", type=str, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--train-sequences", nargs="+", default=DEFAULT_TRAIN_SEQUENCES)
+    parser.add_argument("--val-sequences", nargs="+", default=DEFAULT_VAL_SEQUENCES)
+    parser.add_argument("--max-frames", type=int, default=None, help="Max frames per split (for debugging).")
+
+    args = parser.parse_args()
+
     print("=== Processing training split ===")
-    train_info = process_split("train", TRAIN_SEQUENCES)
+    train_info = process_split("train", args.train_sequences, dataset_root=args.dataset_root, output_dir=args.output_dir, max_frames=args.max_frames)
 
     print("\n=== Processing validation split ===")
-    val_info = process_split("val", VAL_SEQUENCES)
+    val_info = process_split("val", args.val_sequences, dataset_root=args.dataset_root, output_dir=args.output_dir, max_frames=args.max_frames)
 
     metadata = {
-        "dataset_root": DATASET_ROOT,
-        "train_sequences": TRAIN_SEQUENCES,
-        "val_sequences": VAL_SEQUENCES,
+        "dataset_root": args.dataset_root,
+        "train_sequences": args.train_sequences,
+        "val_sequences": args.val_sequences,
         "project_classes": PROJECT_CLASSES,
         "train": train_info,
         "val": val_info,
     }
 
-    meta_path = os.path.join(OUTPUT_DIR, "dataset_metadata.json")
+    os.makedirs(args.output_dir, exist_ok=True)
+    meta_path = os.path.join(args.output_dir, "dataset_metadata.json")
     with open(meta_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
-    print(f"\nDone. Preprocessed files & metadata saved to: {os.path.abspath(OUTPUT_DIR)}")
+    print(f"\nDone. Preprocessed files & metadata saved to: {os.path.abspath(args.output_dir)}")
 
+
+if __name__ == "__main__":
+    main()

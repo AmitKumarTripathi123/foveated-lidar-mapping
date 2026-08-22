@@ -1,0 +1,76 @@
+{
+  "dataset_root": "dataset",
+  "train_sequences": [
+    "00",
+    "01",
+    "03",
+    "04",
+    "05"
+  ],
+  "val_sequences": [
+    "02"
+  ],
+  "project_classes": {
+    "0": "drivable_terrain",
+    "1": "non_drivable_terrain",
+    "2": "static_obstacle",
+    "3": "dynamic_object"
+  },
+  "train": {
+    "num_frames": 1,
+    "total_points": 49757,
+    "class_counts": [
+      0,
+      0,
+      3878,
+      0,
+      45879
+    ],
+    "class_weights": [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    "distribution": {
+      "drivable_terrain": {
+        "count": 0,
+        "percentage": 0.0
+      },
+      "non_drivable_terrain": {
+        "count": 0,
+        "percentage": 0.0
+      },
+      "static_obstacle": {
+        "count": 3878,
+        "percentage": 7.79
+      },
+      "dynamic_object": {
+        "count": 0,
+        "percentage": 0.0
+      },
+      "ignored": {
+        "count": 45879,
+        "percentage": 92.21
+      }
+    }
+  },
+  "val": {
+    "num_frames": 0,
+    "total_points": 0,
+    "class_counts": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "class_weights": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "distribution": {}
+  }
+}
