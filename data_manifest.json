@@ -1,0 +1,67 @@
+{
+  "dataset_root": "data/semanticposs_sequence",
+  "total_frames": 5,
+  "train": [
+    "data/semanticposs_sequence/sequences/01/velodyne/000000.bin",
+    "data/semanticposs_sequence/sequences/01/velodyne/000001.bin",
+    "data/semanticposs_sequence/sequences/01/velodyne/000002.bin",
+    "data/semanticposs_sequence/sequences/01/velodyne/000003.bin",
+    "data/semanticposs_sequence/sequences/01/velodyne/000004.bin"
+  ],
+  "val": [],
+  "train_pairs": [
+    [
+      "data/semanticposs_sequence/sequences/01/velodyne/000000.bin",
+      "data/semanticposs_sequence/sequences/01/labels/000000.label"
+    ],
+    [
+      "data/semanticposs_sequence/sequences/01/velodyne/000001.bin",
+      "data/semanticposs_sequence/sequences/01/labels/000001.label"
+    ],
+    [
+      "data/semanticposs_sequence/sequences/01/velodyne/000002.bin",
+      "data/semanticposs_sequence/sequences/01/labels/000002.label"
+    ],
+    [
+      "data/semanticposs_sequence/sequences/01/velodyne/000003.bin",
+      "data/semanticposs_sequence/sequences/01/labels/000003.label"
+    ],
+    [
+      "data/semanticposs_sequence/sequences/01/velodyne/000004.bin",
+      "data/semanticposs_sequence/sequences/01/labels/000004.label"
+    ]
+  ],
+  "val_pairs": [],
+  "sequence_breakdown": {
+    "00": {
+      "bins": 0,
+      "labels": 0,
+      "matched": 0
+    },
+    "01": {
+      "bins": 5,
+      "labels": 5,
+      "matched": 5
+    },
+    "02": {
+      "bins": 0,
+      "labels": 0,
+      "matched": 0
+    },
+    "03": {
+      "bins": 0,
+      "labels": 0,
+      "matched": 0
+    },
+    "04": {
+      "bins": 0,
+      "labels": 0,
+      "matched": 0
+    },
+    "05": {
+      "bins": 0,
+      "labels": 0,
+      "matched": 0
+    }
+  }
+}

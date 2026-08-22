@@ -80,23 +80,44 @@ class Phase2Predictor:
             self.device = device
 
         if self.model_type in ("spvcnn", "spv_cnn"):
-            resolved_path = model_path if model_path is not None else "checkpoints/spvcnn_pretrained.pt"
+            # Check for trained fine-tuned model first, then pretrained
+            if model_path is not None:
+                resolved_path = Path(model_path)
+            elif Path("checkpoints/best_spvcnn.pt").exists():
+                resolved_path = Path("checkpoints/best_spvcnn.pt")
+            else:
+                resolved_path = Path("checkpoints/spvcnn_pretrained.pt")
+
+            # Auto-detect checkpoint class count
+            actual_classes = num_classes
+            actual_source = self.native_source
+            if resolved_path.exists():
+                ckpt = torch.load(str(resolved_path), map_location="cpu")
+                state = ckpt.get("model_state_dict", ckpt)
+                classifier_weight = state.get("classifier.4.weight", None)
+                if classifier_weight is not None:
+                    actual_classes = classifier_weight.shape[0]
+                    if actual_classes == 4:
+                        actual_source = "sih_direct"
+                    elif actual_classes == 19:
+                        actual_source = "semantickitti"
+
             self.model = build_spvcnn(
-                num_classes=num_classes,
+                num_classes=actual_classes,
                 in_channels=4,
-                pretrained_path=resolved_path if Path(resolved_path).exists() else None,
+                pretrained_path=str(resolved_path) if resolved_path.exists() else None,
                 device=self.device
             )
             self.input_adapter = SPVCNNInputAdapter(voxel_size=self.voxel_size)
-            self.label_adapter = SPVCNNLabelAdapter(native_source=self.native_source)
+            self.label_adapter = SPVCNNLabelAdapter(native_source=actual_source)
             param_count = sum(p.numel() for p in self.model.parameters())
             self.model_info = {
                 "model_type": "SPVCNN",
                 "device": str(self.device),
                 "parameters": param_count,
-                "native_classes": num_classes,
+                "native_classes": actual_classes,
                 "target_classes": 4,
-                "checkpoint": str(resolved_path) if Path(resolved_path).exists() else "None (Uninitialized)"
+                "checkpoint": str(resolved_path) if resolved_path.exists() else "None (Uninitialized)"
             }
 
         else:
