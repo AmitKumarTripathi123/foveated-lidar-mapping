@@ -1,9 +1,9 @@
-# Phase 3 — Performance Benchmark Report (SPVCNN)
+# Phase 3 â€” Performance Benchmark Report (SPVCNN)
 
 **Objective**: Empirical performance profiling of the 5-stage perception pipeline with SPVCNN.  
-**Benchmark Date**: 2026-08-23 00:36:44  
-**Hardware & Environment**: Windows-11-10.0.26200-SP0 | CPU: Intel64 Family 6 Model 186 Stepping 2, GenuineIntel (12 threads) | RAM: 15.7 GB  
-**PyTorch Version**: 2.13.0+cpu | Python: 3.14.5  
+**Benchmark Date**: 2026-08-22 23:05:16  
+**Hardware & Environment**: macOS-26.5.2-arm64-arm-64bit | CPU: arm (10 threads) | RAM: 16.0 GB  
+**PyTorch Version**: 2.8.0 | Python: 3.9.6  
 **Model Architecture**: SPVCNN (136,979 parameters)  
 
 ---
@@ -12,12 +12,12 @@
 
 | Pipeline Stage     |   Mean (ms) |   Median (ms) |   P95 (ms) |   Min (ms) |   Max (ms) |   Std Dev |
 |--------------------|-------------|---------------|------------|------------|------------|-----------|
-| 1. LiDAR Loading   |      41.78  |        47.956 |     59.7   |      0.977 |     61.374 |    21.106 |
-| 2. Preprocessing   |       5.073 |         4.799 |      6.716 |      3.981 |      6.998 |     1.131 |
-| 3. ML Inference    |     254.731 |       254.53  |    267.59  |    241.227 |    269.326 |     9.765 |
-| 4. Grid Generation |      15.976 |        16.003 |     16.761 |     14.964 |     16.898 |     0.626 |
-| 5. Vis Preparation |      13.467 |        13.366 |     14.875 |     12.35  |     15.195 |     0.966 |
-| TOTAL END-TO-END   |     331.027 |       338.575 |    363.464 |    275.632 |    367.068 |    30.945 |
+| 1. LiDAR Loading   |       1.672 |         2.13  |      2.22  |      0.359 |      2.23  |     0.714 |
+| 2. Preprocessing   |       2.669 |         2.65  |      2.777 |      2.61  |      2.807 |     0.071 |
+| 3. ML Inference    |      97.373 |        97.176 |    103.733 |     91.434 |    105.149 |     4.51  |
+| 4. Grid Generation |     156.565 |       166.376 |    167.376 |    120.243 |    167.553 |    18.263 |
+| 5. Vis Preparation |      93.227 |        93.148 |     93.997 |     92.62  |     94.124 |     0.543 |
+| TOTAL END-TO-END   |     351.506 |       359.322 |    368.692 |    314.473 |    370.245 |    19.516 |
 
 ---
 
@@ -27,21 +27,21 @@
 | :--- | :--- |
 | **Mean Input Points / Frame** | **40,000 points** |
 | **Mean 2.5D Cells / Frame** | **28,308 cells** |
-| **Mean End-to-End Latency** | **331.03 ms** |
-| **Median End-to-End Latency** | **338.57 ms** |
-| **95th Percentile Latency (P95)**| **363.46 ms** |
-| **End-to-End Throughput (FPS)** | **3.05 FPS** |
-| **Mean Process RAM (RSS)** | **494.24 MB** |
-| **Mean CPU Utilization** | **763.7%** |
+| **Mean End-to-End Latency** | **351.51 ms** |
+| **Median End-to-End Latency** | **359.32 ms** |
+| **95th Percentile Latency (P95)**| **368.69 ms** |
+| **End-to-End Throughput (FPS)** | **2.85 FPS** |
+| **Mean Process RAM (RSS)** | **552.76 MB** |
+| **Mean CPU Utilization** | **140.8%** |
 
 ---
 
 ## 3. Scaling Benchmark Across Point Counts
 
-|   Points (N) | Total (ms)   | Load (ms)   | Prep (ms)   | ML (ms)     | Grid (ms)   |   FPS | RAM (MB)   |
+| Points (N)   | Total (ms)   | Load (ms)   | Prep (ms)   | ML (ms)     | Grid (ms)   |   FPS | RAM (MB)   |
 |--------------|--------------|-------------|-------------|-------------|-------------|-------|------------|
-|       10,000 | 116.23 ms    | 0.03 ms     | 1.13 ms     | 69.42 ms    | 4.72 ms     |  8.6  | 388.2 MB   |
-|      100,000 | 1364.90 ms   | 0.05 ms     | 10.20 ms    | 727.10 ms   | 47.36 ms    |  0.73 | 645.9 MB   |
-|      500,000 | 5535.78 ms   | 1.06 ms     | 62.71 ms    | 3618.76 ms  | 269.51 ms   |  0.18 | 1009.8 MB  |
-|    1,000,000 | 10123.07 ms  | 2.10 ms     | 102.38 ms   | 6854.48 ms  | 696.06 ms   |  0.1  | 987.9 MB   |
-|    5,000,000 | 46984.60 ms  | 9.18 ms     | 493.33 ms   | 39081.90 ms | 4269.26 ms  |  0.02 | 1863.1 MB  |
+| 10,000       | 59.27 ms     | 0.01 ms     | 0.53 ms     | 21.42 ms    | 37.30 ms    | 16.87 | 561.8 MB   |
+| 100,000      | 780.64 ms    | 0.02 ms     | 4.51 ms     | 291.57 ms   | 484.54 ms   |  1.28 | 1049.8 MB  |
+| 500,000      | 3318.90 ms   | 0.06 ms     | 24.92 ms    | 1389.49 ms  | 1904.43 ms  |  0.3  | 1208.8 MB  |
+| 1,000,000    | 6038.98 ms   | 0.12 ms     | 46.34 ms    | 3164.55 ms  | 2827.97 ms  |  0.17 | 1321.6 MB  |
+| 5,000,000    | 24853.43 ms  | 2.18 ms     | 302.07 ms   | 14732.28 ms | 9816.89 ms  |  0.04 | 2081.8 MB  |
