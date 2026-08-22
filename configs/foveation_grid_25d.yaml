@@ -1,0 +1,25 @@
+version: 2.0.0
+name: phase2_frozen_4band
+max_range: 100.0
+description: "Phase-2 Frozen 4-Band Distance-Aware 2.5D Foveated Grid Specification"
+bands:
+  - name: near_field
+    min_range: 0.0
+    max_range: 10.0
+    voxel_size: 0.05
+    description: "0–10m @ 5cm resolution"
+  - name: mid_near_field
+    min_range: 10.0
+    max_range: 30.0
+    voxel_size: 0.10
+    description: "10–30m @ 10cm resolution"
+  - name: mid_far_field
+    min_range: 30.0
+    max_range: 60.0
+    voxel_size: 0.25
+    description: "30–60m @ 25cm resolution"
+  - name: far_field
+    min_range: 60.0
+    max_range: 100.0
+    voxel_size: 0.50
+    description: "60–100m @ 50cm resolution"
