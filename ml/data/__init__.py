@@ -53,6 +53,11 @@ from ml.data.authoritative_label_mapping import (
     SEMANTICKITTI_TO_SIH,
     SEMANTICPOSS_TO_SIH,
 )
+from ml.data.semanticposs_label_mapping import (
+    SemanticPOSSLabelRemapper,
+    SemanticPOSSMappingError,
+    SEMANTICPOSS_RAW_TO_SIH,
+)
 from ml.data.manifest import (
     discover_dataset,
     audit_dataset,
@@ -102,6 +107,9 @@ __all__ = [
     "AuthoritativeMappingError",
     "SEMANTICKITTI_TO_SIH",
     "SEMANTICPOSS_TO_SIH",
+    "SemanticPOSSLabelRemapper",
+    "SemanticPOSSMappingError",
+    "SEMANTICPOSS_RAW_TO_SIH",
     "discover_dataset",
     "audit_dataset",
     "FrameRecord",
