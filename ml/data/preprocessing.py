@@ -63,7 +63,7 @@ class IntensityConfig:
 
 @dataclass
 class PreprocessingConfig:
-    """Complete preprocessing configuration."""
+    """Composite preprocessing pipeline configuration."""
     invalid_points: InvalidPointsConfig = field(default_factory=InvalidPointsConfig)
     range_filter: RangeFilterConfig = field(default_factory=RangeFilterConfig)
     sampling: SamplingConfig = field(default_factory=SamplingConfig)
@@ -73,7 +73,7 @@ class PreprocessingConfig:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "PreprocessingConfig":
-        """Build configuration from a nested dictionary."""
+        """Build PreprocessingConfig from a dictionary."""
         p_data = data.get("preprocessing", data)
 
         inv_data = p_data.get("invalid_points", {})
@@ -204,7 +204,6 @@ def apply_range_filter(
         mask &= points[:, 2] <= max_z
 
     num_filtered = int((~mask).sum())
-
     filtered_points = points[mask]
     filtered_labels = labels[mask] if labels is not None else None
 
@@ -219,19 +218,19 @@ def sample_points(
     labels: Optional[np.ndarray] = None,
     num_points: Optional[int] = None,
     strategy: str = "keep_all",
-    seed: Optional[int] = None,
+    seed: Optional[int] = 42,
 ) -> Tuple[np.ndarray, Optional[np.ndarray], Dict[str, Any]]:
-    """Sample point cloud and labels using a specified strategy while preserving correspondence.
+    """Sample point cloud and corresponding labels.
 
     Args:
         points: Point cloud array of shape (N, 4).
         labels: Optional label array of shape (N,).
-        num_points: Target number of points to sample/pad to.
-        strategy: Sampling strategy name.
-        seed: Random seed for reproducible sampling.
+        num_points: Desired number of points.
+        strategy: 'keep_all', 'random', 'deterministic', 'random_with_replacement', 'pad'.
+        seed: Random seed for reproducibility.
 
     Returns:
-        Tuple: (sampled_points, sampled_labels, sampling_metadata)
+        Tuple: (sampled_points, sampled_labels, metadata_dict)
     """
     n_pts = points.shape[0]
     metadata = {
@@ -254,7 +253,7 @@ def sample_points(
             raise PreprocessingError(
                 f"Cannot perform random sampling without replacement: "
                 f"requested {num_points} points, but point cloud has only {n_pts} points. "
-                f"Use strategy='random_with_replacement' or 'pad' instead."
+                f"Use strategy=''random_with_replacement'' or ''pad'' instead."
             )
         indices = rng.choice(n_pts, size=num_points, replace=False)
 
@@ -289,8 +288,8 @@ def sample_points(
 
     else:
         raise PreprocessingError(
-            f"Unknown sampling strategy '{strategy}'. "
-            f"Supported: 'keep_all', 'random', 'deterministic', 'random_with_replacement', 'pad'."
+            f"Unknown sampling strategy ''{strategy}''. "
+            f"Supported: ''keep_all'', ''random'', ''deterministic'', ''random_with_replacement'', ''pad''."
         )
 
     sampled_points = points[indices]
@@ -324,7 +323,7 @@ def handle_coordinates(points: np.ndarray, normalization: str = "none") -> np.nd
         processed[:, :3] = (xyz - mean) / std
 
     else:
-        raise PreprocessingError(f"Unknown coordinate normalization '{normalization}'")
+        raise PreprocessingError(f"Unknown coordinate normalization ''{normalization}''")
 
     return processed
 
@@ -350,7 +349,7 @@ def handle_intensity(points: np.ndarray, normalization: str = "none") -> np.ndar
         processed[:, 3] = (intensity - mean) / std
 
     else:
-        raise PreprocessingError(f"Unknown intensity normalization '{normalization}'")
+        raise PreprocessingError(f"Unknown intensity normalization ''{normalization}''")
 
     return processed
 
@@ -363,12 +362,7 @@ class LidarPreprocessor:
         config: Optional[Union[PreprocessingConfig, Dict[str, Any], Path, str]] = None,
         label_remapper: Optional[Any] = None,
     ):
-        """Initialize preprocessor with configuration and optional label remapper.
-
-        Args:
-            config: PreprocessingConfig object, dict, or path to YAML config.
-            label_remapper: Optional callable / SemanticLabelRemapper instance.
-        """
+        """Initialize preprocessor with configuration and optional label remapper."""
         if config is None:
             self.config = PreprocessingConfig()
         elif isinstance(config, PreprocessingConfig):
@@ -388,21 +382,11 @@ class LidarPreprocessor:
         labels: Optional[np.ndarray] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> PreprocessedSample:
-        """Run complete preprocessing pipeline on a point cloud and optional labels.
-
-        Args:
-            points: Raw point cloud array (N, 4) with dtype float32.
-            labels: Optional semantic label array (N,) with integer dtype.
-            metadata: Optional dictionary with sequence/frame identifiers.
-
-        Returns:
-            PreprocessedSample: Processed points, labels, updated metadata, and report.
-        """
+        """Run complete preprocessing pipeline on a point cloud and optional labels."""
         meta = dict(metadata) if metadata is not None else {}
         orig_count = points.shape[0]
         orig_dtype = str(points.dtype)
 
-        # Initial alignment validation if labels provided
         if labels is not None:
             validate_point_label_alignment(points, labels)
 
@@ -418,8 +402,8 @@ class LidarPreprocessor:
 
         # Stage 2: Spatial Range Filter
         num_range_filtered = 0
-        if self.config.range_filter.enabled:
-            rf = self.config.range_filter
+        rf = self.config.range_filter
+        if rf.enabled:
             cur_points, cur_labels, num_range_filtered = apply_range_filter(
                 cur_points,
                 cur_labels,
@@ -467,16 +451,6 @@ class LidarPreprocessor:
         final_count = cur_points.shape[0]
         final_label_count = cur_labels.shape[0] if cur_labels is not None else None
 
-        # Assemble rich metadata
-        meta.update({
-            "original_point_count": orig_count,
-            "invalid_points_removed": num_invalid,
-            "range_filtered_points": num_range_filtered,
-            "final_point_count": final_count,
-            "sampling_strategy": samp.strategy,
-            "sampling_seed": samp.seed,
-        })
-
         report = ProcessingReport(
             sequence=meta.get("sequence"),
             frame=meta.get("frame"),
@@ -500,3 +474,15 @@ class LidarPreprocessor:
             metadata=meta,
             report=report,
         )
+
+
+def preprocess_point_cloud(
+    points: np.ndarray,
+    labels: Optional[np.ndarray] = None,
+    config: Optional[Union[PreprocessingConfig, Dict[str, Any]]] = None,
+    label_remapper: Optional[Any] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> PreprocessedSample:
+    """Convenience functional interface for LidarPreprocessor."""
+    preprocessor = LidarPreprocessor(config=config, label_remapper=label_remapper)
+    return preprocessor(points=points, labels=labels, metadata=metadata)
