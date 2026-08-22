@@ -12,3 +12,15 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 *.log
+
+# Data & Cache Directories
+dataset/
+processed/
+experiments/
+checkpoints/
+*.npy
+*.bin
+*.label
+*.pt
+*.pth
+

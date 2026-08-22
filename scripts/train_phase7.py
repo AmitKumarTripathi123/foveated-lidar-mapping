@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Phase 7 Multi-Frame PointNet++ Training & Diagnostic Engine.
 
 Usage:
@@ -48,6 +48,7 @@ def main() -> int:
     parser.add_argument("--augmentation", action="store_true", help="Enable training-only 3D augmentation")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
 
+    parser.add_argument("--force-raw", action="store_true", help="Force loading raw dataset bypass cache")
     args = parser.parse_args()
 
     cfg_path = Path(args.config)
@@ -84,7 +85,19 @@ def main() -> int:
     cached_train_dir = Path(config.get("dataset", {}).get("cached_train_dir", "processed/train"))
     cached_val_dir = Path(config.get("dataset", {}).get("cached_val_dir", "processed/val"))
 
-    if cached_train_dir.is_dir() and len(list(cached_train_dir.glob("*_pts.npy"))) > 0:
+    manifest = discover_dataset(config.get("dataset", {}).get("dataset_root", "dataset"))
+    expected_train_count = len(manifest.get("train", []))
+    expected_val_count = len(manifest.get("val", []))
+
+    cached_train_files = list(cached_train_dir.glob("*_pts.npy")) if cached_train_dir.is_dir() else []
+    cached_val_files = list(cached_val_dir.glob("*_pts.npy")) if cached_val_dir.is_dir() else []
+
+    if (
+        not args.force_raw
+        and len(cached_train_files) >= expected_train_count > 0
+        and len(cached_val_files) >= expected_val_count > 0
+    ):
+        print(f"[CACHE MATCH] Loading full preprocessed dataset cache: {len(cached_train_files)} train frames, {len(cached_val_files)} val frames")
         train_dataset = FoveatedLidarDataset(
             cached_dir=cached_train_dir, target_num_points=num_points, to_tensor=True, seed=seed
         )
@@ -92,13 +105,14 @@ def main() -> int:
             cached_dir=cached_val_dir, target_num_points=num_points, to_tensor=True, seed=seed + 1000
         )
     else:
-        manifest = discover_dataset(config.get("dataset", {}).get("dataset_root", "dataset"))
+        print(f"[RAW DISCOVERY] Loading raw dataset manifest: {expected_train_count} train frames, {expected_val_count} val frames (Cache count was: train={len(cached_train_files)}, val={len(cached_val_files)})")
         train_dataset = FoveatedLidarDataset(
             raw_manifest=manifest["train"], target_num_points=num_points, to_tensor=True, seed=seed
         )
         val_dataset = FoveatedLidarDataset(
             raw_manifest=manifest["val"], target_num_points=num_points, to_tensor=True, seed=seed + 1000
         )
+
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=lidar_collate_fn)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, collate_fn=lidar_collate_fn)

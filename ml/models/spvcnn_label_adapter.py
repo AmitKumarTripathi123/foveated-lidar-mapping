@@ -1,4 +1,4 @@
-﻿"""SPVCNN Label Adapter for SIH 4-Class Semantic Ontology (Phase 12).
+"""SPVCNN Label Adapter for SIH 4-Class Semantic Ontology (Phase 12).
 
 Maps SPVCNN native class predictions (e.g. 19-class SemanticKITTI or 14-class SemanticPOSS)
 into the frozen Smart India Hackathon (SIH) 4-Class super-class ontology:
@@ -9,7 +9,8 @@ into the frozen Smart India Hackathon (SIH) 4-Class super-class ontology:
     255: ignore
 """
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import numpy as np
 import torch
 import torch.nn.functional as F

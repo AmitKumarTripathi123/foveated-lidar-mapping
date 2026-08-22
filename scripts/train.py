@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """PointNet++ Training CLI Script on Foveated LiDAR Data (Master Task).
 
 Usage:
@@ -88,7 +88,18 @@ def main() -> int:
     cached_train_dir = Path("processed/train")
     cached_val_dir = Path("processed/val")
 
-    if cached_train_dir.is_dir() and len(list(cached_train_dir.glob("*_pts.npy"))) > 0:
+    manifest = discover_dataset("dataset")
+    expected_train_count = len(manifest.get("train", []))
+    expected_val_count = len(manifest.get("val", []))
+
+    cached_train_files = list(cached_train_dir.glob("*_pts.npy")) if cached_train_dir.is_dir() else []
+    cached_val_files = list(cached_val_dir.glob("*_pts.npy")) if cached_val_dir.is_dir() else []
+
+    if (
+        len(cached_train_files) >= expected_train_count > 0
+        and len(cached_val_files) >= expected_val_count > 0
+    ):
+        print(f"[CACHE MATCH] Loading full preprocessed dataset cache: {len(cached_train_files)} train frames, {len(cached_val_files)} val frames")
         train_dataset = FoveatedLidarDataset(
             cached_dir=cached_train_dir, target_num_points=num_points, to_tensor=True, seed=seed
         )
@@ -96,13 +107,14 @@ def main() -> int:
             cached_dir=cached_val_dir, target_num_points=num_points, to_tensor=True, seed=seed + 1000
         )
     else:
-        manifest = discover_dataset("dataset")
+        print(f"[RAW DISCOVERY] Loading raw dataset manifest: {expected_train_count} train frames, {expected_val_count} val frames (Cache count was: train={len(cached_train_files)}, val={len(cached_val_files)})")
         train_dataset = FoveatedLidarDataset(
             raw_manifest=manifest["train"], target_num_points=num_points, to_tensor=True, seed=seed
         )
         val_dataset = FoveatedLidarDataset(
             raw_manifest=manifest["val"], target_num_points=num_points, to_tensor=True, seed=seed + 1000
         )
+
 
     train_loader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True, collate_fn=lidar_collate_fn
