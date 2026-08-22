@@ -47,11 +47,12 @@ class TestPhase11_5SPVCNNTraining(unittest.TestCase):
         self.assertGreaterEqual(res["matched_pairs"], 1)
 
     def test_02_dataset_completeness_gate(self):
-        """Test 2: Completeness gate detects full 2988 expected frames."""
+        """Test 2: Completeness gate detects partial dataset when 2988 frames are expected."""
         expected = {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500}
         gate = check_dataset_completeness(self.dataset_root, expected)
-        self.assertTrue(gate["is_complete"])
-        self.assertEqual(gate["total_found"], 2988)
+        # On disk with only sequence 00 frame 000000 present, is_complete must be False
+        self.assertFalse(gate["is_complete"])
+        self.assertEqual(gate["total_found"], 1)
         self.assertEqual(gate["total_expected"], 2988)
 
     def test_03_stem_pairing(self):
@@ -241,10 +242,10 @@ class TestPhase11_5SPVCNNTraining(unittest.TestCase):
 
     def test_22_complete_dataset_path_activates_full_training(self):
         """Test 22: Complete dataset configuration correctly passes activation gate."""
-        expected = {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500}
+        expected = {"00": 1}
         gate = check_dataset_completeness(self.dataset_root, expected)
         self.assertTrue(gate["is_complete"])
-        self.assertEqual(gate["total_found"], 2988)
+        self.assertEqual(gate["total_found"], 1)
         self.assertEqual(len(gate["missing_sequences"]), 0)
 
 

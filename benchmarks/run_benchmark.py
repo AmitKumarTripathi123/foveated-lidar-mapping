@@ -24,7 +24,10 @@ import torch
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from tabulate import tabulate
+try:
+    from tabulate import tabulate
+except ImportError:
+    tabulate = None
 
 # Add workspace root to sys.path
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
