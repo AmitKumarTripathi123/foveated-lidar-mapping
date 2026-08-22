@@ -1,4 +1,4 @@
-﻿"""Dataset Discovery, Manifest Builder, and Integrity Audit Generator (Master Task).
+"""Dataset Discovery, Manifest Builder, and Integrity Audit Generator (Master Task).
 
 Discovers all available sequences and scans, builds reproducible data_manifest.json,
 and generates comprehensive dataset_audit.json and dataset_audit.md.
@@ -34,11 +34,12 @@ def discover_dataset(
     seq_dir = root / "sequences" if (root / "sequences").is_dir() else root
 
     if train_sequences is None:
-        train_sequences = ["00"]
+        train_sequences = ["00", "01", "03", "04", "05"]
     if val_sequences is None:
-        val_sequences = ["00"]
+        val_sequences = ["02"] if (seq_dir / "02").is_dir() else ["00"]
     if test_sequences is None:
         test_sequences = []
+
 
     train_set = {str(s).zfill(2) for s in train_sequences}
     val_set = {str(s).zfill(2) for s in val_sequences}

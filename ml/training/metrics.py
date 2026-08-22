@@ -1,4 +1,4 @@
-﻿"""Evaluation Metrics and 4x4 Confusion Matrix Engine (Phase 5).
+"""Evaluation Metrics and 4x4 Confusion Matrix Engine (Phase 5).
 
 Computes:
   - Per-class Intersection over Union (IoU)
@@ -199,7 +199,9 @@ def format_metric_report(report: MetricReport) -> str:
     # 2. 4x4 Confusion Matrix
     lines.append("\n2. 4x4 Confusion Matrix (Rows = Ground Truth, Cols = Predicted):")
     lines.append("  " + "-" * 62)
-    header = f"  {'GT \\ Pred':<12} | " + " | ".join(f"{f'C{c}':>8}" for c in range(report.num_classes))
+    gt_pred_label = "GT \\ Pred"
+    header = f"  {gt_pred_label:<12} | " + " | ".join(f"C{c:>7}" for c in range(report.num_classes))
+
     lines.append(header)
     lines.append("  " + "-" * 62)
     for r in range(report.num_classes):
