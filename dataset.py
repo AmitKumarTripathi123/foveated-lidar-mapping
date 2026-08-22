@@ -96,10 +96,24 @@ class FoveatedLidarDataset(Dataset):
 
     def _range_aware_downsample(self, points, labels, r):
         """
-        Fast distance-aware multi-band voxel downsampling.
-        Calculates 3D voxel grid coordinates per distance band and retains
-        the first point in each voxel to keep 1:1 spatial & label alignment.
+        Fast distance-aware multi-band voxel downsampling with
+        Obstacle-Preserving Voxel Aggregation.
+        
+        Priority hierarchy within each voxel:
+          1. dynamic_object (3) -> highest priority (pedestrians, cars, riders)
+          2. static_obstacle (2) -> second priority (poles, fences, signs, curbs)
+          3. non_drivable_terrain (1) -> third priority
+          4. drivable_terrain (0) -> fourth priority
+          5. IGNORE_LABEL (255) -> lowest priority
         """
+        # Priority mapping table indexed by label ID (0..255)
+        priority_map = np.zeros(256, dtype=np.int32)
+        priority_map[3] = 4    # dynamic_object
+        priority_map[2] = 3    # static_obstacle
+        priority_map[1] = 2    # non_drivable_terrain
+        priority_map[0] = 1    # drivable_terrain
+        priority_map[255] = 0  # IGNORE_LABEL
+
         out_pts, out_lbl = [], []
         for lo, hi, voxel_size in RANGE_BANDS:
             band_mask = (r >= lo) & (r < hi)
@@ -108,16 +122,25 @@ class FoveatedLidarDataset(Dataset):
             band_points = points[band_mask]
             band_labels = labels[band_mask]
 
+            # Priority-based sorting so obstacle points take precedence inside each voxel
+            safe_labels = np.clip(band_labels, 0, 255)
+            point_priorities = priority_map[safe_labels]
+            sort_idx = np.argsort(-point_priorities)
+
+            sorted_points = band_points[sort_idx]
+            sorted_labels = band_labels[sort_idx]
+
             # Quantize 3D coordinates into integer voxel indices
-            voxel_coords = np.floor(band_points[:, :3] / voxel_size).astype(np.int64)
+            voxel_coords = np.floor(sorted_points[:, :3] / voxel_size).astype(np.int64)
             _, keep_idx = np.unique(voxel_coords, axis=0, return_index=True)
 
-            out_pts.append(band_points[keep_idx])
-            out_lbl.append(band_labels[keep_idx])
+            out_pts.append(sorted_points[keep_idx])
+            out_lbl.append(sorted_labels[keep_idx])
 
         if not out_pts:
             return points, labels
         return np.concatenate(out_pts, axis=0), np.concatenate(out_lbl, axis=0)
+
 
     def _augment(self, points, labels):
         # Trigonometric random 2D yaw rotation around Z-axis
