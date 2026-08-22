@@ -5,6 +5,7 @@ and generates comprehensive dataset_audit.json and dataset_audit.md.
 """
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
@@ -70,11 +71,15 @@ def discover_dataset(
             l_file = label_dir / f"{frame_stem}.label"
             has_label = l_file.is_file()
 
+            # Store portable relative POSIX paths
+            rel_b = b_file.as_posix()
+            rel_l = l_file.as_posix() if has_label else None
+
             record = {
                 "sequence": seq_id,
                 "frame": frame_stem,
-                "point_path": str(b_file.resolve()),
-                "label_path": str(l_file.resolve()) if has_label else None,
+                "point_path": rel_b,
+                "label_path": rel_l,
                 "has_label": has_label,
             }
 
