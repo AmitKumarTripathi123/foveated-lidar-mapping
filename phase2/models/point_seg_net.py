@@ -38,6 +38,7 @@ class FoveatedPointSegNet(nn.Module):
         self.in_channels = in_channels
         self.num_classes = num_classes
 
+        # Input projection takes [x_norm, y_norm, z_norm, intensity, r_norm] (5 features)
         self.input_proj = nn.Sequential(
             nn.Linear(in_channels + 1, embed_dim),
             nn.LayerNorm(embed_dim),
@@ -85,8 +86,14 @@ class FoveatedPointSegNet(nn.Module):
             if N == 0:
                 return torch.empty((0, self.num_classes), device=points.device, dtype=points.dtype)
 
-            r = torch.sqrt(pts[:, 0:1]**2 + pts[:, 1:2]**2)
-            feat = torch.cat([pts, r], dim=-1)
+            # Feature normalization for robust multi-scale perception
+            x_norm = pts[:, 0:1] / 50.0
+            y_norm = pts[:, 1:2] / 50.0
+            z_norm = pts[:, 2:3] / 3.0
+            i_norm = pts[:, 3:4]
+            r = torch.sqrt(pts[:, 0:1]**2 + pts[:, 1:2]**2) / 50.0
+
+            feat = torch.cat([x_norm, y_norm, z_norm, i_norm, r], dim=-1)
 
             f0 = self.input_proj(feat)
             f1 = self.enc1(f0)

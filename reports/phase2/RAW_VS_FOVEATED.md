@@ -7,19 +7,19 @@
 | Evaluation Metric        | Raw LiDAR (No Foveation)   | Foveated LiDAR (0.05/0.15/0.50m)   | Delta / Gain   |
 |--------------------------|----------------------------|------------------------------------|----------------|
 | Point Count / Frame      | 40,000                     | 32,377                             | -19.1%         |
-| Inference Latency        | 231.71 ms                  | 202.91 ms                          | 12.4% speedup  |
-| Throughput (FPS)         | 4.3 FPS                    | 4.9 FPS                            | +15.2%         |
-| Mean IoU (mIoU)          | 27.98%                     | 27.57%                             | -0.41%         |
-| Drivable Terrain IoU     | 0.00%                      | 0.00%                              | +0.00%         |
-| Non-Drivable Terrain IoU | 42.71%                     | 40.38%                             | -2.33%         |
-| Static Obstacle IoU      | 69.20%                     | 69.88%                             | +0.68%         |
-| Dynamic Object IoU       | 0.00%                      | 0.00%                              | +0.00%         |
-| Overall Accuracy         | 61.66%                     | 64.34%                             | +2.68%         |
+| Inference Latency        | 225.81 ms                  | 211.95 ms                          | 6.1% speedup   |
+| Throughput (FPS)         | 4.4 FPS                    | 4.7 FPS                            | +15.2%         |
+| Mean IoU (mIoU)          | 50.39%                     | 52.69%                             | +2.30%         |
+| Drivable Terrain IoU     | 19.43%                     | 27.81%                             | +8.38%         |
+| Non-Drivable Terrain IoU | 54.84%                     | 56.16%                             | +1.32%         |
+| Static Obstacle IoU      | 88.03%                     | 87.82%                             | -0.21%         |
+| Dynamic Object IoU       | 39.25%                     | 38.95%                             | -0.30%         |
+| Overall Accuracy         | 74.29%                     | 78.65%                             | +4.36%         |
 
 ## 2. Distance-Band Semantic Performance (Foveated Model)
 
 | Distance Band | Band mIoU | Drivable IoU | Non-Drivable IoU | Static Obstacle IoU | Dynamic Object IoU | Points Retained |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Near (0–10m @ 0.05m)** | **23.18%** | 0.00% | 39.46% | 53.25% | 0.00% | 1,934 |
-| **Mid (10–40m @ 0.15m)** | **27.92%** | 0.00% | 43.93% | 67.74% | 0.00% | 13,816 |
-| **Far (40–100m @ 0.50m)** | **26.91%** | 0.00% | 36.36% | 71.30% | 0.00% | 16,240 |
+| **Near (0–10m @ 0.05m)** | **55.07%** | 58.36% | 13.84% | 67.77% | 80.30% | 1,934 |
+| **Mid (10–40m @ 0.15m)** | **48.04%** | 25.56% | 51.61% | 77.18% | 37.82% | 13,816 |
+| **Far (40–100m @ 0.50m)** | **45.95%** | 0.00% | 67.35% | 94.12% | 22.31% | 16,240 |

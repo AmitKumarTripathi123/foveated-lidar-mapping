@@ -1,19 +1,19 @@
 # Phase 1 -> Phase 2 Interface Contract Validation
 
-## 1. Frozen Interface Specifications
+## 1. Frozen Interface Contract Specifications
 
-### Phase 1 Output Contract: `PointCloudFrame`
+### Phase 1 Output: `PointCloudFrame`
 - `points`: `np.ndarray` of shape `(N, 4)`, dtype `float32` representing `(x, y, z, intensity)`
-- `labels`: `np.ndarray` of shape `(N,)`, dtype `uint32` (or `int64`) with values in `{0, 1, 2, 3, 255}`
+- `labels`: `np.ndarray` of shape `(N,)`, dtype `uint32` (or `int64`) in `{0, 1, 2, 3, 255}`
 - `frame_id`: `str`
 - `timestamp`: `float`
 - `sequence_id`: `str`
 - **Coordinate System**: $+X = 	ext{forward}$, $+Y = 	ext{left}$, $+Z = 	ext{upward}$ (Right-handed, ISO 8855)
 - **Units**: Meters for XYZ, normalized $[0, 1]$ float32 for Intensity.
 
-### Phase 2 Output Contract: `SemanticPrediction`
+### Phase 2 Output: `SemanticPrediction`
 - `points`: `np.ndarray` of shape `(N, 4)`, dtype `float32`
-- `predicted_class`: `np.ndarray` of shape `(N,)`, dtype `int64` with values in `{0, 1, 2, 3}`
+- `predicted_class`: `np.ndarray` of shape `(N,)`, dtype `int64` in `{0, 1, 2, 3}`
 - `class_probabilities`: `np.ndarray` of shape `(N, 4)`, dtype `float32` in range $[0, 1]$ summing to $1.0$
 - `confidence`: `np.ndarray` of shape `(N,)`, dtype `float32` where $	ext{confidence}[i] = \max(P[i])$
 - `frame_id`: `str`
@@ -21,7 +21,7 @@
 
 ---
 
-## 2. Contract Compliance Verification
+## 2. Contract Compliance Matrix
 
 | Contract Property | Phase 1 Output | Phase 2 Input | Phase 2 Output | Compliance Status |
 | :--- | :--- | :--- | :--- | :--- |

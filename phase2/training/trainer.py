@@ -23,7 +23,7 @@ class Phase2Trainer:
         model: Optional[FoveatedPointSegNet] = None,
         train_dataset: Optional[Phase2Dataset] = None,
         val_dataset: Optional[Phase2Dataset] = None,
-        lr: float = 1e-3,
+        lr: float = 3e-3,
         weight_decay: float = 1e-4,
         class_weights: Optional[torch.Tensor] = None,
         device: Optional[str] = "cpu",
@@ -45,11 +45,12 @@ class Phase2Trainer:
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-        if class_weights is not None:
-            cw = class_weights.to(self.device)
-            self.criterion = nn.CrossEntropyLoss(weight=cw, ignore_index=SuperClass.IGNORE_LABEL)
-        else:
-            self.criterion = nn.CrossEntropyLoss(ignore_index=SuperClass.IGNORE_LABEL)
+        if class_weights is None:
+            # Default balanced weights: 0: drivable (2.5), 1: non-drivable (1.5), 2: static (0.8), 3: dynamic (4.0)
+            class_weights = torch.tensor([2.5, 1.5, 0.8, 4.0], dtype=torch.float32)
+
+        cw = class_weights.to(self.device)
+        self.criterion = nn.CrossEntropyLoss(weight=cw, ignore_index=SuperClass.IGNORE_LABEL)
 
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=lr, weight_decay=weight_decay)
         self.evaluator = Phase2SemanticEvaluator()
@@ -116,7 +117,7 @@ class Phase2Trainer:
         eval_res["val_loss"] = total_loss / max(total_points, 1)
         return eval_res
 
-    def fit(self, epochs: int = 15, batch_size: int = 1) -> Dict[str, Any]:
+    def fit(self, epochs: int = 25, batch_size: int = 1) -> Dict[str, Any]:
         train_loader = DataLoader(self.train_dataset, batch_size=batch_size, shuffle=True)
         val_loader = DataLoader(self.val_dataset, batch_size=batch_size, shuffle=False) if self.val_dataset else None
 
