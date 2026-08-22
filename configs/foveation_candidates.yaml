@@ -1,0 +1,72 @@
+version: 1.0.0
+max_range: 100.0
+policies:
+- nearest
+- centroid
+- majority
+- confidence_weighted
+- obstacle_preserving
+configurations:
+  baseline_no_foveation:
+    type: no_foveation
+    description: 'Baseline A: Raw range-filtered point cloud without voxelization'
+  baseline_uniform_005:
+    type: uniform
+    voxel_size: 0.05
+    description: 'Baseline B1: Uniform voxelization @ 0.05m'
+  baseline_uniform_015:
+    type: uniform
+    voxel_size: 0.15
+    description: 'Baseline B2: Uniform voxelization @ 0.15m'
+  baseline_uniform_050:
+    type: uniform
+    voxel_size: 0.5
+    description: 'Baseline B3: Uniform voxelization @ 0.50m'
+  config_A:
+    type: foveated
+    description: 'Candidate A: Initial config (0.05 / 0.15 / 0.50)'
+    bands:
+    - name: near_field
+      min_range: 0.0
+      max_range: 10.0
+      voxel_size: 0.05
+    - name: mid_field
+      min_range: 10.0
+      max_range: 40.0
+      voxel_size: 0.15
+    - name: far_field
+      min_range: 40.0
+      max_range: 100.0
+      voxel_size: 0.5
+  config_B:
+    type: foveated
+    description: 'Candidate B: Balanced config (0.10 / 0.20 / 0.50)'
+    bands:
+    - name: near_field
+      min_range: 0.0
+      max_range: 10.0
+      voxel_size: 0.1
+    - name: mid_field
+      min_range: 10.0
+      max_range: 40.0
+      voxel_size: 0.2
+    - name: far_field
+      min_range: 40.0
+      max_range: 100.0
+      voxel_size: 0.5
+  config_C:
+    type: foveated
+    description: 'Candidate C: Aggressive far-field reduction (0.05 / 0.20 / 0.75)'
+    bands:
+    - name: near_field
+      min_range: 0.0
+      max_range: 10.0
+      voxel_size: 0.05
+    - name: mid_field
+      min_range: 10.0
+      max_range: 40.0
+      voxel_size: 0.2
+    - name: far_field
+      min_range: 40.0
+      max_range: 100.0
+      voxel_size: 0.75

@@ -1,42 +1,14 @@
-# Python & Virtual Environment
+# Virtual Environment
 .venv/
-venv/
-ENV/
 env/
+venv/
+
+# Python Cache
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*.so
 
-# Operating System & IDE Files
+# Testing & OS
+.pytest_cache/
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-.vscode/
-.idea/
-
-# Dataset & Processed Output Directories (Large LiDAR Binary Data)
-dataset/
-processed/
-
-# Data File Extensions
-*.bin
-*.label
-*.npy
-*.npz
-*.pcd
-*.ply
-*.avi
-*.mp4
-
-# Model Checkpoints & Logs
-*.pt
-*.pth
-*.onnx
 *.log
-runs/
-wandb/

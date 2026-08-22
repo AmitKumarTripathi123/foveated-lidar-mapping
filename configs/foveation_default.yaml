@@ -1,0 +1,24 @@
+# Default Foveated LiDAR Configuration
+version: '1.0.0'
+max_range: 100.0
+coordinate_convention:
+  forward: '+X'
+  left: '+Y'
+  up: '+Z'
+
+bands:
+  - name: 'near_field'
+    min_range: 0.0
+    max_range: 10.0
+    voxel_size: 0.05
+  - name: 'mid_field'
+    min_range: 10.0
+    max_range: 40.0
+    voxel_size: 0.15
+  - name: 'far_field'
+    min_range: 40.0
+    max_range: 100.0
+    voxel_size: 0.50
+
+default_aggregation_policy: 'obstacle_preserving'
+elevation_grid_resolution: 0.20

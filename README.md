@@ -1,104 +1,83 @@
-# Foveated 2.5D LiDAR Mapping for Autonomous Navigation
+# Foveated 2.5D LiDAR Mapping & Semantic Segmentation for Autonomous Navigation
 
-[![Tests](https://img.shields.io/badge/Tests-96%20Passed-brightgreen)](tests/)
-[![Architecture](https://img.shields.io/badge/Model-PointNet%2B%2B-blue)](ml/models/)
-[![Ontology](https://img.shields.io/badge/Ontology-SIH%204--Class-orange)](ml/data/)
-
-A complete autonomous vehicle perception system integrating **3-Zone Distance-Aware Foveated Voxel Downsampling** with a **PointNet++ 3D Semantic Segmentation** neural network to generate high-resolution, low-latency 2.5D elevation and semantic occupancy grids.
+**Project**: Smart India Hackathon  
+**Target System**: Real-time Distance-Aware (Foveated) 3D LiDAR Data Pipeline & Semantic Segmentation  
+**Sensor Configuration**: Hesai Pandar40 (40-beam LiDAR), 10 Hz, 100m Range Filtering  
 
 ---
 
-## 1. Overview & Architecture
+## Overview
+
+This repository implements an end-to-end LiDAR perception pipeline for autonomous navigation, featuring:
+1. **Distance-Adaptive 3D Voxel Foveation**:
+   - **Near-Field (0–10m)**: 0.05m (5 cm) voxel resolution
+   - **Mid-Field (10–40m)**: 0.15m (15 cm) voxel resolution
+   - **Far-Field (40–100m)**: 0.50m (50 cm) voxel resolution
+2. **Authoritative 4-Super-Class Semantic Segmentation**:
+   - `0 = drivable_terrain` (Asphalt, road surfaces)
+   - `1 = non_drivable_terrain` (Sidewalks, curbs, off-road terrain)
+   - `2 = static_obstacle` (Buildings, poles, fences, vegetation, trees)
+   - `3 = dynamic_object` (Pedestrians, cars, riders, bicycles, trucks)
+   - `255 = IGNORE_LABEL` (Outliers, unlabeled points)
+3. **`FoveatedPointSegNet` AI Model**:
+   - Lightweight neural point segmentation model (~450k parameters)
+   - Distance-conditioned embedding & multi-scale residual spatial feature extraction
+   - Generates per-point class probabilities, predicted class, and confidence scores
+4. **Interface Contract for Phase 3 2.5D Mapping**:
+   - Standardized `SemanticPrediction` dataclass for seamless costmap integration.
+
+---
+
+## Directory Structure
 
 ```text
-RAW LiDAR (.bin) ──> Preprocessing ──> Amit's Foveated Voxelizer ──> SIH 4-Class Remapper
-                                                                            │
-                                                                            ▼
-Amit's Frozen Contract <── PointNet2Predictor <── PointNet++ <── PyTorch Dataset
-[x,y,z, class, conf]
-```
-
-### 3-Zone Foveated Voxelization
-Foveated processing applies **distance-adaptive multi-resolution 3D voxel downsampling**:
-- **Near-Field ($0\text{m} - 10\text{m}$)**: $0.05\text{ m}$ ($5\text{ cm}$) voxel size — High resolution for immediate ego-vehicle surroundings.
-- **Mid-Field ($10\text{m} - 40\text{m}$)**: $0.15\text{ m}$ ($15\text{ cm}$) voxel size — Mid-range detail tradeoff.
-- **Far-Field ($40\text{m} - 100\text{m}$)**: $0.50\text{ m}$ ($50\text{ cm}$) voxel size — Sparse retention for far targets.
-
-### Obstacle-Preserving Voxel Aggregation
-Points inside each voxel cell are aggregated according to a strict priority hierarchy so obstacles are never swallowed by ground/ignored points during downsampling:
-$$\text{Priority}: \quad \text{dynamic\_object (3)} > \text{static\_obstacle (2)} > \text{non\_drivable (1)} > \text{drivable (0)} > \text{IGNORE (255)}$$
-
----
-
-## 2. Phase-2 Label Mapping Scheme
-
-Raw SemanticPOSS 32-bit labels (`0` through `22`) map to **4 project super-classes**:
-
-| ID | Class Name | Raw SemanticPOSS Sources | Description |
-| :---: | :--- | :--- | :--- |
-| `0` | `drivable_terrain` | Drivable (`21`) | Navigable road surfaces |
-| `1` | `non_drivable_terrain` | Sidewalks (`19, 20`) | Non-drivable terrain / curbs |
-| `2` | `static_obstacle` | Trunk (`8`), Plants (`9`), Signs (`10-12, 18`), Pole (`13`), Trashcan (`14`), Building (`15`), Fence (`17`) | Fixed environmental structures |
-| `3` | `dynamic_object` | Pedestrians (`4, 5`), Rider (`6`), Car (`7`) | Dynamic / moving agents |
-| `255` | `IGNORE_LABEL` | Unlabeled (`0, 1`), Ground (`22`) | Excluded from loss & evaluation |
-
----
-
-## 3. Data Interface & Output Contract
-
-Each frame returns:
-- **`points`**: Tensor of shape `(N, 4)` of type `float32` representing `(x, y, z, intensity)`
-- **`labels`**: Tensor of shape `(N,)` of type `int64` representing `class_id`
-
----
-
-## 4. Codebase Structure
-
-```
-3d lidar foveated mapping/
-├── class_map.py          # Label remapping, color definitions, and loss weight calculations
-├── dataset.py            # PyTorch FoveatedLidarDataset, obstacle priority, & DataLoader factory
-├── preprocess.py         # Multi-sequence preprocessing & .npy dataset caching tool
-├── verify_pipeline.py    # Pipeline verification, priority test suite, & DataLoader tests
-├── ml/                   # PointNet++ model architecture, trainer, and predictor
-├── configs/              # YAML configurations (dataset, model, training, label mapping)
-├── scripts/              # Training, evaluation, and experiment comparison CLI tools
-├── experiments/          # Model checkpoints (best_checkpoint.pt), metrics, and training logs
-├── docs/                 # Architectural documentation and team contracts
-└── tests/                # Unit test suite (96 tests passed)
+3D Lidar/
+├── configs/
+│   ├── foveation_default.yaml     # Foveation bands & voxel resolutions
+│   ├── phase2.yaml                # AI model & training hyperparameters
+│   └── semanticposs_mapping.yaml  # SemanticPOSS raw -> super-class mapping
+├── data/
+│   └── semanticposs_sequence/     # 40-beam SemanticPOSS sequence scans
+├── phase2/
+│   ├── dataset.py                 # PyTorch Phase2Dataset adapter (sequence-split)
+│   ├── models/
+│   │   └── point_seg_net.py       # FoveatedPointSegNet architecture
+│   ├── training/
+│   │   └── trainer.py             # Model training with class-weighted loss
+│   ├── inference/
+│   │   └── predictor.py           # Phase2Predictor & SemanticPrediction interface
+│   └── metrics/
+│       └── semantic_evaluator.py  # mIoU, confusion matrix, & calibration evaluator
+├── reports/
+│   ├── phase1/                    # Phase 1 verification & benchmarks
+│   ├── terrain/                   # SemanticPOSS terrain validation & review tables
+│   └── phase2/                    # Phase 2 audit, training, & comparison reports
+├── src/                           # Phase 1 LiDAR data foundation & foveation engine
+├── tests/                         # Full unit & regression test suite (52 tests)
+├── checkpoints/
+│   └── best_model.pth             # Trained AI model weights
+├── run_phase1_pipeline.py         # Phase 1 end-to-end runner
+└── run_phase2_pipeline.py         # Phase 2 end-to-end runner
 ```
 
 ---
 
-## 5. Quickstart & CLI Commands
+## Quick Start
 
+### 1. Setup Environment
 ```bash
-# 1. Verify Foveated Pipeline & Obstacle Priority Test
-OMP_NUM_THREADS=1 python3 verify_pipeline.py
-
-# 2. Discover dataset & generate integrity audit
-python scripts/generate_manifest.py
-
-# 3. Preprocess & cache 3-zone foveated point clouds
-python scripts/preprocess_foveated.py
-
-# 4. Train PointNet++ Baseline (Experiment A)
-python scripts/train.py --experiment baseline_ce --epochs 10 --num-points 1024
-
-# 5. Train Class-Weighted Model (Experiment B)
-python scripts/train.py --experiment weighted_ce --epochs 10 --num-points 1024 --weighted-loss
-
-# 6. Compare Experiments & Evaluate Checkpoint
-python scripts/evaluate.py --checkpoint experiments/baseline_ce/best_checkpoint.pt
-
-# 7. Run Full Test Suite
-python -m unittest discover -s tests -p "test_*.py" -v
+python3 -m venv .venv
+source .venv/bin/activate
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install pyyaml numpy scipy pandas matplotlib tabulate
 ```
 
----
+### 2. Run Test Suite
+```bash
+python3 -m unittest discover -s tests -p "test_*.py" -v
+```
 
-## 6. Project Documentation
-
-* [`docs/INTEGRATION_PLAN.md`](docs/INTEGRATION_PLAN.md): Architecture blueprint and module ownership.
-* [`docs/TEAM_CONTRACT.md`](docs/TEAM_CONTRACT.md): Domain boundaries and data contracts.
-* [`docs/PHASE_5_FINAL_REPORT.md`](docs/PHASE_5_FINAL_REPORT.md): Full experimental validation and benchmark results.
+### 3. Run End-to-End Pipeline
+```bash
+python3 run_phase2_pipeline.py
+```

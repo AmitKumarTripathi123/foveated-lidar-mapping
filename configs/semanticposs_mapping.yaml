@@ -1,0 +1,31 @@
+dataset: SemanticPOSS
+version: '1.0'
+mapping_complete: false
+warning: 'WARNING: non_drivable_terrain mapping is undefined/incomplete. Human confirmation
+  required.'
+super_class_definitions:
+  0: drivable_terrain
+  1: non_drivable_terrain
+  2: static_obstacle
+  3: dynamic_object
+  255: ignore
+mapping:
+  0: 255
+  4: 3
+  5: 3
+  6: 3
+  7: 3
+  8: 3
+  9: 2
+  10: 2
+  11: 2
+  13: 2
+  14: 2
+  15: 2
+  16: 2
+  17: 2
+  18: 2
+  19: 1
+  20: 255
+  21: 0
+  22: 255
