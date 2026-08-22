@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "pybind11>=2.10.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "foveated_lidar_mapping"
+version = "1.0.0"
+description = "High-Performance Foveated 2.5D LiDAR Mapping Pipeline with SPVCNN and C++ Grid Engine"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy",
+    "torch",
+    "pandas",
+    "matplotlib",
+    "pybind11"
+]

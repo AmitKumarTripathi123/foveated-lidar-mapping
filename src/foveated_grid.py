@@ -19,6 +19,12 @@ from typing import Dict, List, Optional, Tuple, Any, Union
 import numpy as np
 import pandas as pd
 
+try:
+    import foveated_grid_cpp
+    HAS_CPP_GRID = True
+except ImportError:
+    HAS_CPP_GRID = False
+
 from src.types import (
     SuperClass,
     PointCloudFrame,
@@ -190,6 +196,9 @@ class GridMap25D:
 
         self._cells_dict: Optional[Dict[Tuple[str, int, int], GridCell25D]] = None
         self._custom_cells: Dict[Tuple[str, int, int], GridCell25D] = {}
+
+    def __len__(self) -> int:
+        return len(self._ix) + len(self._custom_cells)
 
     def _populate_cells_dict(self):
         if self._cells_dict is None:
@@ -369,8 +378,8 @@ class GridMap25D:
 
 class FoveatedGrid25D:
     """
-    Optimized Phase-4 Foveated 2.5D Grid Builder.
-    Leverages 64-bit 1D spatial coordinate hashing and vectorized C-level NumPy reductions:
+    Optimized Phase-4 & Phase-6 Foveated 2.5D Grid Builder.
+    Supports high-speed pure C++ pybind11 execution with transparent Python fallback:
       1. Elevation aggregation: mean(z), min(z), max(z)
       2. Deterministic obstacle-preserving semantic priority aggregation:
          dynamic_object (3) > static_obstacle (2) > non_drivable (1) > drivable (0) > ignore (255)
@@ -379,10 +388,13 @@ class FoveatedGrid25D:
     def __init__(
         self,
         bands: Optional[List[FoveationBand]] = None,
-        max_range: float = 100.0
+        max_range: float = 100.0,
+        use_cpp: bool = True
     ):
         self.bands = list(bands) if bands is not None else list(DEFAULT_FROZEN_BANDS)
         self.max_range = float(max_range)
+        self.use_cpp = use_cpp and HAS_CPP_GRID
+        self._cpp_engine = foveated_grid_cpp.FoveatedGridEngine() if HAS_CPP_GRID else None
 
     def build_grid(
         self,
@@ -405,6 +417,36 @@ class FoveatedGrid25D:
                 frame_id=frame_id,
                 timestamp=timestamp,
                 sequence_id=sequence_id
+            )
+
+        if self.use_cpp and self._cpp_engine is not None:
+            lbls_in = labels.astype(np.int64) if labels is not None else None
+            confs_in = confidences.astype(np.float32) if confidences is not None else None
+            pts_in = points.astype(np.float32)
+            res_dict = self._cpp_engine.build_grid_numpy(pts_in, lbls_in, confs_in)
+            if res_dict["num_cells"] == 0:
+                return GridMap25D(
+                    bands=self.bands,
+                    frame_id=frame_id,
+                    timestamp=timestamp,
+                    sequence_id=sequence_id
+                )
+            return GridMap25D(
+                bands=self.bands,
+                frame_id=frame_id,
+                timestamp=timestamp,
+                sequence_id=sequence_id,
+                bands_arr=np.array(res_dict["bands"], dtype=object),
+                ix_arr=res_dict["ix"],
+                iy_arr=res_dict["iy"],
+                res_arr=res_dict["resolution"],
+                counts_arr=res_dict["point_count"],
+                mean_z_arr=res_dict["elevation_mean"],
+                min_z_arr=res_dict["elevation_min"],
+                max_z_arr=res_dict["elevation_max"],
+                classes_arr=res_dict["semantic_class"],
+                conf_arr=res_dict["confidence"],
+                trav_arr=res_dict["traversability"]
             )
 
         N = len(points)
