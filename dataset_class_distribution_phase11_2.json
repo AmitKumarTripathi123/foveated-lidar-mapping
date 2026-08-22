@@ -1,0 +1,16 @@
+﻿{
+  "total_points": 66658,
+  "dataset_type": "SemanticPOSS",
+  "supervised_points": 65500,
+  "ignored_points": 1158,
+  "class_distribution": {
+    "0": {"name": "drivable_terrain", "count": 23000, "percentage": 34.50},
+    "1": {"name": "non_drivable_terrain", "count": 8000, "percentage": 12.00},
+    "2": {"name": "static_obstacle", "count": 28500, "percentage": 42.76},
+    "3": {"name": "dynamic_object", "count": 6000, "percentage": 9.00},
+    "255": {"name": "ignore", "count": 1158, "percentage": 1.74}
+  },
+  "imbalance_ratio": 4.75,
+  "majority_class": "static_obstacle",
+  "minority_class": "dynamic_object"
+}
