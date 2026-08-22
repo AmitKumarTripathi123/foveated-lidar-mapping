@@ -4,6 +4,7 @@ Verifies compilation, execution, golden comparison, and edge-case behavior.
 """
 
 import subprocess
+import sys
 import unittest
 from pathlib import Path
 import pandas as pd
@@ -13,6 +14,7 @@ repo_root = Path(__file__).resolve().parent.parent
 from tests.compare_outputs import compare_grids
 
 
+@unittest.skipIf(sys.platform == "win32", "C++ Linux ELF binary execution requires Linux/POSIX environment")
 class TestCPPGridIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
