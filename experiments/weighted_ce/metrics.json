@@ -1,0 +1,61 @@
+{
+  "experiment_name": "weighted_ce",
+  "best_epoch": 1,
+  "best_val_miou": 0.02847782258064516,
+  "total_epochs": 10,
+  "total_time_seconds": 3.8893463611602783,
+  "config": {
+    "experiment": {
+      "name": "weighted_ce",
+      "seed": 42,
+      "device": "auto"
+    },
+    "dataset": {
+      "root": "dataset",
+      "num_points": 1024,
+      "seed": 42
+    },
+    "training": {
+      "epochs": 10,
+      "batch_size": 1,
+      "learning_rate": 0.005,
+      "weight_decay": 0.0001,
+      "optimizer": "adam",
+      "scheduler": "cosine"
+    },
+    "loss": {
+      "type": "weighted_cross_entropy",
+      "ignore_index": 255,
+      "weighting_strategy": "inverse_frequency"
+    },
+    "augmentation": {
+      "enabled": false,
+      "rotation_range": [
+        -15.0,
+        15.0
+      ],
+      "scale_range": [
+        0.95,
+        1.05
+      ],
+      "jitter_std": 0.01
+    },
+    "checkpoint": {
+      "monitor": "val_miou",
+      "mode": "max",
+      "save_last": true
+    }
+  },
+  "final_epoch_record": {
+    "epoch": 10,
+    "train_loss": 0.872173011302948,
+    "val_loss": 1.3816972970962524,
+    "val_miou": 0.02847782258064516,
+    "val_accuracy": 0.11391129032258064,
+    "iou_drivable": 0.0,
+    "iou_non_drivable": 0.11391129032258064,
+    "iou_static": 0.0,
+    "iou_dynamic": 0.0,
+    "learning_rate": 0.00012333423752026375
+  }
+}

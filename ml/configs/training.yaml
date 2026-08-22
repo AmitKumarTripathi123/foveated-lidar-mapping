@@ -1,0 +1,36 @@
+﻿# PointNet++ Supervised Training Configuration (Phase 5)
+# Project: Foveated 2.5D LiDAR Mapping for Autonomous Navigation
+
+experiment:
+  name: "baseline_ce"
+  seed: 42
+  device: "auto"              # "auto", "cuda", or "cpu"
+
+dataset:
+  root: "dataset"
+  num_points: 1024            # Number of points per scan for training/validation
+  seed: 42
+
+training:
+  epochs: 15
+  batch_size: 1
+  learning_rate: 0.005
+  weight_decay: 0.0001
+  optimizer: "adam"           # "adam" or "sgd"
+  scheduler: "cosine"         # "cosine", "step", or "none"
+
+loss:
+  type: "cross_entropy"       # "cross_entropy" or "weighted_cross_entropy"
+  ignore_index: 255
+  weighting_strategy: "inverse_frequency" # "inverse_frequency", "median_frequency", "sqrt_inverse"
+
+augmentation:
+  enabled: false
+  rotation_range: [-15.0, 15.0]
+  scale_range: [0.95, 1.05]
+  jitter_std: 0.01
+
+checkpoint:
+  monitor: "val_miou"
+  mode: "max"
+  save_last: true

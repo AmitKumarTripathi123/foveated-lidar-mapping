@@ -1,0 +1,22 @@
+{
+  "train": [
+    {
+      "sequence": "00",
+      "frame": "000000",
+      "point_path": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\dataset\\sequences\\00\\velodyne\\000000.bin",
+      "label_path": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\dataset\\sequences\\00\\labels\\000000.label",
+      "has_label": true
+    }
+  ],
+  "val": [
+    {
+      "sequence": "00",
+      "frame": "000000",
+      "point_path": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\dataset\\sequences\\00\\velodyne\\000000.bin",
+      "label_path": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\dataset\\sequences\\00\\labels\\000000.label",
+      "has_label": true
+    }
+  ],
+  "test": [],
+  "unassigned": []
+}

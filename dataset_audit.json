@@ -1,0 +1,45 @@
+{
+  "total_unique_frames": 1,
+  "total_points": 66658,
+  "discovered_sequences": [
+    "00"
+  ],
+  "train_frames_count": 1,
+  "val_frames_count": 1,
+  "test_frames_count": 0,
+  "global_raw_classes": {
+    "0": 1158,
+    "10": 6000,
+    "40": 23000,
+    "48": 8000,
+    "50": 10000,
+    "51": 2000,
+    "70": 13000,
+    "71": 2000,
+    "80": 1500
+  },
+  "corrupted_count": 0,
+  "corrupted_frames": [],
+  "frame_audits": [
+    {
+      "sequence": "00",
+      "frame": "000000",
+      "point_count": 66658,
+      "label_count": 66658,
+      "aligned": true,
+      "has_nan": false,
+      "has_inf": false,
+      "raw_distribution": {
+        "0": 1158,
+        "10": 6000,
+        "40": 23000,
+        "48": 8000,
+        "50": 10000,
+        "51": 2000,
+        "70": 13000,
+        "71": 2000,
+        "80": 1500
+      }
+    }
+  ]
+}
