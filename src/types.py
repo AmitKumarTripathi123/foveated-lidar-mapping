@@ -5,7 +5,7 @@ Strictly adheres to the project interface contract.
 
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
 
 
@@ -167,3 +167,72 @@ class CClassifiedPointPacked(ctypes.Structure):
         ("class_id", ctypes.c_uint8),
         ("confidence", ctypes.c_float)
     ]
+
+# ==============================================================================
+# Phase-2 2.5D Foveated Grid Data Types
+# ==============================================================================
+
+class CellState(IntEnum):
+    """Occupancy and observation state of a 2.5D grid cell."""
+    UNKNOWN = 0   # Unobserved cell (no LiDAR points received)
+    OCCUPIED = 1  # Observed cell containing LiDAR point(s)
+    FREE = 2      # Proven free space via ray-tracing/sensor clearance
+
+
+@dataclass
+class GridCell25D:
+    """
+    Standardized 2.5D Foveated Spatial Cell.
+    Spatial identity is strictly 2D (ix, iy). Elevation Z is a cell attribute.
+    """
+    ix: int
+    iy: int
+    resolution: float
+    point_count: int = 0
+    elevation_mean: float = float("nan")
+    elevation_min: float = float("nan")
+    elevation_max: float = float("nan")
+    semantic_class: int = SuperClass.IGNORE_LABEL
+    confidence: float = 0.0
+    traversability: float = 0.0
+    state: CellState = CellState.UNKNOWN
+    band_name: str = ""
+
+    @property
+    def bounds(self) -> Tuple[float, float, float, float]:
+        """Returns (min_x, max_x, min_y, max_y) in physical meters."""
+        min_x = self.ix * self.resolution
+        max_x = (self.ix + 1) * self.resolution
+        min_y = self.iy * self.resolution
+        max_y = (self.iy + 1) * self.resolution
+        return (min_x, max_x, min_y, max_y)
+
+    @property
+    def center_xy(self) -> Tuple[float, float]:
+        """Returns cell center (x, y) in physical meters."""
+        return ((self.ix + 0.5) * self.resolution, (self.iy + 0.5) * self.resolution)
+
+    def contains_point(self, x: float, y: float) -> bool:
+        """Verifies spatial invariant: ix*s <= x < (ix+1)*s and iy*s <= y < (iy+1)*s."""
+        min_x, max_x, min_y, max_y = self.bounds
+        return (min_x <= x < max_x) and (min_y <= y < max_y)
+
+
+@dataclass
+class FoveatedGridConfig:
+    """
+    Phase-2 Frozen 4-Band Distance-Aware Spatial Grid Specification:
+      0–10 m   -> 0.05 m  (5 cm)
+      10–30 m  -> 0.10 m  (10 cm)
+      30–60 m  -> 0.25 m  (25 cm)
+      60–100 m -> 0.50 m  (50 cm)
+      >= 100 m -> Out of range
+    """
+    name: str = "phase2_frozen_4band"
+    max_range: float = 100.0
+    bands: List[FoveationBand] = field(default_factory=lambda: [
+        FoveationBand(name="near_field", min_range=0.0, max_range=10.0, voxel_size=0.05),
+        FoveationBand(name="mid_near_field", min_range=10.0, max_range=30.0, voxel_size=0.10),
+        FoveationBand(name="mid_far_field", min_range=30.0, max_range=60.0, voxel_size=0.25),
+        FoveationBand(name="far_field", min_range=60.0, max_range=100.0, voxel_size=0.50),
+    ])
