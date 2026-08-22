@@ -1,0 +1,14 @@
+# Virtual Environment
+.venv/
+env/
+venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Testing & OS
+.pytest_cache/
+.DS_Store
+*.log
