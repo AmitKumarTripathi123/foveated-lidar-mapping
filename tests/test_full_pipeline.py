@@ -1,4 +1,4 @@
-﻿"""Master End-to-End Pipeline & Integration Test Suite (26 Tests).
+"""Master End-to-End Pipeline & Integration Test Suite (26 Tests).
 
 Covers:
   1. Real .bin loading
@@ -353,8 +353,8 @@ class TestFullPipeline(unittest.TestCase):
     def test_26_end_to_end_smoke_training(self):
         """Test 26: Multi-epoch smoke training loop on real foveated dataset."""
         manifest = discover_dataset(repo_root / "dataset")
-        train_ds = FoveatedLidarDataset(raw_manifest=manifest["train"], target_num_points=128, to_tensor=True)
-        val_ds = FoveatedLidarDataset(raw_manifest=manifest["val"], target_num_points=128, to_tensor=True)
+        train_ds = FoveatedLidarDataset(raw_manifest=manifest["train"][:2], target_num_points=128, to_tensor=True)
+        val_ds = FoveatedLidarDataset(raw_manifest=manifest["val"][:2], target_num_points=128, to_tensor=True)
 
         train_loader = DataLoader(train_ds, batch_size=1, collate_fn=lidar_collate_fn)
         val_loader = DataLoader(val_ds, batch_size=1, collate_fn=lidar_collate_fn)

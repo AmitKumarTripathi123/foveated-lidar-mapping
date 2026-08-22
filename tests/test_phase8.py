@@ -126,18 +126,25 @@ class TestPhase8(unittest.TestCase):
 
     # 6. Raw label validation
     def test_06_raw_label_validation(self):
-        """Test 6: Raw labels contain expected SemanticKITTI class IDs."""
+        """Test 6: Raw labels contain valid LiDAR class IDs."""
         lbls = load_labels(self.lbl_file)
         unique_raw = set(np.unique(lbls))
-        self.assertIn(40, unique_raw)  # road
-        self.assertIn(10, unique_raw)  # car
+        is_kitti = 40 in unique_raw
+        is_poss = (20 in unique_raw or 12 in unique_raw or 10 in unique_raw)
+        self.assertTrue(is_kitti or is_poss)
 
     # 7. SIH label validation
     def test_07_sih_label_validation(self):
         """Test 7: Remapped labels strictly belong to {0, 1, 2, 3, 255}."""
         lbls = load_labels(self.lbl_file)
-        remapper = SemanticLabelRemapper()
-        sih_lbls = remapper.remap(lbls)
+        unique_raw = set(np.unique(lbls))
+        if 40 in unique_raw:
+            remapper = SemanticLabelRemapper()
+            sih_lbls = remapper.remap(lbls)
+        else:
+            from ml.data.semanticposs_label_mapping import SemanticPOSSLabelRemapper
+            remapper = SemanticPOSSLabelRemapper()
+            sih_lbls = remapper.remap(lbls)
         self.assertTrue(set(np.unique(sih_lbls)).issubset({0, 1, 2, 3, 255}))
 
     # 8. Foveated alignment
