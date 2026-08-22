@@ -54,17 +54,24 @@ POSS_RAW_CLASSES = {
     22: "ground",
 }
 
-# Raw POSS label ID -> project super-class ID
+# Frozen Phase-2 SemanticPOSS raw label ID -> project super-class ID mapping:
+# 21 -> 0 (drivable_terrain)
+# 20 -> 1 (non_drivable_terrain)
+# 19 -> 1 (non_drivable_terrain)
+# 22 -> 255 (IGNORE_LABEL)
 POSS_CLASS_REMAP = {
-    0:  IGNORE_LABEL,  # unlabeled
-    1:  IGNORE_LABEL,  # outlier/unlabeled
-    22: 0,             # ground -> drivable terrain
+    0:  IGNORE_LABEL,  # unlabeled -> ignore
+    1:  IGNORE_LABEL,  # outlier/unlabeled -> ignore
+    22: IGNORE_LABEL,  # ground -> ignore (as per Phase-2 specification)
+
+    21: 0,             # 21 -> 0 (drivable terrain)
+    20: 1,             # 20 -> 1 (non-drivable terrain)
+    19: 1,             # 19 -> 1 (non-drivable terrain)
 
     4:  3,  # people -> dynamic
     5:  3,  # 2+ people -> dynamic
     6:  3,  # rider -> dynamic
     7:  3,  # car -> dynamic
-    21: 3,  # bike -> dynamic
 
     8:  2,  # trunk -> static obstacle
     9:  2,  # plants -> static obstacle
@@ -77,10 +84,8 @@ POSS_CLASS_REMAP = {
     16: 2,  # cone/stone -> static obstacle
     17: 2,  # fence -> static obstacle
     18: 2,  # traffic sign 4 -> static obstacle
-    19: 2,  # other static -> static obstacle
-
-    20: IGNORE_LABEL,  # unconfirmed class
 }
+
 
 
 def remap_labels(labels_raw: np.ndarray) -> np.ndarray:

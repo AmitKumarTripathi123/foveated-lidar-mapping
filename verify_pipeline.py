@@ -69,9 +69,35 @@ def verify_cached_outputs():
     return True
 
 
+def test_obstacle_preserving_voxel_priority():
+    print("--- 3. Testing Obstacle-Preserving Voxel Label Priority ---")
+    # Construct 5 synthetic points inside the EXACT same 3D voxel cell in near-field (0-10m, 5cm voxel size)
+    pts = np.array([
+        [2.01, 2.01, 0.01, 0.5],
+        [2.02, 2.02, 0.01, 0.6],
+        [2.03, 2.03, 0.01, 0.7],
+        [2.04, 2.04, 0.01, 0.8],
+        [2.00, 2.00, 0.01, 0.2],
+    ], dtype=np.float32)
+    lbls = np.array([0, 1, 2, 3, 255], dtype=np.int64)
+    r = np.linalg.norm(pts[:, :2], axis=1)  # ~2.84m (near-field band 0-10m)
+
+    ds = FoveatedLidarDataset([], [], train=False)
+    downsampled_pts, downsampled_lbls = ds._range_aware_downsample(pts, lbls, r)
+
+    print(f"Input : {len(pts)} mixed points inside 1 voxel with labels [0, 1, 2, 3, 255]")
+    print(f"Output: {len(downsampled_pts)} downsampled point with label ID: {downsampled_lbls[0]}")
+
+    assert len(downsampled_pts) == 1, "Expected exactly 1 downsampled point for 1 voxel"
+    assert downsampled_lbls[0] == 3, f"Expected highest priority label 3 (dynamic_object), got {downsampled_lbls[0]}"
+    print("Obstacle-Preserving Voxel Priority Test PASSED! (dynamic_object > static > non-drivable > drivable > ignore)\n")
+
+
 if __name__ == "__main__":
     print("==================================================")
     print(" 3D LiDAR Foveated Mapping Data Pipeline Verifier ")
     print("==================================================\n")
+    test_obstacle_preserving_voxel_priority()
     verify_raw_and_dataloader()
     verify_cached_outputs()
+
