@@ -1,0 +1,50 @@
+dataset:
+  root: dataset
+  target_total_frames: 2988
+  train_sequences:
+  - '00'
+  - '01'
+  - '03'
+  - '04'
+  - '05'
+  val_sequences:
+  - '02'
+  expected_frames:
+    '00': 488
+    '01': 500
+    '02': 500
+    '03': 500
+    '04': 500
+    '05': 500
+foveation:
+  near_dist: 10.0
+  near_voxel: 0.05
+  mid_dist: 40.0
+  mid_voxel: 0.15
+  far_dist: 100.0
+  far_voxel: 0.5
+model:
+  name: spvcnn
+  in_channels: 4
+  num_classes: 4
+  base_channels: 32
+  voxel_size: 0.05
+  pretrained_checkpoint: checkpoints/spvcnn_pretrained.pt
+training:
+  epochs: 5
+  batch_size: 2
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  optimizer: adamw
+  scheduler: cosine
+  checkpoint_dir: experiments/phase12_full_semanticposs_spvcnn
+loss:
+  type: weighted_cross_entropy
+  ignore_index: 255
+  class_weights: null
+collapse:
+  threshold_pct: 90.0
+experiment:
+  name: phase12_full_spvcnn_cuda_training
+  device: cuda
+  seed: 42
