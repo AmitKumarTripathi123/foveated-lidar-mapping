@@ -1,0 +1,2 @@
+Stage,Mean_ms,Median_ms,P95_ms,P99_ms,FPS,RAM_MB,CPU_Percent
+Total Pipeline,400.213,387.536,513.039,530.713,2.5,821.222,158.397
