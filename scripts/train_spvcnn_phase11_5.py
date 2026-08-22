@@ -16,8 +16,8 @@ import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-
 import yaml
+
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
@@ -141,6 +141,8 @@ def main():
     parser = argparse.ArgumentParser(description="Phase 11.5 SPVCNN Fine-Tuning Script.")
     parser.add_argument("--config", type=str, default="configs/phase11_5_spvcnn_training.yaml", help="Config file path.")
     parser.add_argument("--dataset-root", type=str, default=None, help="Override dataset root.")
+    parser.add_argument("--train-sequences", nargs="+", default=None, help="Override training sequences (e.g. 00 01 03 04 05).")
+    parser.add_argument("--val-sequences", nargs="+", default=None, help="Override validation sequences (e.g. 02).")
     parser.add_argument("--allow-single-frame", action="store_true", help="Allow running single-scan demonstration if full dataset is absent.")
     parser.add_argument("--epochs", type=int, default=None, help="Override epochs.")
 
@@ -152,14 +154,24 @@ def main():
     ds_root = Path(get_dataset_root(args.dataset_root if args.dataset_root else cfg.get("dataset", {}).get("root", "dataset")))
     expected_counts = cfg.get("dataset", {}).get("expected_frames", {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500})
 
+    # Determine train and val sequences
+    train_seqs = [s.zfill(2) for s in args.train_sequences] if args.train_sequences else cfg.get("dataset", {}).get("train_sequences", ["00", "01", "03", "04", "05"])
+    val_seqs = [s.zfill(2) for s in args.val_sequences] if args.val_sequences else cfg.get("dataset", {}).get("val_sequences", ["02"])
+
+    # Step 10: Strict Data Leakage Protection
+    assert set(train_seqs).isdisjoint(set(val_seqs)), f"Data leakage error: train_sequences {train_seqs} and val_sequences {val_seqs} must be disjoint!"
+
     print("==================================================")
     print("   PHASE 11.5 SPVCNN DATASET ACTIVATION GATE     ")
     print("==================================================")
-    print(f"Dataset Root: {ds_root}")
+    print(f"Dataset Root      : {ds_root}")
+    print(f"Train Sequences   : {train_seqs}")
+    print(f"Val Sequences     : {val_seqs}")
+    print(f"Disjoint Splitting: PASS (zero overlap)")
 
     audit_res = check_dataset_completeness(ds_root, expected_counts)
-    print(f"Expected Frames : {audit_res['total_expected']}")
-    print(f"Discovered Frames: {audit_res['total_found']}")
+    print(f"\nExpected Frames   : {audit_res['total_expected']}")
+    print(f"Discovered Frames : {audit_res['total_found']}")
 
     for seq, info in audit_res["sequence_breakdown"].items():
         status = "COMPLETE" if info["found"] == info["expected"] else f"PARTIAL ({info['found']}/{info['expected']})"
@@ -175,10 +187,6 @@ def main():
             print("To proceed with a single-scan demonstration, rerun with --allow-single-frame.")
             print("Exiting at dataset gate (Zero-fabrication policy enforced).")
             return 1
-
-    # Discover available files
-    train_seqs = cfg.get("dataset", {}).get("train_sequences", ["00", "01", "03", "04", "05"])
-    val_seqs = cfg.get("dataset", {}).get("val_sequences", ["02"])
 
     # Build file records
     train_records = []

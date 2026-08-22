@@ -5,13 +5,13 @@
   "foveated_points": 50571,
   "reduction_pct": 24.13,
   "latency_ms": {
-    "load": 0.79,
-    "foveation": 23.49,
-    "prediction": 366.79,
-    "mapping": 196.82,
-    "total": 588.06
+    "load": 2.43,
+    "foveation": 53.66,
+    "prediction": 720.07,
+    "mapping": 402.1,
+    "total": 1178.72
   },
-  "fps": 1.7,
+  "fps": 0.85,
   "class_distribution": {
     "0": 123,
     "1": 409,
