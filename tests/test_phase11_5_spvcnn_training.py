@@ -1,4 +1,4 @@
-﻿"""Phase 11.5 Full SemanticPOSS Dataset Activation and SPVCNN Fine-Tuning Readiness Test Suite."""
+"""Phase 11.5 Full SemanticPOSS Dataset Activation and SPVCNN Fine-Tuning Readiness Test Suite."""
 
 import json
 import os
@@ -44,24 +44,25 @@ class TestPhase11_5SPVCNNTraining(unittest.TestCase):
     def test_01_dataset_discovery(self):
         """Test 1: Dataset discovery finds sequence 00 with matching files."""
         res = audit_sequence(str(self.dataset_root / "sequences/00"), "00")
-        self.assertEqual(res["matched_pairs"], 1)
+        self.assertGreaterEqual(res["matched_pairs"], 1)
 
     def test_02_dataset_completeness_gate(self):
-        """Test 2: Completeness gate detects 1 frame vs 2988 expected frames."""
+        """Test 2: Completeness gate detects full 2988 expected frames."""
         expected = {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500}
         gate = check_dataset_completeness(self.dataset_root, expected)
-        self.assertFalse(gate["is_complete"])
-        self.assertEqual(gate["total_found"], 1)
+        self.assertTrue(gate["is_complete"])
+        self.assertEqual(gate["total_found"], 2988)
         self.assertEqual(gate["total_expected"], 2988)
 
     def test_03_stem_pairing(self):
         """Test 3: Frame pairing strictly uses stem matching without positional pairing."""
         res = audit_sequence(str(self.dataset_root / "sequences/00"), "00")
         details = res["frame_details"]
-        self.assertEqual(len(details), 1)
+        self.assertGreaterEqual(len(details), 1)
         stem, b_p, l_p, n_pts = details[0]
         self.assertEqual(Path(b_p).stem, Path(l_p).stem)
         self.assertEqual(stem, "000000")
+
 
     def test_04_sequence_split_disjointness(self):
         """Test 4: Train and validation sequence sets are strictly disjoint."""
@@ -230,17 +231,22 @@ class TestPhase11_5SPVCNNTraining(unittest.TestCase):
 
     def test_21_incomplete_dataset_must_block_full_training(self):
         """Test 21: Incomplete dataset audit strictly flags gate failure."""
-        expected = {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500}
-        gate = check_dataset_completeness(self.dataset_root, expected)
-        self.assertFalse(gate["is_complete"])
-        self.assertIn("01", gate["missing_sequences"])
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            (tmp_root / "sequences/00/velodyne").mkdir(parents=True)
+            expected = {"00": 488, "01": 500}
+            gate = check_dataset_completeness(tmp_root, expected)
+            self.assertFalse(gate["is_complete"])
+            self.assertIn("01", gate["missing_sequences"])
 
     def test_22_complete_dataset_path_activates_full_training(self):
         """Test 22: Complete dataset configuration correctly passes activation gate."""
-        expected = {"00": 1}
+        expected = {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500}
         gate = check_dataset_completeness(self.dataset_root, expected)
         self.assertTrue(gate["is_complete"])
+        self.assertEqual(gate["total_found"], 2988)
         self.assertEqual(len(gate["missing_sequences"]), 0)
+
 
 
 if __name__ == "__main__":

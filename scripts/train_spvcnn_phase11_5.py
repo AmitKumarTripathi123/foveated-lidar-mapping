@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """scripts/train_spvcnn_phase11_5.py
 
 Phase 11.5 SPVCNN Fine-Tuning Execution Script with Dataset Activation Gate.
@@ -15,7 +15,8 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
+
 import yaml
 import numpy as np
 import torch
