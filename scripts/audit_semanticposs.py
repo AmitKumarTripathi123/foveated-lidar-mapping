@@ -129,7 +129,7 @@ def main():
 
     for seq_id in ["00", "01", "02", "03", "04", "05"]:
         if seq_id not in all_seqs:
-            print(f"❌ Sequence {seq_id}: MISSING DIRECTORY!")
+            print(f"[MISSING] Sequence {seq_id}: MISSING DIRECTORY!")
             continue
 
         res = audit_sequence(os.path.join(seq_dir, seq_id), seq_id)
@@ -139,7 +139,7 @@ def main():
         total_matched += matched
         total_dataset_points += pts_count
 
-        status = "PASSED ✅" if matched == expected and not res["alignment_errors"] else "WARNING ⚠️"
+        status = "PASSED [OK]" if matched == expected and not res["alignment_errors"] else "WARNING [PARTIAL]"
         print(f"Sequence {seq_id}: {status}")
         print(f"  Matched Scan Pairs: {matched} / {expected}")
         print(f"  Total Points      : {pts_count:,}")
@@ -159,9 +159,9 @@ def main():
     print("--------------------------------------------------\n")
 
     if total_matched == total_expected:
-        print("✅ FULL SEMANTICPOSS DATASET VERIFIED & PASSED!")
+        print("[OK] FULL SEMANTICPOSS DATASET VERIFIED & PASSED!")
     else:
-        print("⚠️ PARTIAL DATASET AUDIT COMPLETED.")
+        print("[WARNING] PARTIAL DATASET AUDIT COMPLETED.")
 
 
 if __name__ == "__main__":
