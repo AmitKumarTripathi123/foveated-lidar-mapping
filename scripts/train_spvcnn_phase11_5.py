@@ -145,11 +145,21 @@ def main():
     parser.add_argument("--val-sequences", nargs="+", default=None, help="Override validation sequences (e.g. 02).")
     parser.add_argument("--allow-single-frame", action="store_true", help="Allow running single-scan demonstration if full dataset is absent.")
     parser.add_argument("--epochs", type=int, default=None, help="Override epochs.")
+    parser.add_argument("--batch-size", type=int, default=None, help="Override batch size.")
+    parser.add_argument("--device", type=str, default=None, help="Device to use (cuda/cpu).")
 
     args = parser.parse_args()
 
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
+
+    if args.device is not None:
+        cfg.setdefault("experiment", {})["device"] = args.device
+    elif torch.cuda.is_available():
+        cfg.setdefault("experiment", {})["device"] = "cuda"
+
+    if args.batch_size is not None:
+        cfg.setdefault("training", {})["batch_size"] = args.batch_size
 
     ds_root = Path(get_dataset_root(args.dataset_root if args.dataset_root else cfg.get("dataset", {}).get("root", "dataset")))
     expected_counts = cfg.get("dataset", {}).get("expected_frames", {"00": 488, "01": 500, "02": 500, "03": 500, "04": 500, "05": 500})

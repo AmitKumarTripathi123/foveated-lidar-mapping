@@ -1,4 +1,4 @@
-﻿"""SPVCNN Fine-Tuning Engine and Scientific Validator (Phase 11.5).
+"""SPVCNN Fine-Tuning Engine and Scientific Validator (Phase 11.5).
 
 Implements end-to-end multi-frame fine-tuning for SPVCNN on SemanticPOSS foveated data:
   - Input: Foveated point clouds [N, 4] and remapped SIH labels [N]
@@ -91,8 +91,9 @@ class SPVCNNTrainer:
         self.model.train()
         total_loss = 0.0
         total_batches = 0
+        num_total_batches = len(self.train_loader)
 
-        for batch in self.train_loader:
+        for i, batch in enumerate(self.train_loader):
             pts_batch, lbls_batch = self._unpack_batch(batch)
             if pts_batch is None:
                 continue
@@ -121,6 +122,10 @@ class SPVCNNTrainer:
             total_loss += batch_loss.item()
             total_batches += 1
 
+            if (i + 1) % 200 == 0 or (i + 1) == num_total_batches:
+                avg_so_far = total_loss / max(total_batches, 1)
+                print(f"  [Train Batch {i+1:4d}/{num_total_batches:4d}] Loss: {avg_so_far:.4f}")
+
         self.scheduler.step()
         return total_loss / max(total_batches, 1)
 
@@ -147,15 +152,16 @@ class SPVCNNTrainer:
         self.model.eval()
         total_loss = 0.0
         total_batches = 0
+        num_val_batches = len(loader)
 
         cm = np.zeros((self.num_classes, self.num_classes), dtype=np.int64)
-        all_preds = []
+        pred_counts = np.zeros(self.num_classes, dtype=np.int64)
         total_pts = 0
         total_supervised = 0
         total_ignored = 0
 
         with torch.no_grad():
-            for batch in loader:
+            for i, batch in enumerate(loader):
                 pts_batch, lbls_batch = self._unpack_batch(batch)
                 if pts_batch is None:
                     continue
@@ -180,7 +186,8 @@ class SPVCNNTrainer:
                     gts = lbls_t.cpu().numpy().astype(np.int64)
 
                     total_pts += int(len(gts))
-                    all_preds.extend(preds.tolist())
+                    counts = np.bincount(preds, minlength=self.num_classes)
+                    pred_counts[:len(counts)] += counts
 
                     valid = (gts != self.ignore_index) & (gts >= 0) & (gts < self.num_classes)
                     gts_v = gts[valid]
@@ -192,6 +199,9 @@ class SPVCNNTrainer:
                     for t in range(self.num_classes):
                         for p in range(self.num_classes):
                             cm[t, p] += int(np.sum((gts_v == t) & (preds_v == p)))
+
+                if (i + 1) % 100 == 0 or (i + 1) == num_val_batches:
+                    print(f"  [Val Batch {i+1:3d}/{num_val_batches:3d}] Processed...")
 
         assert int(np.sum(cm)) == total_supervised, f"Confusion matrix sum {int(np.sum(cm))} != supervised count {total_supervised}"
 
@@ -211,13 +221,12 @@ class SPVCNNTrainer:
         val_miou = float(np.mean(list(ious.values()))) if ious else 0.0
         acc = float(np.trace(cm) / total_supervised * 100.0) if total_supervised > 0 else 0.0
 
-        all_preds_arr = np.array(all_preds, dtype=np.int64) if all_preds else np.empty(0, dtype=np.int64)
-        if len(all_preds_arr) > 0:
-            u_p, c_p = np.unique(all_preds_arr, return_counts=True)
-            dom_idx = int(np.argmax(c_p))
-            dom_cls = int(u_p[dom_idx])
-            dom_pct = float(np.max(c_p) / len(all_preds_arr) * 100.0)
-            p_dist = c_p / len(all_preds_arr)
+        total_preds_count = int(np.sum(pred_counts))
+        if total_preds_count > 0:
+            dom_idx = int(np.argmax(pred_counts))
+            dom_cls = dom_idx
+            dom_pct = float(np.max(pred_counts) / total_preds_count * 100.0)
+            p_dist = pred_counts / total_preds_count
             entropy = float(-np.sum(p_dist * np.log2(p_dist + 1e-12)))
         else:
             dom_cls = None
@@ -226,6 +235,10 @@ class SPVCNNTrainer:
 
         collapse_threshold = float(self.config.get("collapse", {}).get("threshold_pct", 90.0))
         collapse_warning = dom_pct >= collapse_threshold
+
+        # Measure GPU memory
+        peak_alloc_mb = float(torch.cuda.max_memory_allocated() / (1024**2)) if torch.cuda.is_available() else 0.0
+        peak_res_mb = float(torch.cuda.max_memory_reserved() / (1024**2)) if torch.cuda.is_available() else 0.0
 
         return {
             "val_loss": round(float(total_loss / max(total_batches, 1)), 4),
@@ -242,6 +255,8 @@ class SPVCNNTrainer:
             "dominant_class_pct": round(dom_pct, 2),
             "prediction_entropy": round(entropy, 4),
             "collapse_warning": collapse_warning,
+            "peak_vram_allocated_mb": round(peak_alloc_mb, 2),
+            "peak_vram_reserved_mb": round(peak_res_mb, 2),
         }
 
     def train(self) -> Dict[str, Any]:
