@@ -1,0 +1,22 @@
+﻿{
+  "total_points": 66658,
+  "dataset_detected": "SemanticKITTI",
+  "raw_class_counts": {
+    "0": {"name": "unlabeled", "count": 1158, "pct": 1.74, "sih_class": 255, "sih_name": "ignore"},
+    "10": {"name": "car", "count": 6000, "pct": 9.00, "sih_class": 3, "sih_name": "dynamic_object"},
+    "40": {"name": "road", "count": 23000, "pct": 34.50, "sih_class": 0, "sih_name": "drivable_terrain"},
+    "48": {"name": "sidewalk", "count": 8000, "pct": 12.00, "sih_class": 1, "sih_name": "non_drivable_terrain"},
+    "50": {"name": "building", "count": 10000, "pct": 15.00, "sih_class": 2, "sih_name": "static_obstacle"},
+    "51": {"name": "fence", "count": 2000, "pct": 3.00, "sih_class": 2, "sih_name": "static_obstacle"},
+    "70": {"name": "vegetation", "count": 13000, "pct": 19.50, "sih_class": 2, "sih_name": "static_obstacle"},
+    "71": {"name": "trunk", "count": 2000, "pct": 3.00, "sih_class": 2, "sih_name": "static_obstacle"},
+    "80": {"name": "pole", "count": 1500, "pct": 2.25, "sih_class": 2, "sih_name": "static_obstacle"}
+  },
+  "sih_four_class_summary": {
+    "0": {"name": "drivable_terrain", "count": 23000, "pct": 34.50},
+    "1": {"name": "non_drivable_terrain", "count": 8000, "pct": 12.00},
+    "2": {"name": "static_obstacle", "count": 28500, "pct": 42.76},
+    "3": {"name": "dynamic_object", "count": 6000, "pct": 9.00},
+    "255": {"name": "ignore", "count": 1158, "pct": 1.74}
+  }
+}
