@@ -1,8 +1,8 @@
 ﻿"""Foveated Cached & Normalized PyTorch Dataset (Master Task).
 
 Combines:
-  1. Amit's 3-zone Foveated Voxel Sampling
-  2. Atul's Phase 3 SIH 4-Class Label Remapping
+  1. Amit''s 3-zone Foveated Voxel Sampling
+  2. Atul''s Phase 3 SIH 4-Class Label Remapping
   3. Configurable Point-Count Normalization (to fixed N=16,384 or N=1,024 for PointNet++)
   4. PyTorch Dataset & DataLoader integration
 """
@@ -32,7 +32,7 @@ def normalize_point_count(
         points: Point cloud array of shape (N, 4).
         labels: Optional label array of shape (N,).
         target_num_points: Target number of points (default: 16384).
-        strategy: Sampling strategy ('random', 'deterministic', 'pad', 'repeat').
+        strategy: Sampling strategy (''random'', ''deterministic'', ''pad'', ''repeat'').
         seed: Optional random seed.
 
     Returns:
@@ -66,7 +66,7 @@ class FoveatedLidarDataset(TorchDataset):
     def __init__(
         self,
         cached_dir: Optional[Union[str, Path]] = None,
-        raw_manifest: Optional[List[Dict[str, Any]]] = None,
+        raw_manifest: Optional[Union[List[Dict[str, Any]], List[Any]]] = None,
         target_num_points: int = 16384,
         foveated_sampler: Optional[FoveatedVoxelSampler] = None,
         label_remapper: Optional[SemanticLabelRemapper] = None,
@@ -77,7 +77,7 @@ class FoveatedLidarDataset(TorchDataset):
 
         Args:
             cached_dir: Optional directory containing cached .npy files.
-            raw_manifest: Optional list of raw frame records from data_manifest.json.
+            raw_manifest: Optional list of raw frame records or FrameRecord objects.
             target_num_points: Target normalized point count (default: 16384).
             foveated_sampler: Optional FoveatedVoxelSampler instance.
             label_remapper: Optional SemanticLabelRemapper instance.
@@ -118,13 +118,19 @@ class FoveatedLidarDataset(TorchDataset):
             metadata = {"source": "cache", "pts_path": str(pts_path), "lbl_path": str(lbl_path)}
         else:
             rec = self.raw_manifest[idx]
-            raw_pts = load_point_cloud(rec["point_path"])
-            raw_lbls = load_labels(rec["label_path"]) if rec.get("label_path") else None
+            if hasattr(rec, "point_cloud_path"):
+                raw_pts = load_point_cloud(rec.point_cloud_path)
+                raw_lbls = load_labels(rec.label_path) if (rec.label_path and rec.has_label) else None
+                metadata = {"source": "raw", "sequence": rec.sequence_id, "frame": rec.frame_id}
+            else:
+                raw_pts = load_point_cloud(rec["point_path"])
+                raw_lbls = load_labels(rec["label_path"]) if rec.get("label_path") else None
+                metadata = {"source": "raw", "sequence": rec.get("sequence"), "frame": rec.get("frame")}
 
             # Stage 1: Invalid removal
             valid_pts, valid_lbls, _ = filter_invalid_points(raw_pts, raw_lbls)
 
-            # Stage 2: Amit's 3-Zone Foveated Voxel Sampling
+            # Stage 2: Amit''s 3-Zone Foveated Voxel Sampling
             fov_pts, fov_lbls, _ = self.foveated_sampler.sample(valid_pts, valid_lbls)
 
             # Stage 3: Phase 3 SIH Label Remapping
@@ -133,7 +139,6 @@ class FoveatedLidarDataset(TorchDataset):
             else:
                 labels = None
             points = fov_pts
-            metadata = {"source": "raw", "sequence": rec.get("sequence"), "frame": rec.get("frame")}
 
         # Stage 4: Point-Count Normalization to target_num_points
         norm_pts, norm_lbls = normalize_point_count(
