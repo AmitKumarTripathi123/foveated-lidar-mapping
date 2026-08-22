@@ -10,7 +10,7 @@ using namespace foveated_mapping;
 
 namespace {
 
-// Vectorized C++ grid construction directly on NumPy array buffers (Zero-Copy input access)
+// Vectorized C++ grid construction directly on NumPy array buffers (Zero-Copy input streaming)
 py::dict build_grid_numpy_impl(
     const FoveatedGridEngine& engine,
     py::array_t<float, py::array::c_style | py::array::forcecast> points,
@@ -46,22 +46,8 @@ py::dict build_grid_numpy_impl(
         confs_ptr = static_cast<const float*>(confs_info.ptr);
     }
 
-    // Direct conversion to ClassifiedPoint vector using direct pointer indexing (minimal cache-friendly copy)
-    std::vector<ClassifiedPoint> pt_vec;
-    pt_vec.resize(N);
-
-    for (size_t i = 0; i < N; ++i) {
-        size_t offset = i * feat_dim;
-        pt_vec[i].x = pts_ptr[offset + 0];
-        pt_vec[i].y = pts_ptr[offset + 1];
-        pt_vec[i].z = pts_ptr[offset + 2];
-        pt_vec[i].intensity = (feat_dim >= 4) ? pts_ptr[offset + 3] : 0.0f;
-        pt_vec[i].class_id = lbls_ptr ? static_cast<uint8_t>(lbls_ptr[i] & 0xFF) : SuperClass::IGNORE_LABEL;
-        pt_vec[i].confidence = confs_ptr ? confs_ptr[i] : 1.0f;
-    }
-
-    // Execute core Phase-5 grid engine
-    std::vector<GridCell> cells = engine.build_grid(pt_vec);
+    // Execute optimized core Phase-7 grid engine directly from memory buffer
+    std::vector<GridCell> cells = engine.build_grid_raw(pts_ptr, N, feat_dim, lbls_ptr, confs_ptr);
     size_t M = cells.size();
 
     // Allocate output NumPy arrays
