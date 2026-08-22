@@ -1,4 +1,4 @@
-﻿"""Unit tests for SPVCNN Input and Label Adapters (Phase 12)."""
+"""Unit tests for SPVCNN Input and Label Adapters."""
 
 import sys
 import unittest
@@ -79,3 +79,4 @@ class TestSPVCNNAdapter(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

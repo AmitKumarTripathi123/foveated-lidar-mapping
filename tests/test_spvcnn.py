@@ -1,4 +1,4 @@
-﻿"""Unit tests for SPVCNN architecture and checkpoint handling (Phase 12)."""
+"""Unit tests for SPVCNN architecture and checkpoint handling."""
 
 import os
 import sys
@@ -54,7 +54,6 @@ class TestSPVCNN(unittest.TestCase):
             self.assertEqual(len(report["missing_keys"]), 0)
             self.assertEqual(len(report["unexpected_keys"]), 0)
 
-            # Verify identical weights
             for p1, p2 in zip(model.parameters(), new_model.parameters()):
                 self.assertTrue(torch.allclose(p1, p2))
 
@@ -66,3 +65,4 @@ class TestSPVCNN(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

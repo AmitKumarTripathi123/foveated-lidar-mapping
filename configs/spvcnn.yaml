@@ -1,4 +1,9 @@
-﻿# SPVCNN Perception Model Configuration (Phase 12)
+# SPVCNN Perception Model Configuration
+version: 1.0.0
+model_type: spvcnn
+architecture:
+  name: "Sparse Point-Voxel Convolutional Neural Network (SPVCNN)"
+  reference: "Tang et al., ECCV 2020"
 
 model:
   name: "spvcnn"
@@ -6,8 +11,18 @@ model:
   base_channels: 32
   num_classes: 19
   voxel_size: 0.05
+  dropout: 0.1
   pretrained: true
   checkpoint_path: "checkpoints/spvcnn_pretrained.pt"
+
+weights:
+  pretrained_checkpoint: "checkpoints/spvcnn_pretrained.pt"
+  source_dataset: "SemanticKITTI"
+  target_dataset: "SemanticPOSS"
+  ontology:
+    native_classes: 19
+    superclasses: 4
+    ignore_label: 255
 
 label_mapping:
   native_source: "semantickitti"
@@ -26,3 +41,9 @@ mapping:
   bounds_y: [-50.0, 50.0]
   resolution: 0.20
   num_classes: 4
+
+inference:
+  device: "cpu"
+  voxel_size: 0.05
+  batch_size: 1
+

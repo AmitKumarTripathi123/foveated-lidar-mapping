@@ -3,7 +3,7 @@ Phase 3 — End-to-End Performance Benchmark & Profiling Suite.
 Measures the baseline performance of the complete foveated 2.5D LiDAR mapping system:
   1. LiDAR Loading
   2. Preprocessing & Range Filtering
-  3. ML Semantic Inference
+  3. ML Semantic Inference (SPVCNN or FoveatedPointSegNet)
   4. 2.5D Foveated Grid Generation
   5. Visualization Data Preparation
   6. Total End-to-End Latency & FPS
@@ -39,11 +39,11 @@ from phase2.inference.predictor import Phase2Predictor, SemanticPrediction
 from phase2.adapter import MLToMappingAdapter
 
 
-def collect_environment_metadata() -> Dict[str, Any]:
+def collect_environment_metadata(model_name: str = "SPVCNN", param_count: int = 136979) -> Dict[str, Any]:
     """Captures the system, OS, hardware, and dependency versions for reproducibility."""
     import yaml
     import scipy
-    
+
     return {
         "os": platform.platform(),
         "system": platform.system(),
@@ -58,8 +58,8 @@ def collect_environment_metadata() -> Dict[str, Any]:
         "pandas_version": pd.__version__,
         "matplotlib_version": matplotlib.__version__,
         "pyyaml_version": yaml.__version__,
-        "model_name": "FoveatedPointSegNet",
-        "model_parameters": 451460,
+        "model_name": model_name,
+        "model_parameters": param_count,
         "grid_specification": "4-Band (0-10m:5cm, 10-30m:10cm, 30-60m:25cm, 60-100m:50cm)",
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
     }
@@ -92,7 +92,7 @@ def run_pipeline_single_frame(
     Executes and times the 5 distinct pipeline stages on a single real frame.
     """
     f_id = bin_path.stem
-    
+
     # --------------------------------------------------------------------------
     # STAGE 1: LiDAR Loading
     # --------------------------------------------------------------------------
@@ -116,7 +116,7 @@ def run_pipeline_single_frame(
     preprocess_ms = (t3 - t2) * 1000.0
 
     # --------------------------------------------------------------------------
-    # STAGE 3: ML Inference (FoveatedPointSegNet)
+    # STAGE 3: ML Inference
     # --------------------------------------------------------------------------
     t4 = time.perf_counter()
     prediction = predictor.predict_frame(filtered_frame)
@@ -135,7 +135,6 @@ def run_pipeline_single_frame(
     # STAGE 5: Visualization Preparation
     # --------------------------------------------------------------------------
     t8 = time.perf_counter()
-    # Extract 2.5D layer metrics, bounding coordinates, and color overlays
     df_cells = grid_map.to_dataframe()
     vis_data = {
         "frame_id": f_id,
@@ -150,7 +149,7 @@ def run_pipeline_single_frame(
     # End-to-end total
     total_ms = load_ms + preprocess_ms + ml_inference_ms + grid_generation_ms + visualization_prep_ms
     fps = 1000.0 / max(total_ms, 1e-4)
-    
+
     # Resource metrics
     cpu_pct = process.cpu_percent()
     mem_mb = process.memory_info().rss / (1024.0 * 1024.0)
@@ -182,13 +181,11 @@ def run_scaling_benchmark(
     """
     Benchmarks pipeline runtime and memory across various point-cloud scales:
     10K, 100K, 500K, 1M, 5M points.
-    Uses controlled real point replications / synthetic distributions.
     """
     scaling_results = []
-    
+
     for n_pts in target_counts:
         print(f"  -> Testing Scaling for N = {n_pts:,} points...")
-        # Synthesize realistic point cloud with proper spatial bounds
         np.random.seed(42)
         angles = np.random.uniform(-np.pi, np.pi, n_pts)
         radii = np.random.uniform(0.5, 95.0, n_pts)
@@ -198,18 +195,18 @@ def run_scaling_benchmark(
         i = np.random.uniform(0.1, 0.9, n_pts)
         pts = np.column_stack([x, y, z, i]).astype(np.float32)
         lbls = np.random.choice([0, 1, 2, 3, 255], size=n_pts).astype(np.uint32)
-        
+
         t0 = time.perf_counter()
-        
+
         # 1. Load (in-memory)
         t_l0 = time.perf_counter()
         raw_frame = PointCloudFrame(points=pts, labels=lbls, frame_id="scaling_test")
         t_l1 = time.perf_counter()
-        
+
         # 2. Preprocess
         filt_frame, _ = range_filter.filter_frame(raw_frame)
         t_p1 = time.perf_counter()
-        
+
         # 3. ML Inference (Chunked for multi-million points to avoid OOM)
         t_m0 = time.perf_counter()
         if n_pts > 200000:
@@ -231,21 +228,21 @@ def run_scaling_benchmark(
         else:
             prediction = predictor.predict_frame(filt_frame)
         t_m1 = time.perf_counter()
-        
+
         # 4. Grid generation
         t_g0 = time.perf_counter()
         grid_map = adapter.prediction_to_grid(prediction)
         t_g1 = time.perf_counter()
-        
+
         # 5. Vis prep
         t_v0 = time.perf_counter()
         _ = len(grid_map.cells)
         t_v1 = time.perf_counter()
-        
+
         total_time_ms = (time.perf_counter() - t0) * 1000.0
         fps = 1000.0 / max(total_time_ms, 1e-4)
         mem_mb = process.memory_info().rss / (1024.0 * 1024.0)
-        
+
         scaling_results.append({
             "points": n_pts,
             "total_runtime_ms": round(total_time_ms, 2),
@@ -259,37 +256,38 @@ def run_scaling_benchmark(
             "occupied_cells": grid_map.num_occupied_cells,
             "data_type": "Controlled Real/Synthetic Mixture"
         })
-        
+
     return scaling_results
 
 
 def generate_benchmark_plots(
     df_frames: pd.DataFrame,
     df_scaling: pd.DataFrame,
-    output_dir: Path
+    output_dir: Path,
+    model_name: str = "SPVCNN"
 ):
     """Generates all 6 diagnostic benchmark plots."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # 1. Latency Breakdown per Frame (Stacked Bar)
     fig, ax = plt.subplots(figsize=(10, 6))
     frames = df_frames["frame_id"].astype(str)
     x_pos = np.arange(len(frames))
     width = 0.55
-    
+
     b_load = df_frames["load_ms"]
     b_prep = df_frames["preprocess_ms"]
     b_ml = df_frames["ml_inference_ms"]
     b_grid = df_frames["grid_generation_ms"]
     b_vis = df_frames["visualization_prep_ms"]
-    
+
     ax.bar(x_pos, b_load, width, label="1. Load", color="#4285F4")
     ax.bar(x_pos, b_prep, width, bottom=b_load, label="2. Preprocess", color="#34A853")
     ax.bar(x_pos, b_ml, width, bottom=b_load + b_prep, label="3. ML Inference", color="#EA4335")
     ax.bar(x_pos, b_grid, width, bottom=b_load + b_prep + b_ml, label="4. Grid Gen", color="#FBBC05")
     ax.bar(x_pos, b_vis, width, bottom=b_load + b_prep + b_ml + b_grid, label="5. Vis Prep", color="#9C27B0")
-    
-    ax.set_title("Phase 3 Baseline — Stage-by-Stage Latency Breakdown", fontsize=13, fontweight="bold")
+
+    ax.set_title(f"Phase 3 Performance — Latency Breakdown ({model_name})", fontsize=13, fontweight="bold")
     ax.set_xlabel("Frame ID")
     ax.set_ylabel("Latency (ms)")
     ax.set_xticks(x_pos)
@@ -304,7 +302,7 @@ def generate_benchmark_plots(
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(frames, df_frames["fps"], marker="o", linewidth=2.5, color="#1E88E5", label="Frame FPS")
     ax.axhline(df_frames["fps"].mean(), color="crimson", linestyle="--", linewidth=1.8, label=f"Mean: {df_frames['fps'].mean():.2f} FPS")
-    ax.set_title("Phase 3 Baseline — End-to-End Throughput (FPS)", fontsize=13, fontweight="bold")
+    ax.set_title(f"Phase 3 Performance — End-to-End Throughput ({model_name})", fontsize=13, fontweight="bold")
     ax.set_xlabel("Frame ID")
     ax.set_ylabel("Throughput (FPS = 1000 / Total ms)")
     ax.set_ylim(0, max(df_frames["fps"].max() * 1.3, 10))
@@ -317,7 +315,7 @@ def generate_benchmark_plots(
     # 3. Memory Usage (MB)
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(frames, df_frames["memory_mb"], marker="s", linewidth=2.2, color="#00897B", label="Resident Memory (RSS)")
-    ax.set_title("Phase 3 Baseline — Process Memory Footprint (RAM)", fontsize=13, fontweight="bold")
+    ax.set_title(f"Phase 3 Performance — Process Memory Footprint ({model_name})", fontsize=13, fontweight="bold")
     ax.set_xlabel("Frame ID")
     ax.set_ylabel("Memory (MB)")
     ax.legend()
@@ -329,7 +327,7 @@ def generate_benchmark_plots(
     # 4. CPU Usage (%)
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.plot(frames, df_frames["cpu_percent"], marker="^", linewidth=2.2, color="#FB8C00", label="CPU Utilization (%)")
-    ax.set_title("Phase 3 Baseline — CPU Utilization Across Frames", fontsize=13, fontweight="bold")
+    ax.set_title(f"Phase 3 Performance — CPU Utilization Across Frames ({model_name})", fontsize=13, fontweight="bold")
     ax.set_xlabel("Frame ID")
     ax.set_ylabel("CPU Utilization (%)")
     ax.legend()
@@ -343,7 +341,7 @@ def generate_benchmark_plots(
     ax.plot(df_scaling["points"], df_scaling["total_runtime_ms"], marker="o", linewidth=2.5, color="#D81B60", label="Total Pipeline Runtime")
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_title("Phase 3 Scaling Benchmark — Input Points vs Runtime", fontsize=13, fontweight="bold")
+    ax.set_title(f"Phase 3 Scaling Benchmark — Input Points vs Runtime ({model_name})", fontsize=13, fontweight="bold")
     ax.set_xlabel("Input Points (Log Scale)")
     ax.set_ylabel("Total Runtime ms (Log Scale)")
     ax.grid(True, which="both", linestyle="--", alpha=0.4)
@@ -356,7 +354,7 @@ def generate_benchmark_plots(
     fig, ax = plt.subplots(figsize=(9, 5.5))
     ax.plot(df_scaling["points"], df_scaling["memory_mb"], marker="D", linewidth=2.5, color="#5E35B1", label="Process RAM Footprint")
     ax.set_xscale("log")
-    ax.set_title("Phase 3 Scaling Benchmark — Input Points vs Memory (RAM)", fontsize=13, fontweight="bold")
+    ax.set_title(f"Phase 3 Scaling Benchmark — Input Points vs Memory ({model_name})", fontsize=13, fontweight="bold")
     ax.set_xlabel("Input Points (Log Scale)")
     ax.set_ylabel("Memory RSS (MB)")
     ax.grid(True, which="both", linestyle="--", alpha=0.4)
@@ -371,10 +369,11 @@ def generate_benchmark_report(
     stage_stats: Dict[str, Dict[str, float]],
     df_frames: pd.DataFrame,
     df_scaling: pd.DataFrame,
-    output_dir: Path
+    output_dir: Path,
+    model_name: str = "SPVCNN"
 ):
     """Generates human-readable Markdown report."""
-    
+
     stage_table = [
         ["1. LiDAR Loading", stage_stats["load"]["mean"], stage_stats["load"]["median"], stage_stats["load"]["p95"], stage_stats["load"]["min"], stage_stats["load"]["max"], stage_stats["load"]["std"]],
         ["2. Preprocessing", stage_stats["preprocess"]["mean"], stage_stats["preprocess"]["median"], stage_stats["preprocess"]["p95"], stage_stats["preprocess"]["min"], stage_stats["preprocess"]["max"], stage_stats["preprocess"]["std"]],
@@ -383,18 +382,19 @@ def generate_benchmark_report(
         ["5. Vis Preparation", stage_stats["visualization_prep"]["mean"], stage_stats["visualization_prep"]["median"], stage_stats["visualization_prep"]["p95"], stage_stats["visualization_prep"]["min"], stage_stats["visualization_prep"]["max"], stage_stats["visualization_prep"]["std"]],
         ["TOTAL END-TO-END", stage_stats["total"]["mean"], stage_stats["total"]["median"], stage_stats["total"]["p95"], stage_stats["total"]["min"], stage_stats["total"]["max"], stage_stats["total"]["std"]]
     ]
-    
+
     scaling_table = [
         [f"{r['points']:,}", f"{r['total_runtime_ms']:.2f} ms", f"{r['load_ms']:.2f} ms", f"{r['preprocess_ms']:.2f} ms", f"{r['ml_inference_ms']:.2f} ms", f"{r['grid_generation_ms']:.2f} ms", f"{r['fps']:.2f}", f"{r['memory_mb']:.1f} MB"]
         for _, r in df_scaling.iterrows()
     ]
-    
-    report_md = f"""# Phase 3 — Baseline Performance Benchmark Report
 
-**Objective**: Establish reproducible empirical performance baselines for the unoptimized Python pipeline before Phase 3 acceleration.  
+    report_md = f"""# Phase 3 — Performance Benchmark Report ({model_name})
+
+**Objective**: Empirical performance profiling of the 5-stage perception pipeline with {model_name}.  
 **Benchmark Date**: {env_meta['timestamp']}  
 **Hardware & Environment**: {env_meta['os']} | CPU: {env_meta['processor']} ({env_meta['cpu_count_logical']} threads) | RAM: {env_meta['total_ram_gb']} GB  
 **PyTorch Version**: {env_meta['torch_version']} | Python: {env_meta['python_version']}  
+**Model Architecture**: {env_meta['model_name']} ({env_meta['model_parameters']:,} parameters)  
 
 ---
 
@@ -406,7 +406,7 @@ def generate_benchmark_report(
 
 ## 2. End-to-End System Summary Metrics
 
-| System Metric | Baseline Measured Value |
+| System Metric | Measured Value |
 | :--- | :--- |
 | **Mean Input Points / Frame** | **{df_frames['input_points'].mean():,.0f} points** |
 | **Mean 2.5D Cells / Frame** | **{df_frames['grid_cells'].mean():,.0f} cells** |
@@ -419,34 +419,11 @@ def generate_benchmark_report(
 
 ---
 
-## 3. Bottleneck Analysis for Phase 3 Optimization
-
-1. **Primary Computational Bottleneck**:
-   - **Grid Generation (2.5D XY Cell Indexing & Aggregation)**: Accounts for **{(stage_stats['grid_generation']['mean'] / stage_stats['total']['mean']) * 100:.1f}%** of total latency (~{stage_stats['grid_generation']['mean']:.1f} ms).
-2. **Secondary Bottleneck**:
-   - **ML Inference (FoveatedPointSegNet)**: Accounts for **{(stage_stats['ml_inference']['mean'] / stage_stats['total']['mean']) * 100:.1f}%** (~{stage_stats['ml_inference']['mean']:.1f} ms on CPU).
-3. **Low-Overhead Stages**:
-   - LiDAR Loading ({stage_stats['load']['mean']:.2f} ms) and Preprocessing ({stage_stats['preprocess']['mean']:.2f} ms) account for $< 3\%$ of compute time.
-
----
-
-## 4. Scaling Benchmark Across Point Counts
+## 3. Scaling Benchmark Across Point Counts
 
 {tabulate(scaling_table, headers=["Points (N)", "Total (ms)", "Load (ms)", "Prep (ms)", "ML (ms)", "Grid (ms)", "FPS", "RAM (MB)"], tablefmt="github")}
-
----
-
-## 5. Diagnostic Visualization Artifacts
-
-The following performance diagnostic plots have been exported to `results/baseline/`:
-- `latency_breakdown.png`: Stacked stage latencies per frame.
-- `fps.png`: End-to-end frame rate per second.
-- `memory.png`: Resident memory footprint per frame.
-- `cpu.png`: CPU thread utilization percentage.
-- `scaling_runtime.png`: Computational scalability across $10\text{{K}} \to 5\text{{M}}$ points.
-- `scaling_memory.png`: Memory allocation scaling curve.
 """
-    with open(output_dir / "benchmark_report.md", "w") as f:
+    with open(output_dir / f"benchmark_report_{model_name.lower()}.md", "w") as f:
         f.write(report_md)
 
 
@@ -455,7 +432,8 @@ def main():
     parser.add_argument("--input", type=str, default="data/semanticposs_sequence/sequences/01", help="Dataset directory")
     parser.add_argument("--frames", type=int, default=5, help="Number of frames to benchmark")
     parser.add_argument("--warmup", type=int, default=3, help="Number of warmup iterations")
-    parser.add_argument("--output", type=str, default="results/baseline", help="Output directory")
+    parser.add_argument("--output", type=str, default="results/spvcnn_benchmark", help="Output directory")
+    parser.add_argument("--model-type", type=str, default="spvcnn", choices=["spvcnn", "foveated_pointnet"], help="Model architecture")
     parser.add_argument("--point-counts", type=str, default="10000,100000,500000,1000000,5000000", help="Comma-separated point counts")
     args = parser.parse_args()
 
@@ -463,13 +441,24 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     process = psutil.Process(os.getpid())
 
+    # 1. Instantiate predictor
+    if args.model_type == "spvcnn":
+        predictor = Phase2Predictor(model_type="spvcnn", model_path="checkpoints/spvcnn_pretrained.pt", device="cpu")
+        model_name = "SPVCNN"
+        param_count = 136979
+    else:
+        predictor = Phase2Predictor(model_type="foveated_pointnet", model_path="checkpoints/best_model.pth", device="cpu")
+        model_name = "FoveatedPointSegNet"
+        param_count = 451460
+
     print("=" * 80)
-    print("  PHASE 3: REPRODUCIBLE END-TO-END PERFORMANCE BENCHMARK")
+    print(f"  PHASE 3: PERFORMANCE BENCHMARK WITH {model_name.upper()}")
     print("=" * 80)
 
-    # 1. Environment metadata
-    env_meta = collect_environment_metadata()
+    # Environment metadata
+    env_meta = collect_environment_metadata(model_name=model_name, param_count=param_count)
     print(f"Environment: {env_meta['os']} | CPU: {env_meta['processor']} | RAM: {env_meta['total_ram_gb']} GB")
+    print(f"Active Model: {model_name} ({param_count:,} params) on {env_meta['torch_version']}")
 
     # 2. Discover dataset files
     in_dir = Path(args.input)
@@ -482,29 +471,27 @@ def main():
     bin_files = bin_files[:num_frames]
     lbl_files = lbl_files[:num_frames]
 
-    # 3. Instantiate pipeline components
     range_filter = RangeFilter(min_range=0.0, max_range=100.0)
-    predictor = Phase2Predictor(model_path="checkpoints/best_model.pth", device="cpu")
     adapter = MLToMappingAdapter(bands=DEFAULT_FROZEN_BANDS, max_range=100.0)
 
-    # 4. Warm-up Phase
+    # 3. Warm-up Phase
     print(f"\n[1/4] Warming up pipeline ({args.warmup} iterations)...")
     for w in range(args.warmup):
         _ = run_pipeline_single_frame(bin_files[0], lbl_files[0], range_filter, predictor, adapter, process)
     print("  -> Warm-up completed successfully.")
 
-    # 5. Measure Multi-Frame Execution
+    # 4. Measure Multi-Frame Execution
     print(f"\n[2/4] Benchmarking {num_frames} real LiDAR frames...")
     frame_results = []
     for i in range(num_frames):
         rec = run_pipeline_single_frame(bin_files[i], lbl_files[i], range_filter, predictor, adapter, process)
         frame_results.append(rec)
-        print(f"  Frame {rec['frame_id']}: {rec['input_points']:,} pts -> {rec['grid_cells']:,} cells | Latency: {rec['total_ms']:.2f} ms ({rec['fps']:.2f} FPS)")
+        print(f"  Frame {rec['frame_id']}: {rec['input_points']:,} pts -> {rec['grid_cells']:,} cells | ML: {rec['ml_inference_ms']:.2f} ms | Total: {rec['total_ms']:.2f} ms ({rec['fps']:.2f} FPS)")
 
     df_frames = pd.DataFrame(frame_results)
     df_frames.to_csv(out_dir / "raw_results.csv", index=False)
 
-    # 6. Compute Summary Statistics
+    # 5. Compute Summary Statistics
     stage_stats = {
         "load": compute_stage_stats(df_frames["load_ms"].tolist()),
         "preprocess": compute_stage_stats(df_frames["preprocess_ms"].tolist()),
@@ -514,16 +501,17 @@ def main():
         "total": compute_stage_stats(df_frames["total_ms"].tolist())
     }
 
-    # 7. Scaling Benchmark
+    # 6. Scaling Benchmark
     print("\n[3/4] Running Point Cloud Scaling Benchmark...")
     target_counts = [int(x.strip()) for x in args.point_counts.split(",") if x.strip()]
     scaling_records = run_scaling_benchmark(predictor, adapter, range_filter, process, target_counts)
     df_scaling = pd.DataFrame(scaling_records)
 
-    # 8. Export JSON and Visualizations
+    # 7. Export JSON and Visualizations
     print("\n[4/4] Generating JSON Summary, Plots, and Markdown Report...")
     summary_data = {
         "environment": env_meta,
+        "model_type": model_name,
         "stage_statistics": stage_stats,
         "frames_summary": {
             "mean_points": round(float(df_frames["input_points"].mean()), 1),
@@ -541,12 +529,12 @@ def main():
     with open(out_dir / "summary.json", "w") as f:
         json.dump(summary_data, f, indent=2)
 
-    generate_benchmark_plots(df_frames, df_scaling, out_dir)
-    generate_benchmark_report(env_meta, stage_stats, df_frames, df_scaling, out_dir)
+    generate_benchmark_plots(df_frames, df_scaling, out_dir, model_name=model_name)
+    generate_benchmark_report(env_meta, stage_stats, df_frames, df_scaling, out_dir, model_name=model_name)
 
-    # 9. Print Concise Baseline Tables
+    # 8. Print Concise Baseline Tables
     print("\n" + "=" * 80)
-    print("  PHASE 3 BASELINE PERFORMANCE PROFILE")
+    print(f"  PHASE 3 PERFORMANCE PROFILE ({model_name.upper()})")
     print("=" * 80)
 
     summary_table = [
@@ -567,7 +555,6 @@ def main():
     print(f"RAM:           {df_frames['memory_mb'].mean():.2f} MB")
     print(f"CPU:           {df_frames['cpu_percent'].mean():.1f}%")
     print("-" * 80)
-    print(f"\nAll benchmark deliverables saved to: {out_dir.resolve()}")
 
 
 if __name__ == "__main__":
