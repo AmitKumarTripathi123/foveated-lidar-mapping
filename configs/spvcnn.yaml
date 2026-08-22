@@ -1,0 +1,28 @@
+﻿# SPVCNN Perception Model Configuration (Phase 12)
+
+model:
+  name: "spvcnn"
+  in_channels: 4
+  base_channels: 32
+  num_classes: 19
+  voxel_size: 0.05
+  pretrained: true
+  checkpoint_path: "checkpoints/spvcnn_pretrained.pt"
+
+label_mapping:
+  native_source: "semantickitti"
+  target_ontology: "sih_4class"
+
+foveation:
+  near_dist: 10.0
+  near_voxel: 0.05
+  mid_dist: 40.0
+  mid_voxel: 0.15
+  far_dist: 100.0
+  far_voxel: 0.50
+
+mapping:
+  bounds_x: [-50.0, 50.0]
+  bounds_y: [-50.0, 50.0]
+  resolution: 0.20
+  num_classes: 4

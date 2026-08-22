@@ -1,21 +1,12 @@
-﻿# PointNet++ Semantic Segmentation Baseline Configuration (Phase 4)
-# Project: Foveated 2.5D LiDAR Mapping for Autonomous Navigation
+﻿# Global Model Selection Configuration
 
-model:
-  name: "pointnet2_semseg"
-  num_classes: 4              # Frozen SIH Classes: 0, 1, 2, 3 (255 is ignore target)
-  in_channels: 4              # Total input channels [x, y, z, intensity]
-  num_points: 16384           # Configurable baseline resolution
+primary_model:
+  name: "spvcnn"
+  config_path: "configs/spvcnn.yaml"
+  pretrained: true
+  checkpoint: "checkpoints/spvcnn_pretrained.pt"
 
-  # Input Channel Breakdown
-  coordinates:
-    channels: 3               # Geometric coordinates [x, y, z] in meters
-  features:
-    channels: 1               # Reflectance intensity [intensity]
-
-  # Set Abstraction Hierarchy (Points sampled at each stage)
-  architecture:
-    sa1_npoints: 1024
-    sa2_npoints: 256
-    sa3_npoints: 64
-    sa4_npoints: 16
+legacy_baseline_models:
+  - name: "pointnet2_legacy"
+    config_path: "configs/phase2.yaml"
+    description: "PointNet++ set abstraction baseline model"

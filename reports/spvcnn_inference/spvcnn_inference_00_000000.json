@@ -1,0 +1,22 @@
+{
+  "scan": "dataset\\sequences\\00\\velodyne\\000000.bin",
+  "device": "cpu",
+  "input_points": 66658,
+  "foveated_points": 50571,
+  "reduction_pct": 24.13,
+  "latency_ms": {
+    "load": 0.79,
+    "foveation": 23.49,
+    "prediction": 366.79,
+    "mapping": 196.82,
+    "total": 588.06
+  },
+  "fps": 1.7,
+  "class_distribution": {
+    "0": 123,
+    "1": 409,
+    "2": 21848,
+    "3": 28191
+  },
+  "contract_verified": true
+}
