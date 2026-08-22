@@ -1,0 +1,26 @@
+﻿{
+  "total_points": 66658,
+  "supervised_points": 65500,
+  "ignored_points": 1158,
+  "raw_classes": {
+    "0": {"name": "unlabeled", "count": 1158, "pct": 1.74},
+    "10": {"name": "car", "count": 6000, "pct": 9.00},
+    "40": {"name": "road", "count": 23000, "pct": 34.50},
+    "48": {"name": "sidewalk", "count": 8000, "pct": 12.00},
+    "50": {"name": "building", "count": 15000, "pct": 22.50},
+    "51": {"name": "fence", "count": 3500, "pct": 5.25},
+    "70": {"name": "vegetation", "count": 7000, "pct": 10.50},
+    "71": {"name": "trunk", "count": 1500, "pct": 2.25},
+    "80": {"name": "pole", "count": 1500, "pct": 2.25}
+  },
+  "sih_classes": {
+    "0": {"name": "drivable_terrain", "count": 23000, "pct": 34.50},
+    "1": {"name": "non_drivable_terrain", "count": 8000, "pct": 12.00},
+    "2": {"name": "static_obstacle", "count": 28500, "pct": 42.76},
+    "3": {"name": "dynamic_object", "count": 6000, "pct": 9.00},
+    "255": {"name": "ignore", "count": 1158, "pct": 1.74}
+  },
+  "majority_class": "static_obstacle",
+  "minority_class": "dynamic_object",
+  "imbalance_ratio": 4.75
+}
