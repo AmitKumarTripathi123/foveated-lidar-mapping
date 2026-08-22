@@ -1,0 +1,146 @@
+{
+  "Phase 9 Error (SemanticKITTI mapping on POSS data)": {
+    "mIoU": 0.2952,
+    "overall_accuracy": 0.5449,
+    "confusion_matrix": [
+      [
+        6369,
+        0,
+        151951,
+        4969
+      ],
+      [
+        2262,
+        0,
+        1735,
+        300
+      ],
+      [
+        15167,
+        0,
+        135572,
+        7423
+      ],
+      [
+        789,
+        641,
+        23519,
+        107966
+      ]
+    ],
+    "drivable_terrain_IoU": 0.0351,
+    "non_drivable_terrain_IoU": 0.0,
+    "static_obstacle_IoU": 0.4042,
+    "dynamic_object_IoU": 0.7415,
+    "drivable_terrain_Precision": 0.259,
+    "non_drivable_terrain_Precision": 0.0,
+    "static_obstacle_Precision": 0.4334,
+    "dynamic_object_Precision": 0.8948,
+    "drivable_terrain_Recall": 0.039,
+    "non_drivable_terrain_Recall": 0.0,
+    "static_obstacle_Recall": 0.8572,
+    "dynamic_object_Recall": 0.8123,
+    "drivable_terrain_F1": 0.0678,
+    "non_drivable_terrain_F1": 0.0,
+    "static_obstacle_F1": 0.5758,
+    "dynamic_object_F1": 0.8516,
+    "distance_bands": {
+      "near_0_10m": {
+        "drivable_terrain_IoU": 0.0,
+        "non_drivable_terrain_IoU": 0.0,
+        "static_obstacle_IoU": 0.7575,
+        "dynamic_object_IoU": 0.981,
+        "mIoU": 0.4346,
+        "points": 55891
+      },
+      "mid_10_40m": {
+        "drivable_terrain_IoU": 0.0398,
+        "non_drivable_terrain_IoU": 0.0,
+        "static_obstacle_IoU": 0.4448,
+        "dynamic_object_IoU": 0.7667,
+        "mIoU": 0.3128,
+        "points": 317656
+      },
+      "far_40_100m": {
+        "drivable_terrain_IoU": 0.0208,
+        "non_drivable_terrain_IoU": 0.0,
+        "static_obstacle_IoU": 0.2379,
+        "dynamic_object_IoU": 0.2107,
+        "mIoU": 0.1174,
+        "points": 85116
+      }
+    }
+  },
+  "Correct (SemanticPOSS authoritative mapping)": {
+    "mIoU": 0.6555,
+    "overall_accuracy": 0.8882,
+    "confusion_matrix": [
+      [
+        11784,
+        0,
+        1076,
+        2559
+      ],
+      [
+        0,
+        496,
+        71,
+        177
+      ],
+      [
+        23742,
+        0,
+        287852,
+        12662
+      ],
+      [
+        789,
+        0,
+        10214,
+        107496
+      ]
+    ],
+    "drivable_terrain_IoU": 0.295,
+    "non_drivable_terrain_IoU": 0.6667,
+    "static_obstacle_IoU": 0.8577,
+    "dynamic_object_IoU": 0.8028,
+    "drivable_terrain_Precision": 0.3245,
+    "non_drivable_terrain_Precision": 1.0,
+    "static_obstacle_Precision": 0.962,
+    "dynamic_object_Precision": 0.8747,
+    "drivable_terrain_Recall": 0.7643,
+    "non_drivable_terrain_Recall": 0.6667,
+    "static_obstacle_Recall": 0.8877,
+    "dynamic_object_Recall": 0.9071,
+    "drivable_terrain_F1": 0.4556,
+    "non_drivable_terrain_F1": 0.8,
+    "static_obstacle_F1": 0.9234,
+    "dynamic_object_F1": 0.8906,
+    "distance_bands": {
+      "near_0_10m": {
+        "drivable_terrain_IoU": 0.0,
+        "non_drivable_terrain_IoU": 0.0,
+        "static_obstacle_IoU": 0.7575,
+        "dynamic_object_IoU": 0.9776,
+        "mIoU": 0.4338,
+        "points": 55621
+      },
+      "mid_10_40m": {
+        "drivable_terrain_IoU": 0.3137,
+        "non_drivable_terrain_IoU": 0.0,
+        "static_obstacle_IoU": 0.8593,
+        "dynamic_object_IoU": 0.7495,
+        "mIoU": 0.4806,
+        "points": 329615
+      },
+      "far_40_100m": {
+        "drivable_terrain_IoU": 0.1729,
+        "non_drivable_terrain_IoU": 0.8596,
+        "static_obstacle_IoU": 0.8608,
+        "dynamic_object_IoU": 0.4176,
+        "mIoU": 0.5777,
+        "points": 73682
+      }
+    }
+  }
+}
