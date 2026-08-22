@@ -1,0 +1,149 @@
+{
+  "environment": {
+    "os": "macOS-26.5.2-arm64-arm-64bit",
+    "system": "Darwin",
+    "processor": "arm",
+    "cpu_count_physical": 10,
+    "cpu_count_logical": 10,
+    "total_ram_gb": 16.0,
+    "python_version": "3.9.6",
+    "torch_version": "2.8.0",
+    "numpy_version": "2.0.2",
+    "scipy_version": "1.13.1",
+    "pandas_version": "2.3.3",
+    "matplotlib_version": "3.9.4",
+    "pyyaml_version": "6.0.3",
+    "model_name": "SPVCNN",
+    "model_parameters": 136979,
+    "grid_specification": "4-Band (0-10m:5cm, 10-30m:10cm, 30-60m:25cm, 60-100m:50cm)",
+    "timestamp": "2026-08-22 18:06:18"
+  },
+  "model_type": "SPVCNN",
+  "stage_statistics": {
+    "load": {
+      "mean": 1.395,
+      "median": 1.555,
+      "min": 0.352,
+      "max": 2.097,
+      "std": 0.578,
+      "p95": 2.006
+    },
+    "preprocess": {
+      "mean": 2.803,
+      "median": 2.82,
+      "min": 2.694,
+      "max": 2.946,
+      "std": 0.091,
+      "p95": 2.924
+    },
+    "ml_inference": {
+      "mean": 107.604,
+      "median": 106.863,
+      "min": 106.267,
+      "max": 109.427,
+      "std": 1.371,
+      "p95": 109.36
+    },
+    "grid_generation": {
+      "mean": 164.522,
+      "median": 174.607,
+      "min": 125.602,
+      "max": 175.781,
+      "std": 19.515,
+      "p95": 175.648
+    },
+    "visualization_prep": {
+      "mean": 94.704,
+      "median": 95.154,
+      "min": 92.73,
+      "max": 95.823,
+      "std": 1.184,
+      "p95": 95.817
+    },
+    "total": {
+      "mean": 371.028,
+      "median": 379.752,
+      "min": 330.841,
+      "max": 385.148,
+      "std": 20.334,
+      "p95": 384.785
+    }
+  },
+  "frames_summary": {
+    "mean_points": 40000.0,
+    "mean_cells": 28307.8,
+    "mean_total_ms": 371.028,
+    "median_total_ms": 379.752,
+    "p95_total_ms": 384.785,
+    "mean_fps": 2.7,
+    "mean_memory_mb": 552.36,
+    "mean_cpu_percent": 143.5
+  },
+  "scaling_results": [
+    {
+      "points": 10000,
+      "total_runtime_ms": 61.87,
+      "load_ms": 0.01,
+      "preprocess_ms": 0.54,
+      "ml_inference_ms": 22.85,
+      "grid_generation_ms": 38.46,
+      "visualization_prep_ms": 0.0,
+      "fps": 16.16,
+      "memory_mb": 561.59,
+      "occupied_cells": 9836,
+      "data_type": "Controlled Real/Synthetic Mixture"
+    },
+    {
+      "points": 100000,
+      "total_runtime_ms": 820.6,
+      "load_ms": 0.02,
+      "preprocess_ms": 4.76,
+      "ml_inference_ms": 323.25,
+      "grid_generation_ms": 492.57,
+      "visualization_prep_ms": 0.0,
+      "fps": 1.22,
+      "memory_mb": 1021.73,
+      "occupied_cells": 86322,
+      "data_type": "Controlled Real/Synthetic Mixture"
+    },
+    {
+      "points": 500000,
+      "total_runtime_ms": 3343.18,
+      "load_ms": 0.18,
+      "preprocess_ms": 24.85,
+      "ml_inference_ms": 1375.69,
+      "grid_generation_ms": 1942.46,
+      "visualization_prep_ms": 0.0,
+      "fps": 0.3,
+      "memory_mb": 1177.31,
+      "occupied_cells": 279870,
+      "data_type": "Controlled Real/Synthetic Mixture"
+    },
+    {
+      "points": 1000000,
+      "total_runtime_ms": 5819.43,
+      "load_ms": 0.13,
+      "preprocess_ms": 48.78,
+      "ml_inference_ms": 2961.69,
+      "grid_generation_ms": 2808.83,
+      "visualization_prep_ms": 0.0,
+      "fps": 0.17,
+      "memory_mb": 1290.2,
+      "occupied_cells": 392656,
+      "data_type": "Controlled Real/Synthetic Mixture"
+    },
+    {
+      "points": 5000000,
+      "total_runtime_ms": 24425.38,
+      "load_ms": 1.0,
+      "preprocess_ms": 287.49,
+      "ml_inference_ms": 14464.45,
+      "grid_generation_ms": 9672.44,
+      "visualization_prep_ms": 0.0,
+      "fps": 0.04,
+      "memory_mb": 2312.5,
+      "occupied_cells": 570207,
+      "data_type": "Controlled Real/Synthetic Mixture"
+    }
+  ]
+}
