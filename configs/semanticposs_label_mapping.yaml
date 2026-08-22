@@ -1,0 +1,45 @@
+﻿# SemanticPOSS Authoritative Label Mapping Configuration (Phase 11.1)
+
+dataset_name: "SemanticPOSS"
+sensor_type: "HESAI-Pandora 40-beam LiDAR"
+
+# Frozen Project Ontology:
+#   0: drivable_terrain
+#   1: non_drivable_terrain
+#   2: static_obstacle
+#   3: dynamic_object
+#   255: ignore
+
+semanticposs_raw_to_sih:
+  # Class 0: drivable_terrain
+  22: 0   # ground
+
+  # Class 1: non_drivable_terrain
+  19: 1   # other static / terrain
+  20: 1   # unknown ground
+
+  # Class 2: static_obstacle
+  8: 2    # trunk
+  9: 2    # plants / vegetation
+  10: 2   # traffic sign 1
+  11: 2   # traffic sign 2
+  12: 2   # traffic sign 3
+  13: 2   # pole
+  14: 2   # trashcan
+  15: 2   # building
+  16: 2   # cone / stone
+  17: 2   # fence
+  18: 2   # traffic sign 4
+
+  # Class 3: dynamic_object
+  4: 3    # people (standing)
+  5: 3    # people (walking)
+  6: 3    # rider
+  7: 3    # car
+  21: 3   # bike / bicycle
+
+  # Class 255: ignore
+  0: 255  # unlabeled
+  1: 255  # unlabeled outlier
+
+unmapped_policy: "ignore"

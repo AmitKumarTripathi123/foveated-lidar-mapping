@@ -1,0 +1,31 @@
+﻿# Phase 11.1 SemanticPOSS Dataset Partitioning Policy
+
+split_type: "sequence_level"
+description: "Disjoint sequence partitioning for 6-sequence SemanticPOSS dataset (sequences 00-05)"
+
+expected_inventory:
+  sequences: ["00", "01", "02", "03", "04", "05"]
+  expected_frames_per_seq:
+    "00": 488
+    "01": 500
+    "02": 500
+    "03": 500
+    "04": 500
+    "05": 500
+  expected_total_frames: 2988
+
+actual_inventory_in_workspace:
+  sequences_found: ["00"]
+  actual_frames: 1
+  discrepancy: "Full multi-sequence archive is not yet unpacked in local directory; 1 representative scan present"
+
+planned_splits:
+  train:
+    sequences: ["00", "01", "03", "04", "05"]
+    expected_frames: 2488
+  validation:
+    sequences: ["02"]
+    expected_frames: 500
+  test:
+    sequences: []
+    status: "UNAVAILABLE (Requires independent external sequence)"
