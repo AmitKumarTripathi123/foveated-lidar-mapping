@@ -54,6 +54,8 @@ def discover_dataset(
     if not seq_dir.is_dir():
         return manifest
 
+    cwd = Path.cwd()
+
     for s_path in sorted(seq_dir.iterdir()):
         if not s_path.is_dir():
             continue
@@ -72,8 +74,15 @@ def discover_dataset(
             has_label = l_file.is_file()
 
             # Store portable relative POSIX paths
-            rel_b = b_file.as_posix()
-            rel_l = l_file.as_posix() if has_label else None
+            try:
+                rel_b = b_file.resolve().relative_to(cwd.resolve()).as_posix()
+            except ValueError:
+                rel_b = b_file.as_posix()
+
+            try:
+                rel_l = l_file.resolve().relative_to(cwd.resolve()).as_posix() if has_label else None
+            except ValueError:
+                rel_l = l_file.as_posix() if has_label else None
 
             record = {
                 "sequence": seq_id,

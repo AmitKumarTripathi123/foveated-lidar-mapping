@@ -1,0 +1,46 @@
+﻿# Phase 7 PointNet++ Multi-Frame Training Configuration
+
+experiment:
+  name: "phase7_baseline_ce"
+  seed: 42
+  device: "auto"
+
+dataset:
+  dataset_root: "dataset"
+  train_sequences: ["00"]
+  val_sequences: ["00"]
+  test_sequences: []
+  num_points: 1024
+  target_num_points: 1024
+  use_foveated_cache: true
+  cached_train_dir: "processed/train"
+  cached_val_dir: "processed/val"
+
+training:
+  epochs: 10
+  batch_size: 1
+  learning_rate: 0.005
+  weight_decay: 0.0001
+  optimizer: "adam"
+  scheduler: "cosine"
+
+loss:
+  type: "cross_entropy"
+  ignore_index: 255
+  weighting_strategy: "inverse_frequency"
+
+augmentation:
+  enabled: false
+  rotation_range: [-15.0, 15.0]
+  scale_range: [0.95, 1.05]
+  jitter_std: 0.01
+
+diagnostics:
+  collapse_threshold: 0.90
+  stagnation_epochs: 5
+
+checkpoint:
+  save_best: true
+  save_last: true
+  checkpoint_dir: "experiments"
+  monitor_metric: "val_miou"
