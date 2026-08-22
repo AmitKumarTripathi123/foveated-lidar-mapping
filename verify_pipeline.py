@@ -1,4 +1,4 @@
-﻿"""
+"""
 verify_pipeline.py
 ==================
 Verification script to test the complete 3D LiDAR Foveated Mapping Data Pipeline:
@@ -109,7 +109,8 @@ def main():
     parser = argparse.ArgumentParser(description="Verify 3D LiDAR Foveated Mapping Data Pipeline.")
     parser.add_argument("--dataset-root", type=str, default=DEFAULT_DATASET_ROOT)
     parser.add_argument("--output-dir", type=str, default=DEFAULT_OUTPUT_DIR)
-    parser.add_argument("--sequences", nargs="+", default=["00"])
+    parser.add_argument("--sequences", nargs="+", default=["00", "01", "02", "03", "04", "05"])
+
     parser.add_argument("--max-frames", type=int, default=None)
 
     args = parser.parse_args()

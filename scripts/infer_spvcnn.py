@@ -153,24 +153,54 @@ def run_inference(
 def main():
     parser = argparse.ArgumentParser(description="SPVCNN Inference CLI.")
     parser.add_argument("--dataset-root", type=str, default="dataset", help="Dataset root directory.")
-    parser.add_argument("--sequence", type=str, default="00", help="Sequence ID.")
-    parser.add_argument("--frame", type=str, default="000000", help="Frame ID.")
+    parser.add_argument("--sequence", type=str, default="00", help="Sequence ID (or 'all' for all sequences).")
+    parser.add_argument("--frame", type=str, default="000000", help="Frame ID (or 'all' for all frames).")
+    parser.add_argument("--all-frames", action="store_true", help="Process all 2,988 frames across all sequences.")
     parser.add_argument("--checkpoint", type=str, default="checkpoints/spvcnn_pretrained.pt", help="Path to SPVCNN checkpoint.")
     parser.add_argument("--device", type=str, default=None, help="Device (cpu or cuda).")
     parser.add_argument("--voxel-size", type=float, default=0.05, help="Voxel size in meters.")
     parser.add_argument("--output-dir", type=str, default="reports/spvcnn_inference", help="Output directory.")
 
     args = parser.parse_args()
-    run_inference(
-        dataset_root=args.dataset_root,
-        sequence=args.sequence,
-        frame=args.frame,
-        checkpoint=args.checkpoint,
-        device=args.device,
-        voxel_size=args.voxel_size,
-        output_dir=args.output_dir,
-    )
+
+    root = Path(args.dataset_root)
+    if args.all_frames or args.frame.lower() == "all" or args.sequence.lower() == "all":
+
+        seqs = ["00", "01", "02", "03", "04", "05"] if (args.sequence.lower() == "all" or args.all_frames) else [args.sequence.zfill(2)]
+        total_processed = 0
+        for seq_id in seqs:
+            velo_dir = root / "sequences" / seq_id / "velodyne"
+            if not velo_dir.exists():
+                velo_dir = root / seq_id / "velodyne"
+            if not velo_dir.exists():
+                continue
+            bin_files = sorted(list(velo_dir.glob("*.bin")))
+            print(f"\n=== Processing Sequence {seq_id} ({len(bin_files)} frames) ===")
+            for b_file in bin_files:
+                frame_stem = b_file.stem
+                run_inference(
+                    dataset_root=args.dataset_root,
+                    sequence=seq_id,
+                    frame=frame_stem,
+                    checkpoint=args.checkpoint,
+                    device=args.device,
+                    voxel_size=args.voxel_size,
+                    output_dir=args.output_dir,
+                )
+                total_processed += 1
+        print(f"\n✅ Total Frames Processed: {total_processed:,}")
+    else:
+        run_inference(
+            dataset_root=args.dataset_root,
+            sequence=args.sequence,
+            frame=args.frame,
+            checkpoint=args.checkpoint,
+            device=args.device,
+            voxel_size=args.voxel_size,
+            output_dir=args.output_dir,
+        )
 
 
 if __name__ == "__main__":
     main()
+

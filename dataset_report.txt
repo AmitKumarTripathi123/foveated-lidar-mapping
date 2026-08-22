@@ -1,34 +1,24 @@
-﻿============================================================
+============================================================
 SEMANTICPOSS DATASET FORENSIC AUDIT REPORT
 ============================================================
-
-Dataset Root:           dataset
+Dataset Root:           /Users/amitkumartripathi/Desktop/3d lidar foveated mapping/dataset
 Expected Sequences:     00, 01, 02, 03, 04, 05
-Detected Sequences:     00
-
-Expected Total Frames:  2,988
-Detected Total Frames:  1
+Detected Sequences:     00, 01, 02, 03, 04, 05
+Total Matched Frames:   2,988 / 2,988
+Total Points Audited:   202,504,402
 
 Sequence Breakdown:
-  Sequence 00: 1 frame (velodyne/000000.bin, labels/000000.label, 66,658 points)
-  Sequence 01: MISSING (0 frames)
-  Sequence 02: MISSING (0 frames)
-  Sequence 03: MISSING (0 frames)
-  Sequence 04: MISSING (0 frames)
-  Sequence 05: MISSING (0 frames)
+  Sequence 00: 488 frames (32,861,751 points)
+  Sequence 01: 500 frames (33,408,421 points)
+  Sequence 02: 500 frames (34,646,570 points)
+  Sequence 03: 500 frames (34,317,254 points)
+  Sequence 04: 500 frames (33,581,357 points)
+  Sequence 05: 500 frames (33,689,049 points)
 
-Pairing Verification:
-  Point clouds:   1
-  Labels:         1
-  Matched pairs:  1 (100% matched for sequence 00)
-  Missing labels: 0
-  Missing clouds: 0
-
-Split Availability:
-  Train frames:      1 (Sequence 00)
-  Validation frames: 0 (Sequence 02 missing)
-  Test frames:       UNAVAILABLE
+Split Allocation:
+  Train Frames (00, 01, 03, 04, 05): 2,488 frames
+  Val Frames (02):                  500 frames
 
 Status:
-  DATASET ACTIVATION BLOCKED (Incomplete Physical Archive)
+  DATASET ACTIVATED AND VALIDATED (2,988 Real Frames Accessible)
 ============================================================

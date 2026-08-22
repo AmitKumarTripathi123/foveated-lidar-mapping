@@ -1,24 +1,41 @@
-﻿{
-  "dataset_name": "SemanticPOSS",
-  "dataset_root": "dataset",
-  "expected_sequences": ["00", "01", "02", "03", "04", "05"],
-  "detected_sequences": ["00"],
-  "expected_total_frames": 2988,
-  "detected_total_frames": 1,
-  "point_cloud_count": 1,
-  "label_count": 1,
-  "matched_pairs": 1,
-  "missing_labels": 0,
-  "missing_clouds": 0,
-  "train_frames": 1,
-  "validation_frames": 0,
-  "independent_test_frames": 0,
-  "points_per_frame_stats": {
-    "min": 66658,
-    "max": 66658,
-    "mean": 66658.0,
-    "median": 66658.0
+{
+  "dataset_root": "/Users/amitkumartripathi/Desktop/3d lidar foveated mapping/dataset",
+  "total_sequences": 6,
+  "expected_sequences": [
+    "00",
+    "01",
+    "02",
+    "03",
+    "04",
+    "05"
+  ],
+  "total_matched_frames": 2988,
+  "total_points": 202504402,
+  "sequence_breakdown": {
+    "00": {
+      "matched_frames": 488,
+      "points": 32861751
+    },
+    "01": {
+      "matched_frames": 500,
+      "points": 33408421
+    },
+    "02": {
+      "matched_frames": 500,
+      "points": 34646570
+    },
+    "03": {
+      "matched_frames": 500,
+      "points": 34317254
+    },
+    "04": {
+      "matched_frames": 500,
+      "points": 33581357
+    },
+    "05": {
+      "matched_frames": 500,
+      "points": 33689049
+    }
   },
-  "audit_status": "FAIL_INCOMPLETE_PHYSICAL_ARCHIVE",
-  "reason": "Sequences 01-05 are not physically extracted in dataset/sequences/ directory"
+  "status": "FULL SEMANTICPOSS DATASET ACTIVATED (2,988 Frames Validated)"
 }
