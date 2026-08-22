@@ -1,10 +1,11 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Dataset Manifest and Integrity Audit Generation CLI Tool (Master Task).
 
 Usage:
     python scripts/generate_manifest.py --dataset-root dataset
 """
 
+import os
 import argparse
 import json
 import sys
@@ -18,6 +19,18 @@ if str(repo_root) not in sys.path:
 from ml.data.manifest import discover_dataset, audit_dataset
 
 
+def resolve_dataset_root(cli_arg: str = None) -> str:
+    """Resolve dataset root using priority: CLI > DATASET_ROOT Env Var > Default 'dataset/'."""
+    if cli_arg and cli_arg != "dataset" and os.path.exists(cli_arg):
+        return os.path.abspath(cli_arg)
+    env_root = os.getenv("DATASET_ROOT")
+    if env_root and os.path.exists(env_root):
+        return os.path.abspath(env_root)
+    if cli_arg and os.path.exists(cli_arg):
+        return os.path.abspath(cli_arg)
+    return os.path.abspath("dataset")
+
+
 def main() -> int:
     """CLI entrypoint."""
     parser = argparse.ArgumentParser(description="Generate dataset manifest and integrity audit.")
@@ -28,11 +41,14 @@ def main() -> int:
 
     args = parser.parse_args()
 
+    root = resolve_dataset_root(args.dataset_root)
+
     # 1. Discover all scans
-    manifest = discover_dataset(args.dataset_root)
+    manifest = discover_dataset(root)
     with open(args.manifest_out, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
     print(f"[OK] Generated manifest: {args.manifest_out}")
+
 
     # 2. Audit dataset
     audit = audit_dataset(manifest, args.audit_json, args.audit_md)
