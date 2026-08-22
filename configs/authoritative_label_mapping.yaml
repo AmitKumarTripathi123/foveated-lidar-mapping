@@ -1,0 +1,91 @@
+﻿# Authoritative Label Mapping Configuration (Phase 11)
+# Supported Datasets: SemanticKITTI, SemanticPOSS
+
+dataset_name: "SemanticKITTI"
+dataset_version: "1.0"
+
+# Target SIH 4-Class Project Ontology:
+#   0: drivable_terrain
+#   1: non_drivable_terrain
+#   2: static_obstacle
+#   3: dynamic_object
+#   255: ignore
+
+semantickitti_raw_to_sih:
+  # Class 0: drivable_terrain
+  40: 0   # road
+  44: 0   # parking
+  60: 0   # lane-marking
+
+  # Class 1: non_drivable_terrain
+  48: 1   # sidewalk
+  49: 1   # other-ground
+  72: 1   # terrain
+
+  # Class 2: static_obstacle
+  50: 2   # building
+  51: 2   # fence
+  52: 2   # other-structure
+  70: 2   # vegetation
+  71: 2   # trunk
+  80: 2   # pole
+  81: 2   # traffic-sign
+  99: 2   # other-object
+
+  # Class 3: dynamic_object
+  10: 3   # car
+  11: 3   # bicycle
+  13: 3   # bus
+  15: 3   # motorcycle
+  16: 3   # on-rails
+  18: 3   # truck
+  20: 3   # other-vehicle
+  30: 3   # person
+  31: 3   # bicyclist
+  32: 3   # motorcyclist
+  252: 3  # moving-car
+  253: 3  # moving-bicyclist
+  254: 3  # moving-pedestrian
+  255: 3  # moving-motorcyclist
+  256: 3  # moving-on-rails
+  257: 3  # moving-bus
+  258: 3  # moving-truck
+  259: 3  # moving-other-vehicle
+
+  # Class 255: ignore
+  0: 255  # unlabeled / outlier
+  1: 255  # outlier
+
+semanticposs_raw_to_sih:
+  # Class 0: drivable_terrain
+  22: 0   # ground
+
+  # Class 1: non_drivable_terrain
+  19: 1   # other static / terrain
+  20: 1   # unknown ground
+
+  # Class 2: static_obstacle
+  8: 2    # trunk
+  9: 2    # plants / vegetation
+  10: 2   # traffic sign 1
+  11: 2   # traffic sign 2
+  12: 2   # traffic sign 3
+  13: 2   # pole
+  14: 2   # trashcan
+  15: 2   # building
+  16: 2   # cone/stone
+  17: 2   # fence
+  18: 2   # traffic sign 4
+
+  # Class 3: dynamic_object
+  4: 3    # people 1
+  5: 3    # people 2
+  6: 3    # rider
+  7: 3    # car
+  21: 3   # bike
+
+  # Class 255: ignore
+  0: 255  # unlabeled
+  1: 255  # unlabeled_outlier
+
+unmapped_policy: "ignore"

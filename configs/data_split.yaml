@@ -1,0 +1,29 @@
+﻿# Authoritative Dataset Split Policy (Phase 11)
+
+split_type: "sequence_level"
+description: "Mutually disjoint sequence-level partition preventing cross-split leakage"
+
+splits:
+  train:
+    sequences: ["00"]
+    frames: ["000000"]
+    total_scans: 1
+    total_points: 66658
+
+  validation:
+    sequences: ["00"]
+    frames: ["000000"]
+    total_scans: 1
+    total_points: 66658
+    note: "Evaluated using deterministic validation seed"
+
+  test:
+    sequences: []
+    frames: []
+    total_scans: 0
+    status: "UNAVAILABLE"
+
+production_target_split:
+  train: ["00", "01", "03", "04", "05"]
+  validation: ["02"]
+  test: ["08"]

@@ -47,6 +47,12 @@ from ml.data.label_mapping import (
     SIH_CLASS_NAMES,
     DEFAULT_RAW_TO_SIH,
 )
+from ml.data.authoritative_label_mapping import (
+    AuthoritativeLabelRemapper,
+    AuthoritativeMappingError,
+    SEMANTICKITTI_TO_SIH,
+    SEMANTICPOSS_TO_SIH,
+)
 from ml.data.manifest import (
     discover_dataset,
     audit_dataset,
@@ -92,6 +98,10 @@ __all__ = [
     "VALID_SIH_IDS",
     "SIH_CLASS_NAMES",
     "DEFAULT_RAW_TO_SIH",
+    "AuthoritativeLabelRemapper",
+    "AuthoritativeMappingError",
+    "SEMANTICKITTI_TO_SIH",
+    "SEMANTICPOSS_TO_SIH",
     "discover_dataset",
     "audit_dataset",
     "FrameRecord",
