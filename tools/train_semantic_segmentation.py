@@ -124,7 +124,9 @@ def train_model(
     epochs: int = 5,
     lr: float = 0.002,
     device: str = "cpu",
-    output_dir: str = "experiments/full_semanticposs_train"
+    output_dir: str = "experiments/full_semanticposs_train",
+    max_train_frames: Optional[int] = None,
+    max_val_frames: Optional[int] = None
 ) -> Dict[str, Any]:
     """
     Executes full multi-frame training across all discovered SemanticPOSS frames.
@@ -154,10 +156,16 @@ def train_model(
     elif len(val_pairs) == 0:
         val_pairs = train_pairs
 
+    # Optional frame limits for fast execution if requested
+    if max_train_frames and max_train_frames > 0:
+        train_pairs = train_pairs[:max_train_frames]
+    if max_val_frames and max_val_frames > 0:
+        val_pairs = val_pairs[:max_val_frames]
+
     print(f"Discovered Dataset Root: {manifest.get('dataset_root')}")
     print(f"Total Available Frames:  {len(train_pairs) + len(val_pairs)} frames")
-    print(f"Training Partition:      {len(train_pairs)} frames")
-    print(f"Validation Partition:    {len(val_pairs)} frames")
+    print(f"Training Partition:      {len(train_pairs)} frames (Sequences 00, 01, 03, 04, 05)")
+    print(f"Validation Partition:    {len(val_pairs)} frames (Sequence 02)")
     print("-" * 80)
 
     # 2. Build Datasets and DataLoaders
@@ -183,6 +191,9 @@ def train_model(
     history = []
 
     # 4. Training Loop
+    total_train = len(train_loader)
+    total_val = len(val_loader)
+
     for ep in range(1, epochs + 1):
         t0 = time.time()
         model.train()
@@ -204,14 +215,20 @@ def train_model(
             train_loss += loss.item() * len(targets)
             train_points += len(targets)
 
+            if (b_idx + 1) % 50 == 0 or (b_idx + 1) == total_train:
+                cur_avg = train_loss / max(train_points, 1)
+                elapsed = time.time() - t0
+                print(f"  Epoch {ep:2d}/{epochs:2d} | Train Frame [{b_idx+1:4d}/{total_train:4d}] ({100*(b_idx+1)/total_train:5.1f}%) | Loss: {cur_avg:.4f} | {elapsed:.1f}s")
+
         scheduler.step()
         train_loss_avg = train_loss / max(train_points, 1)
 
         # Validation Step
         model.eval()
         val_preds_list, val_targets_list = [], []
+        t_v0 = time.time()
         with torch.no_grad():
-            for batch in val_loader:
+            for v_idx, batch in enumerate(val_loader):
                 feats = batch["features"].to(dev)
                 p2v = batch["point_to_voxel_idx"].to(dev)
                 n_vox = batch["num_voxels"]
@@ -224,6 +241,9 @@ def train_model(
                 val_preds_list.append(preds)
                 val_targets_list.append(targets)
 
+                if (v_idx + 1) % 100 == 0 or (v_idx + 1) == total_val:
+                    print(f"  Epoch {ep:2d}/{epochs:2d} | Val Frame [{v_idx+1:4d}/{total_val:4d}] ({100*(v_idx+1)/total_val:5.1f}%) | {time.time()-t_v0:.1f}s")
+
         val_preds_cat = np.concatenate(val_preds_list) if val_preds_list else np.empty(0)
         val_targs_cat = np.concatenate(val_targets_list) if val_targets_list else np.empty(0)
 
@@ -232,7 +252,7 @@ def train_model(
         val_oa = metrics.get("overall_accuracy", 0.0)
         dt = time.time() - t0
 
-        print(f"Epoch {ep:2d}/{epochs:2d} [{dt:.1f}s] | Train Loss: {train_loss_avg:.4f} | Val Accuracy: {val_oa*100:5.2f}% | Val mIoU: {val_miou*100:5.2f}%")
+        print(f"\n>> Epoch {ep:2d}/{epochs:2d} Summary [{dt:.1f}s] | Train Loss: {train_loss_avg:.4f} | Val Accuracy: {val_oa*100:5.2f}% | Val mIoU: {val_miou*100:5.2f}%\n")
 
         history.append({
             "epoch": ep,
@@ -268,13 +288,15 @@ def train_model(
     }
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Full Multi-Frame SemanticPOSS Training Engine")
     parser.add_argument("--dataset-root", type=str, default=None, help="Path to SemanticPOSS dataset root")
-    parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
+    parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs")
     parser.add_argument("--lr", type=float, default=0.003, help="Learning rate")
     parser.add_argument("--device", type=str, default="cpu", help="Device (cpu/cuda/mps)")
     parser.add_argument("--output-dir", type=str, default="experiments/full_semanticposs_train")
+    parser.add_argument("--max-train-frames", type=int, default=None, help="Max train frames (None for full 2488)")
+    parser.add_argument("--max-val-frames", type=int, default=None, help="Max val frames (None for full 500)")
 
     args = parser.parse_args()
     train_model(
@@ -282,5 +304,11 @@ if __name__ == "__main__":
         epochs=args.epochs,
         lr=args.lr,
         device=args.device,
-        output_dir=args.output_dir
+        output_dir=args.output_dir,
+        max_train_frames=args.max_train_frames,
+        max_val_frames=args.max_val_frames
     )
+
+
+if __name__ == "__main__":
+    main()
