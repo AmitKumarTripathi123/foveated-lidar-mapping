@@ -36,7 +36,7 @@ def discover_dataset(
     if train_sequences is None:
         train_sequences = ["00", "01", "03", "04", "05"]
     if val_sequences is None:
-        val_sequences = ["02"]
+        val_sequences = ["02"] if (seq_dir / "02").is_dir() else ["00"]
     if test_sequences is None:
         test_sequences = []
 
