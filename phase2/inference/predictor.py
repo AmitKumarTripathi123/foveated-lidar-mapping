@@ -140,7 +140,6 @@ class Phase2Predictor:
 
         self.model.eval()
 
-    @torch.no_grad()
     def predict_frame(self, frame: PointCloudFrame) -> SemanticPrediction:
         """
         Executes semantic prediction on a PointCloudFrame and returns a validated SemanticPrediction.
@@ -158,45 +157,46 @@ class Phase2Predictor:
                 model_type=self.model_type
             )
 
-        if self.model_type in ("spvcnn", "spv_cnn"):
-            bundle = self.input_adapter.prepare_input(pts, device=self.device)
-            logits = self.model(
-                features=bundle["features"],
-                point_to_voxel_idx=bundle["point_to_voxel_idx"],
-                num_voxels=bundle["num_voxels"]
-            )
-            sih_preds, super_probs, conf = self.label_adapter.process_logits(logits)
+        with torch.inference_mode():
+            if self.model_type in ("spvcnn", "spv_cnn"):
+                bundle = self.input_adapter.prepare_input(pts, device=self.device)
+                logits = self.model(
+                    features=bundle["features"],
+                    point_to_voxel_idx=bundle["point_to_voxel_idx"],
+                    num_voxels=bundle["num_voxels"]
+                )
+                sih_preds, super_probs, conf = self.label_adapter.process_logits(logits)
 
-            return SemanticPrediction(
-                points=pts,
-                predicted_class=sih_preds,
-                class_probabilities=super_probs,
-                confidence=conf,
-                frame_id=frame.frame_id,
-                timestamp=frame.timestamp,
-                sequence_id=frame.sequence_id,
-                raw_point_count=frame.metadata.get("raw_point_count", len(pts)),
-                foveated_point_count=len(pts),
-                model_type="SPVCNN"
-            )
+                return SemanticPrediction(
+                    points=pts,
+                    predicted_class=sih_preds,
+                    class_probabilities=super_probs,
+                    confidence=conf,
+                    frame_id=frame.frame_id,
+                    timestamp=frame.timestamp,
+                    sequence_id=frame.sequence_id,
+                    raw_point_count=frame.metadata.get("raw_point_count", len(pts)),
+                    foveated_point_count=len(pts),
+                    model_type="SPVCNN"
+                )
 
-        else:
-            # Fallback: FoveatedPointSegNet
-            tensor_pts = torch.from_numpy(pts.astype(np.float32)).to(self.device)
-            logits = self.model(tensor_pts)
-            probs = F.softmax(logits, dim=-1).cpu().numpy()
-            preds = np.argmax(probs, axis=-1).astype(np.int64)
-            conf = np.max(probs, axis=-1).astype(np.float32)
+            else:
+                # Fallback: FoveatedPointSegNet
+                tensor_pts = torch.from_numpy(pts.astype(np.float32)).to(self.device)
+                logits = self.model(tensor_pts)
+                probs = F.softmax(logits, dim=-1).cpu().numpy()
+                preds = np.argmax(probs, axis=-1).astype(np.int64)
+                conf = np.max(probs, axis=-1).astype(np.float32)
 
-            return SemanticPrediction(
-                points=pts,
-                predicted_class=preds,
-                class_probabilities=probs,
-                confidence=conf,
-                frame_id=frame.frame_id,
-                timestamp=frame.timestamp,
-                sequence_id=frame.sequence_id,
-                raw_point_count=frame.metadata.get("raw_point_count", len(pts)),
-                foveated_point_count=len(pts),
-                model_type="FoveatedPointSegNet"
-            )
+                return SemanticPrediction(
+                    points=pts,
+                    predicted_class=preds,
+                    class_probabilities=probs,
+                    confidence=conf,
+                    frame_id=frame.frame_id,
+                    timestamp=frame.timestamp,
+                    sequence_id=frame.sequence_id,
+                    raw_point_count=frame.metadata.get("raw_point_count", len(pts)),
+                    foveated_point_count=len(pts),
+                    model_type="FoveatedPointSegNet"
+                )

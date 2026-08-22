@@ -82,14 +82,23 @@ class SPVCNNInputAdapter:
                 "raw_xyz": xyz,
             }
 
-        # 1. Quantize 3D coordinates into integer voxel grid
-        v_coords = np.floor(xyz / self.voxel_size).astype(np.int64)
+        # 1. Quantize 3D coordinates into integer voxel grid with 64-bit integer packing
+        OFFSET = 50000
+        vx = np.floor(xyz[:, 0] / self.voxel_size).astype(np.int64) + OFFSET
+        vy = np.floor(xyz[:, 1] / self.voxel_size).astype(np.int64) + OFFSET
+        vz = np.floor(xyz[:, 2] / self.voxel_size).astype(np.int64) + OFFSET
+        packed = (vx << 42) | (vy << 21) | vz
 
         # 2. Extract unique voxels and inverse point-to-voxel mapping
-        unique_voxels, voxel_to_pt, pt_to_voxel = np.unique(
-            v_coords, axis=0, return_index=True, return_inverse=True
+        unique_packed, voxel_to_pt, pt_to_voxel = np.unique(
+            packed, return_index=True, return_inverse=True
         )
-        n_voxels = unique_voxels.shape[0]
+        n_voxels = unique_packed.shape[0]
+
+        u_vx = (unique_packed >> 42) - OFFSET
+        u_vy = ((unique_packed >> 21) & 0x1FFFFF) - OFFSET
+        u_vz = (unique_packed & 0x1FFFFF) - OFFSET
+        unique_voxels = np.column_stack([u_vx, u_vy, u_vz])
 
         # 3. Build PyTorch tensors
         dev = device if device is not None else torch.device("cpu")
@@ -171,11 +180,14 @@ class SPVCNNLabelAdapter:
         sih_preds_np = self.remap_predictions(native_preds_np)
 
         # Aggregate native class probabilities into 4 super-classes
-        N = len(native_preds_np)
-        super_probs = np.zeros((N, 4), dtype=np.float32)
-        for native_c, sih_c in self.mapping.items():
-            if native_c < probs_np.shape[1] and sih_c in (0, 1, 2, 3):
-                super_probs[:, sih_c] += probs_np[:, native_c]
+        if probs_np.shape[1] == 4 and self.native_source == "sih_direct":
+            super_probs = probs_np
+        else:
+            N = len(native_preds_np)
+            super_probs = np.zeros((N, 4), dtype=np.float32)
+            for native_c, sih_c in self.mapping.items():
+                if native_c < probs_np.shape[1] and sih_c in (0, 1, 2, 3):
+                    super_probs[:, sih_c] += probs_np[:, native_c]
 
         # Normalize superclass probabilities where sum > 0
         p_sums = np.sum(super_probs, axis=1, keepdims=True)
