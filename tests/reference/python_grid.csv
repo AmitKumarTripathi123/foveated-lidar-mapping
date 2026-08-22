@@ -1,0 +1,13 @@
+band_name,ix,iy,resolution,point_count,elevation_mean,elevation_min,elevation_max,semantic_class,confidence,traversability
+far_field,120,0,0.5,1,0.6,0.6,0.6,1,0.75,0.2
+far_field,-91,90,0.5,3,2.16667,1.0,3.5,3,0.88333,0.0
+far_field,-142,141,0.5,1,-1.2,-1.2,-1.2,2,0.7,0.0
+mid_far_field,239,0,0.25,1,0.5,0.5,0.5,1,0.75,0.2
+mid_far_field,0,120,0.25,1,0.4,0.4,0.4,2,0.85,0.0
+mid_near_field,100,0,0.1,1,0.2,0.2,0.2,0,0.9,1.0
+mid_near_field,0,299,0.1,1,0.3,0.3,0.3,2,0.85,0.0
+near_field,-85,-63,0.05,1,0.35,0.35,0.35,1,0.8,0.2
+near_field,-1,-1,0.05,2,-0.35,-0.5,-0.2,3,0.935,0.0
+near_field,0,0,0.05,1,0.0,0.0,0.0,0,0.95,1.0
+near_field,199,0,0.05,1,0.1,0.1,0.1,0,0.9,1.0
+near_field,40,60,0.05,3,1.16667,0.9,1.5,2,0.89,0.0
