@@ -1,0 +1,89 @@
+{
+  "scan": "dataset/sequences/00/velodyne/000000.bin",
+  "raw_points": 66658,
+  "preprocessed_points": 66021,
+  "foveated_points": 47231,
+  "foveation_reduction_pct": 28.46064131109799,
+  "unique_voxels": 46107,
+  "active_voxel_ratio_pct": 97.62,
+  "grid_occupied_cells": 30154,
+  "spvcnn_latency_ms": 151.35,
+  "grid_latency_ms": 11.62,
+  "total_latency_ms": 192.75,
+  "fps": 5.19,
+  "accuracy": {
+    "miou": 91.35,
+    "overall_accuracy": 95.38
+  },
+  "class_distribution": {
+    "Drivable Terrain": {
+      "class_id": 0,
+      "count": 5506,
+      "percentage": 11.66,
+      "color": "#2ca02c"
+    },
+    "Non-Drivable Terrain": {
+      "class_id": 1,
+      "count": 83,
+      "percentage": 0.18,
+      "color": "#d62728"
+    },
+    "Static Obstacle": {
+      "class_id": 2,
+      "count": 28947,
+      "percentage": 61.29,
+      "color": "#1f77b4"
+    },
+    "Dynamic Object": {
+      "class_id": 3,
+      "count": 12695,
+      "percentage": 26.88,
+      "color": "#ff7f0e"
+    },
+    "Ignore / Outlier": {
+      "class_id": 255,
+      "count": 0,
+      "percentage": 0.0,
+      "color": "#7f7f7f"
+    }
+  },
+  "confidence_statistics": {
+    "min": 0.3423,
+    "mean": 0.8811,
+    "median": 0.9633,
+    "max": 0.9999
+  },
+  "sample_point_trace": {
+    "point_index": 150,
+    "raw_xyz": [
+      -10.268144607543945,
+      -46.14506149291992,
+      6.055899620056152
+    ],
+    "distance_m": 47.274,
+    "band": "mid_far_field",
+    "foveated_retained": false,
+    "voxel_coords": [
+      -206,
+      -923,
+      121
+    ],
+    "packed_64bit_key": "0x30a0817f6a0c3c9",
+    "predicted_class": "Ignore / Outlier",
+    "confidence": 0.0,
+    "grid_cell": [
+      -42,
+      -185
+    ],
+    "elevation": null,
+    "traversability": 0.0
+  },
+  "stage_timings": {
+    "1_load_ms": 1.7287079999999122,
+    "2_preprocess_ms": 6.482499999999725,
+    "3_foveation_ms": 16.11091699999978,
+    "4_voxelization_ms": 5.4564159999999085,
+    "5_spvcnn_inference_ms": 151.3496670000003,
+    "6_grid_generation_ms": 11.62129200000006
+  }
+}
