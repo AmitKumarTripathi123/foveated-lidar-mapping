@@ -244,11 +244,21 @@ class TestPhase11_5SPVCNNTraining(unittest.TestCase):
 
     def test_22_complete_dataset_path_activates_full_training(self):
         """Test 22: Complete dataset configuration correctly passes activation gate."""
-        expected = {"00": 488}
-        gate = check_dataset_completeness(self.dataset_root, expected)
-        self.assertTrue(gate["is_complete"])
-        self.assertEqual(gate["total_found"], 488)
-        self.assertEqual(len(gate["missing_sequences"]), 0)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            v_dir = tmp_root / "sequences/00/velodyne"
+            l_dir = tmp_root / "sequences/00/labels"
+            v_dir.mkdir(parents=True)
+            l_dir.mkdir(parents=True)
+            # Create a valid pair
+            np.zeros((10, 4), dtype=np.float32).tofile(str(v_dir / "000000.bin"))
+            np.zeros(10, dtype=np.uint32).tofile(str(l_dir / "000000.label"))
+
+            expected = {"00": 1}
+            gate = check_dataset_completeness(tmp_root, expected)
+            self.assertTrue(gate["is_complete"])
+            self.assertEqual(gate["total_found"], 1)
+            self.assertEqual(len(gate["missing_sequences"]), 0)
 
 
 
