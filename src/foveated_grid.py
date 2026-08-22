@@ -148,30 +148,89 @@ def point_to_cell(
 
 class GridMap25D:
     """
-    Multi-Layer 2.5D Foveated Grid Map Representation.
-    Stores spatial cells indexed by (band_name, ix, iy).
-    Spatial identity is strictly 2D (ix, iy). Elevation Z is an aggregated cell attribute.
+    High-Performance Multi-Layer 2.5D Foveated Grid Map Representation.
+    Stores columnar vectorized spatial layers for sub-millisecond querying and export,
+    while providing backward-compatible lazy dictionary access.
     """
     def __init__(
         self,
         bands: Optional[List[FoveationBand]] = None,
         frame_id: str = "000000",
         timestamp: float = 0.0,
-        sequence_id: str = "00"
+        sequence_id: str = "00",
+        # Vectorized layer arrays
+        bands_arr: Optional[np.ndarray] = None,
+        ix_arr: Optional[np.ndarray] = None,
+        iy_arr: Optional[np.ndarray] = None,
+        res_arr: Optional[np.ndarray] = None,
+        counts_arr: Optional[np.ndarray] = None,
+        mean_z_arr: Optional[np.ndarray] = None,
+        min_z_arr: Optional[np.ndarray] = None,
+        max_z_arr: Optional[np.ndarray] = None,
+        classes_arr: Optional[np.ndarray] = None,
+        conf_arr: Optional[np.ndarray] = None,
+        trav_arr: Optional[np.ndarray] = None
     ):
         self.bands = list(bands) if bands is not None else list(DEFAULT_FROZEN_BANDS)
         self.frame_id = frame_id
         self.timestamp = timestamp
         self.sequence_id = sequence_id
-        self.cells: Dict[Tuple[str, int, int], GridCell25D] = {}
+
+        self._bands = bands_arr if bands_arr is not None else np.empty(0, dtype=object)
+        self._ix = ix_arr if ix_arr is not None else np.empty(0, dtype=np.int64)
+        self._iy = iy_arr if iy_arr is not None else np.empty(0, dtype=np.int64)
+        self._res = res_arr if res_arr is not None else np.empty(0, dtype=np.float32)
+        self._counts = counts_arr if counts_arr is not None else np.empty(0, dtype=np.int64)
+        self._mean_z = mean_z_arr if mean_z_arr is not None else np.empty(0, dtype=np.float32)
+        self._min_z = min_z_arr if min_z_arr is not None else np.empty(0, dtype=np.float32)
+        self._max_z = max_z_arr if max_z_arr is not None else np.empty(0, dtype=np.float32)
+        self._classes = classes_arr if classes_arr is not None else np.empty(0, dtype=np.int64)
+        self._conf = conf_arr if conf_arr is not None else np.empty(0, dtype=np.float32)
+        self._trav = trav_arr if trav_arr is not None else np.empty(0, dtype=np.float32)
+
+        self._cells_dict: Optional[Dict[Tuple[str, int, int], GridCell25D]] = None
+        self._custom_cells: Dict[Tuple[str, int, int], GridCell25D] = {}
+
+    def _populate_cells_dict(self):
+        if self._cells_dict is None:
+            self._cells_dict = {}
+            for i in range(len(self._ix)):
+                b_name = str(self._bands[i])
+                ix = int(self._ix[i])
+                iy = int(self._iy[i])
+                cell = GridCell25D(
+                    ix=ix,
+                    iy=iy,
+                    resolution=float(self._res[i]),
+                    point_count=int(self._counts[i]),
+                    elevation_mean=float(self._mean_z[i]),
+                    elevation_min=float(self._min_z[i]),
+                    elevation_max=float(self._max_z[i]),
+                    semantic_class=int(self._classes[i]),
+                    confidence=float(self._conf[i]),
+                    traversability=float(self._trav[i]),
+                    state=CellState.OCCUPIED,
+                    band_name=b_name
+                )
+                self._cells_dict[(b_name, ix, iy)] = cell
+            self._cells_dict.update(self._custom_cells)
+
+    @property
+    def cells(self) -> Dict[Tuple[str, int, int], GridCell25D]:
+        self._populate_cells_dict()
+        return self._cells_dict
 
     @property
     def num_cells(self) -> int:
-        return len(self.cells)
+        if self._cells_dict is not None:
+            return len(self._cells_dict)
+        return len(self._ix) + len(self._custom_cells)
 
     @property
     def num_occupied_cells(self) -> int:
-        return sum(1 for c in self.cells.values() if c.state == CellState.OCCUPIED)
+        if self._cells_dict is not None:
+            return sum(1 for c in self._cells_dict.values() if c.state == CellState.OCCUPIED)
+        return len(self._ix) + sum(1 for c in self._custom_cells.values() if c.state == CellState.OCCUPIED)
 
     def get_cell(self, band_name: str, ix: int, iy: int) -> GridCell25D:
         """
@@ -179,8 +238,31 @@ class GridMap25D:
         If cell was never observed, returns an UNKNOWN state cell with NaN elevation.
         """
         key = (band_name, ix, iy)
-        if key in self.cells:
-            return self.cells[key]
+        if self._cells_dict is not None:
+            if key in self._cells_dict:
+                return self._cells_dict[key]
+        elif key in self._custom_cells:
+            return self._custom_cells[key]
+        else:
+            if len(self._ix) > 0:
+                match = (self._bands == band_name) & (self._ix == ix) & (self._iy == iy)
+                indices = np.flatnonzero(match)
+                if len(indices) > 0:
+                    idx = indices[0]
+                    return GridCell25D(
+                        ix=ix,
+                        iy=iy,
+                        resolution=float(self._res[idx]),
+                        point_count=int(self._counts[idx]),
+                        elevation_mean=float(self._mean_z[idx]),
+                        elevation_min=float(self._min_z[idx]),
+                        elevation_max=float(self._max_z[idx]),
+                        semantic_class=int(self._classes[idx]),
+                        confidence=float(self._conf[idx]),
+                        traversability=float(self._trav[idx]),
+                        state=CellState.OCCUPIED,
+                        band_name=band_name
+                    )
 
         # Find band resolution
         res = 0.05
@@ -218,12 +300,49 @@ class GridMap25D:
     def insert_cell(self, cell: GridCell25D):
         """Inserts or overwrites a cell in the grid map."""
         key = (cell.band_name, cell.ix, cell.iy)
-        self.cells[key] = cell
+        if self._cells_dict is not None:
+            self._cells_dict[key] = cell
+        else:
+            self._custom_cells[key] = cell
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Exports all observed cells into a tabular pandas DataFrame."""
+        """Exports all observed cells into a tabular pandas DataFrame using high-speed vectorization."""
+        if len(self._ix) == 0 and len(self._custom_cells) == 0:
+            return pd.DataFrame(columns=[
+                "band_name", "ix", "iy", "resolution", "min_x", "max_x", "min_y", "max_y",
+                "center_x", "center_y", "point_count", "elevation_mean", "elevation_min",
+                "elevation_max", "semantic_class", "confidence", "traversability", "state"
+            ])
+
+        if len(self._custom_cells) == 0 and len(self._ix) > 0:
+            min_x = self._ix * self._res
+            max_x = min_x + self._res
+            min_y = self._iy * self._res
+            max_y = min_y + self._res
+            return pd.DataFrame({
+                "band_name": self._bands,
+                "ix": self._ix,
+                "iy": self._iy,
+                "resolution": self._res,
+                "min_x": min_x,
+                "max_x": max_x,
+                "min_y": min_y,
+                "max_y": max_y,
+                "center_x": (min_x + max_x) / 2.0,
+                "center_y": (min_y + max_y) / 2.0,
+                "point_count": self._counts,
+                "elevation_mean": self._mean_z,
+                "elevation_min": self._min_z,
+                "elevation_max": self._max_z,
+                "semantic_class": self._classes,
+                "confidence": self._conf,
+                "traversability": self._trav,
+                "state": "OCCUPIED"
+            })
+
+        self._populate_cells_dict()
         rows = []
-        for c in self.cells.values():
+        for c in self._cells_dict.values():
             min_x, max_x, min_y, max_y = c.bounds
             rows.append({
                 "band_name": c.band_name,
@@ -250,8 +369,8 @@ class GridMap25D:
 
 class FoveatedGrid25D:
     """
-    Core Phase-2 Foveated 2.5D Grid Builder.
-    Processes LiDAR points, executes distance-aware 2D XY cell indexing, and performs:
+    Optimized Phase-4 Foveated 2.5D Grid Builder.
+    Leverages 64-bit 1D spatial coordinate hashing and vectorized C-level NumPy reductions:
       1. Elevation aggregation: mean(z), min(z), max(z)
       2. Deterministic obstacle-preserving semantic priority aggregation:
          dynamic_object (3) > static_obstacle (2) > non_drivable (1) > drivable (0) > ignore (255)
@@ -275,20 +394,18 @@ class FoveatedGrid25D:
         sequence_id: str = "00"
     ) -> GridMap25D:
         """
-        Constructs a GridMap25D from raw or preprocessed LiDAR arrays.
+        Constructs a GridMap25D from raw or preprocessed LiDAR arrays with high-speed vectorization.
         points: float32 [N, 4] -> (x, y, z, intensity)
         labels: int/uint32 [N] -> super-classes
         confidences: float32 [N] -> prediction confidence
         """
-        grid_map = GridMap25D(
-            bands=self.bands,
-            frame_id=frame_id,
-            timestamp=timestamp,
-            sequence_id=sequence_id
-        )
-
         if points is None or len(points) == 0:
-            return grid_map
+            return GridMap25D(
+                bands=self.bands,
+                frame_id=frame_id,
+                timestamp=timestamp,
+                sequence_id=sequence_id
+            )
 
         N = len(points)
         x = points[:, 0]
@@ -308,10 +425,24 @@ class FoveatedGrid25D:
         p_weights[SuperClass.DRIVABLE_TERRAIN] = 1
         p_weights[SuperClass.IGNORE_LABEL] = 0
 
-        # Process each band independently
+        all_bands = []
+        all_ix = []
+        all_iy = []
+        all_res = []
+        all_counts = []
+        all_mean_z = []
+        all_min_z = []
+        all_max_z = []
+        all_classes = []
+        all_conf = []
+        all_trav = []
+
+        OFFSET = 50000  # Coordinate hashing bias
+
+        # Process each band independently with vectorized spatial binning
         for band in self.bands:
             mask = (r >= band.min_range) & (r < band.max_range) & np.isfinite(x) & np.isfinite(y) & np.isfinite(z)
-            if np.sum(mask) == 0:
+            if not np.any(mask):
                 continue
 
             bx = x[mask]
@@ -325,10 +456,14 @@ class FoveatedGrid25D:
             b_ix = np.floor(bx / res).astype(np.int64)
             b_iy = np.floor(by / res).astype(np.int64)
 
-            # Unique 2D XY cells
-            cell_keys = np.column_stack([b_ix, b_iy])
-            unique_keys, inverse_idx = np.unique(cell_keys, axis=0, return_inverse=True)
-            num_cells = len(unique_keys)
+            # 1D 64-bit integer hash encoding (replaces slow 2D unique sort)
+            keys_1d = ((b_ix + OFFSET) << 32) | ((b_iy + OFFSET) & 0xFFFFFFFF)
+            unique_keys_1d, inverse_idx = np.unique(keys_1d, return_inverse=True)
+            num_cells = len(unique_keys_1d)
+
+            # Decode unique coordinates
+            u_ix = (unique_keys_1d >> 32) - OFFSET
+            u_iy = (unique_keys_1d & 0xFFFFFFFF) - OFFSET
 
             # 1. Point counts per cell
             counts = np.bincount(inverse_idx, minlength=num_cells)
@@ -349,40 +484,50 @@ class FoveatedGrid25D:
 
             # 5. Obstacle-preserving semantic class aggregation
             ranks = p_weights[np.clip(bl, 0, 255)]
-            # Sort by rank descending so first unique per cell has highest priority
             sort_order = np.lexsort((-ranks, inverse_idx))
             _, first_idx = np.unique(inverse_idx[sort_order], return_index=True)
             best_idx = sort_order[first_idx]
             agg_labels = bl[best_idx]
 
-            # Populate GridMap25D cells
-            for c_idx in range(num_cells):
-                ix_val = int(unique_keys[c_idx, 0])
-                iy_val = int(unique_keys[c_idx, 1])
-                s_cls = int(agg_labels[c_idx])
+            # 6. Vectorized traversability mapping
+            trav = np.zeros(num_cells, dtype=np.float32)
+            trav[agg_labels == SuperClass.DRIVABLE_TERRAIN] = 1.0
+            trav[agg_labels == SuperClass.NON_DRIVABLE_TERRAIN] = 0.2
 
-                # Traversability mapping
-                if s_cls == SuperClass.DRIVABLE_TERRAIN:
-                    trav = 1.0
-                elif s_cls == SuperClass.NON_DRIVABLE_TERRAIN:
-                    trav = 0.2
-                else:
-                    trav = 0.0
+            all_bands.append(np.full(num_cells, band.name))
+            all_ix.append(u_ix)
+            all_iy.append(u_iy)
+            all_res.append(np.full(num_cells, res, dtype=np.float32))
+            all_counts.append(counts)
+            all_mean_z.append(mean_z)
+            all_min_z.append(min_z)
+            all_max_z.append(max_z)
+            all_classes.append(agg_labels)
+            all_conf.append(mean_c)
+            all_trav.append(trav)
 
-                cell = GridCell25D(
-                    ix=ix_val,
-                    iy=iy_val,
-                    resolution=res,
-                    point_count=int(counts[c_idx]),
-                    elevation_mean=float(mean_z[c_idx]),
-                    elevation_min=float(min_z[c_idx]),
-                    elevation_max=float(max_z[c_idx]),
-                    semantic_class=s_cls,
-                    confidence=float(mean_c[c_idx]),
-                    traversability=trav,
-                    state=CellState.OCCUPIED,
-                    band_name=band.name
-                )
-                grid_map.insert_cell(cell)
+        if len(all_bands) == 0:
+            return GridMap25D(
+                bands=self.bands,
+                frame_id=frame_id,
+                timestamp=timestamp,
+                sequence_id=sequence_id
+            )
 
-        return grid_map
+        return GridMap25D(
+            bands=self.bands,
+            frame_id=frame_id,
+            timestamp=timestamp,
+            sequence_id=sequence_id,
+            bands_arr=np.concatenate(all_bands),
+            ix_arr=np.concatenate(all_ix),
+            iy_arr=np.concatenate(all_iy),
+            res_arr=np.concatenate(all_res),
+            counts_arr=np.concatenate(all_counts),
+            mean_z_arr=np.concatenate(all_mean_z),
+            min_z_arr=np.concatenate(all_min_z),
+            max_z_arr=np.concatenate(all_max_z),
+            classes_arr=np.concatenate(all_classes),
+            conf_arr=np.concatenate(all_conf),
+            trav_arr=np.concatenate(all_trav)
+        )
