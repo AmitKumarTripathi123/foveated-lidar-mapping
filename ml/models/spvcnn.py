@@ -25,7 +25,6 @@ class PointBranch(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: (N, C_in)
         return self.mlp(x)
 
 
@@ -46,17 +45,6 @@ class VoxelSpatialBranch(nn.Module):
         point_to_voxel_idx: torch.Tensor,
         num_voxels: int,
     ) -> torch.Tensor:
-        """Aggregate point features into voxels, apply spatial transformation, and project back.
-
-        Args:
-            point_features: (N, C_in)
-            point_to_voxel_idx: (N,) mapping each point to voxel index
-            num_voxels: int M
-
-        Returns:
-            projected_voxel_features: (N, C_out)
-        """
-        # Scatter mean aggregation into voxels
         c_in = point_features.shape[1]
         voxel_feat = torch.zeros(
             (num_voxels, c_in),
@@ -78,11 +66,8 @@ class VoxelSpatialBranch(nn.Module):
         voxel_counts = torch.clamp(voxel_counts, min=1.0)
         voxel_mean = voxel_feat / voxel_counts
 
-        # Apply voxel transformation
-        transformed_voxel = self.voxel_mlp(voxel_mean)  # (M, C_out)
-
-        # Project back to points
-        return transformed_voxel[point_to_voxel_idx]  # (N, C_out)
+        transformed_voxel = self.voxel_mlp(voxel_mean)
+        return transformed_voxel[point_to_voxel_idx]
 
 
 class SPVConvBlock(nn.Module):
@@ -157,16 +142,6 @@ class SPVCNN(nn.Module):
         point_to_voxel_idx: torch.Tensor,
         num_voxels: int,
     ) -> torch.Tensor:
-        """Forward pass.
-
-        Args:
-            features: (N, in_channels) point features [x, y, z, intensity]
-            point_to_voxel_idx: (N,) mapping each point to voxel index in [0, num_voxels-1]
-            num_voxels: int M count of unique spatial voxels
-
-        Returns:
-            logits: (N, num_classes) per-point class logits
-        """
         x0 = self.stem(features)
         x1 = self.stage1(x0, point_to_voxel_idx, num_voxels)
         x2 = self.stage2(x1, point_to_voxel_idx, num_voxels)
@@ -201,19 +176,34 @@ def load_spvcnn_checkpoint(
     elif "state_dict" in state_dict:
         state_dict = state_dict["state_dict"]
 
-    model_keys = set(model.state_dict().keys())
-    ckpt_keys = set(state_dict.keys())
+    model_state = model.state_dict()
+    filtered_state = {}
+    mismatched_shapes = []
 
-    missing = model_keys - ckpt_keys
-    unexpected = ckpt_keys - model_keys
+    for k, v in state_dict.items():
+        if k in model_state:
+            if model_state[k].shape == v.shape:
+                filtered_state[k] = v
+            else:
+                mismatched_shapes.append((k, list(v.shape), list(model_state[k].shape)))
 
-    load_result = model.load_state_dict(state_dict, strict=strict)
+    missing = set(model_state.keys()) - set(filtered_state.keys())
+    unexpected = set(state_dict.keys()) - set(model_state.keys())
+
+    if strict and (len(missing) > 0 or len(unexpected) > 0 or len(mismatched_shapes) > 0):
+        raise RuntimeError(
+            f"Strict load failed: missing={list(missing)}, unexpected={list(unexpected)}, mismatched={mismatched_shapes}"
+        )
+
+    model.load_state_dict(filtered_state, strict=False)
 
     return {
         "checkpoint_path": path,
         "total_parameters": sum(p.numel() for p in model.parameters()),
+        "loaded_keys": list(filtered_state.keys()),
         "missing_keys": list(missing),
         "unexpected_keys": list(unexpected),
+        "shape_mismatches": mismatched_shapes,
         "strict": strict,
     }
 
@@ -223,6 +213,7 @@ def build_spvcnn(
     in_channels: int = 4,
     pretrained_path: Optional[Union[str, os.PathLike]] = None,
     device: Optional[Union[str, torch.device]] = None,
+    strict_checkpoint: bool = False,
 ) -> SPVCNN:
     """Build and initialize SPVCNN model."""
     dev = device if device is not None else torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -230,6 +221,6 @@ def build_spvcnn(
     model.to(dev)
 
     if pretrained_path is not None and os.path.isfile(pretrained_path):
-        load_spvcnn_checkpoint(model, pretrained_path)
+        load_spvcnn_checkpoint(model, pretrained_path, strict=strict_checkpoint)
 
     return model

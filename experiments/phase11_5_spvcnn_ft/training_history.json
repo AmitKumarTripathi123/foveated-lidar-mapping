@@ -1,0 +1,82 @@
+{
+  "total_epochs": 2,
+  "best_epoch": 2,
+  "best_val_miou": 3.81,
+  "total_time_seconds": 3.21,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.4091,
+      "val_loss": 1.5645,
+      "val_miou": 0.0,
+      "overall_accuracy": 0.0,
+      "lr": 0.0005005000000000001,
+      "is_best": false
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.7529,
+      "val_loss": 1.4989,
+      "val_miou": 3.81,
+      "overall_accuracy": 15.24,
+      "lr": 1e-06,
+      "is_best": true
+    }
+  ],
+  "final_metrics": {
+    "val_loss": 1.4989,
+    "val_miou": 3.81,
+    "overall_accuracy": 15.24,
+    "per_class_iou": {
+      "0": 0.0,
+      "1": 0.0,
+      "2": 15.24,
+      "3": 0.0
+    },
+    "per_class_precision": {
+      "0": 0.0,
+      "1": 0.0,
+      "2": 100.0,
+      "3": 0.0
+    },
+    "per_class_recall": {
+      "0": 0.0,
+      "1": 0.0,
+      "2": 15.24,
+      "3": 0.0
+    },
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        121,
+        2291,
+        574,
+        780
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "evaluated_points": 50571,
+    "supervised_points": 3766,
+    "ignored_points": 46805,
+    "dominant_class": 1,
+    "dominant_class_pct": 54.25,
+    "prediction_entropy": 1.5661,
+    "collapse_warning": false
+  }
+}

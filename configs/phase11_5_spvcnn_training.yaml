@@ -1,0 +1,50 @@
+collapse:
+  threshold_pct: 90.0
+dataset:
+  expected_frames:
+    '00': 488
+    '01': 500
+    '02': 500
+    '03': 500
+    '04': 500
+    '05': 500
+  root: dataset
+  target_total_frames: 2988
+  train_sequences:
+  - '00'
+  - '01'
+  - '03'
+  - '04'
+  - '05'
+  val_sequences:
+  - '02'
+experiment:
+  device: cpu
+  name: phase11_5_spvcnn_finetuning
+  seed: 42
+foveation:
+  far_dist: 100.0
+  far_voxel: 0.5
+  mid_dist: 40.0
+  mid_voxel: 0.15
+  near_dist: 10.0
+  near_voxel: 0.05
+loss:
+  class_weights: null
+  ignore_index: 255
+  type: cross_entropy
+model:
+  base_channels: 32
+  in_channels: 4
+  name: spvcnn
+  num_classes: 4
+  pretrained_checkpoint: checkpoints/spvcnn_pretrained.pt
+  voxel_size: 0.05
+training:
+  batch_size: 2
+  checkpoint_dir: experiments/phase11_5_spvcnn_ft
+  epochs: 10
+  learning_rate: 0.001
+  optimizer: adam
+  scheduler: cosine
+  weight_decay: 0.0001
