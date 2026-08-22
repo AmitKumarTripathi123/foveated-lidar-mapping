@@ -1,0 +1,48 @@
+﻿# Preprocessing Configuration for Foveated 2.5D LiDAR Mapping Pipeline (Phase 2)
+
+preprocessing:
+  # Invalid Point Removal
+  invalid_points:
+    remove: true                # Filter out NaN and Inf points
+
+  # Optional Spatial Range Filter (meters)
+  # Follows vehicle coordinate system: +X front, +Y left, +Z up
+  range_filter:
+    enabled: false              # Default OFF: preserve complete scan
+    min_x: -30.0                # Minimum forward distance
+    max_x: 80.0                 # Maximum forward distance
+    min_y: -40.0                # Minimum right distance (-Y)
+    max_y: 40.0                 # Maximum left distance (+Y)
+    min_z: -3.0                 # Minimum elevation (ground)
+    max_z: 10.0                 # Maximum elevation (height)
+
+  # Point-Count Handling & Sampling Strategy
+  # Strategies:
+  #   - keep_all: preserve all valid points (variable N)
+  #   - random: random sampling without replacement (N_target <= N)
+  #   - deterministic: evenly-spaced index selection
+  #   - random_with_replacement: allows N_target > N
+  #   - pad: zero-pad coordinates with ignore label (255)
+  sampling:
+    strategy: keep_all          # Default for Phase 2 inspection: keep_all
+    num_points: null            # e.g. 16384 for fixed-size sampling experiments
+    seed: 42                    # Random seed for deterministic reproducibility
+
+  # Coordinate Handling
+  # Normalization modes: none, minmax, standard
+  coordinates:
+    normalization: none         # Default NONE: preserve metric vehicle coordinates
+
+  # Intensity Handling
+  # Normalization modes: none, minmax, standard
+  intensity:
+    normalization: none         # Default NONE: preserve calibrated reflectance
+
+# Dataset Sequence Splits
+split:
+  train:
+    sequences: ["00"]
+  val:
+    sequences: ["00"]
+  test:
+    sequences: ["00"]

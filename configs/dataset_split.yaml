@@ -1,0 +1,14 @@
+﻿# Dataset Split Configuration (Phase 5)
+# Project: Foveated 2.5D LiDAR Mapping for Autonomous Navigation
+
+split:
+  train_sequences:
+    - "00"
+  val_sequences:
+    - "00"
+  test_sequences:
+    - "00"
+  seed: 42
+
+metadata:
+  description: "Deterministic split configuration. Single representative sequence 00 with separate train/val sampling seeds to avoid identical point draws."

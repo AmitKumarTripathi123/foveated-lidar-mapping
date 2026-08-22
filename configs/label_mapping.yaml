@@ -1,0 +1,107 @@
+﻿# SIH 4-Class Semantic Ontology and Label Remapping Configuration
+# Project: Foveated 2.5D LiDAR Mapping for Autonomous Navigation
+
+ontology:
+  ignore_id: 255
+  num_classes: 4
+
+classes:
+  0:
+    name: "drivable_terrain"
+    description: "Traversable ground surfaces intended for vehicle driving (roads, parking, lane markings)"
+  1:
+    name: "non_drivable_terrain"
+    description: "Non-traversable ground surfaces (sidewalks, terrain, grass, soil, rough ground)"
+  2:
+    name: "static_obstacle"
+    description: "Permanent structures, barriers, and stationary obstacles (buildings, fences, vegetation, poles, signs)"
+  3:
+    name: "dynamic_object"
+    description: "Moving or potentially moving traffic participants (cars, trucks, buses, cyclists, pedestrians)"
+  255:
+    name: "ignore"
+    description: "Unlabeled noise, outliers, and unsupported classes excluded from supervised training"
+
+# Verified Raw SemanticKITTI ID -> SIH Class Mapping
+# Raw IDs and descriptions match official SemanticKITTI specification
+raw_to_sih:
+  # Class 0: drivable_terrain
+  40: 0    # road
+  44: 0    # parking
+  60: 0    # lane-marking
+
+  # Class 1: non_drivable_terrain
+  48: 1    # sidewalk
+  49: 1    # other-ground
+  72: 1    # terrain
+
+  # Class 2: static_obstacle
+  50: 2    # building
+  51: 2    # fence
+  52: 2    # other-structure
+  70: 2    # vegetation
+  71: 2    # trunk
+  80: 2    # pole
+  81: 2    # traffic-sign
+  99: 2    # other-object
+
+  # Class 3: dynamic_object
+  10: 3    # car
+  11: 3    # bicycle
+  13: 3    # bus
+  15: 3    # motorcycle
+  16: 3    # on-rails
+  18: 3    # truck
+  20: 3    # other-vehicle
+  30: 3    # person
+  31: 3    # bicyclist
+  32: 3    # motorcyclist
+  252: 3   # moving-car
+  253: 3   # moving-bicyclist
+  254: 3   # moving-pedestrian
+  255: 3   # moving-motorcyclist
+  256: 3   # moving-on-rails
+  257: 3   # moving-bus
+  258: 3   # moving-truck
+  259: 3   # moving-other-vehicle
+
+  # Class 255: ignore
+  0: 255   # unlabeled / noise
+  1: 255   # outlier
+
+# Raw Label Metadata Dictionary for human-readable audit reporting
+raw_class_names:
+  0: "unlabeled"
+  1: "outlier"
+  10: "car"
+  11: "bicycle"
+  13: "bus"
+  15: "motorcycle"
+  16: "on-rails"
+  18: "truck"
+  20: "other-vehicle"
+  30: "person"
+  31: "bicyclist"
+  32: "motorcyclist"
+  40: "road"
+  44: "parking"
+  48: "sidewalk"
+  49: "other-ground"
+  50: "building"
+  51: "fence"
+  52: "other-structure"
+  60: "lane-marking"
+  70: "vegetation"
+  71: "trunk"
+  72: "terrain"
+  80: "pole"
+  81: "traffic-sign"
+  99: "other-object"
+  252: "moving-car"
+  253: "moving-bicyclist"
+  254: "moving-pedestrian"
+  255: "moving-motorcyclist"
+  256: "moving-on-rails"
+  257: "moving-bus"
+  258: "moving-truck"
+  259: "moving-other-vehicle"
