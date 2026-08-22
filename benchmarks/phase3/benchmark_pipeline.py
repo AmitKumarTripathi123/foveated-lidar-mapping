@@ -127,8 +127,12 @@ def benchmark_single_frame(
     preprocess_ms = (t3 - t2) * 1000.0
 
     # 3. ML Inference
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
     t4 = time.perf_counter()
     prediction = predictor.predict_frame(filtered_frame)
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
     t5 = time.perf_counter()
     ml_inference_ms = (t5 - t4) * 1000.0
 

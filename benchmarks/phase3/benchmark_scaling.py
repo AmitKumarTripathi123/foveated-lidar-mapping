@@ -64,6 +64,9 @@ def run_scaling_experiment(
         preprocess_ms = (t_p1 - t_p0) * 1000.0
 
         # 3. ML Inference (Chunked for multi-million points to avoid OOM on CPU)
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         t_m0 = time.perf_counter()
         if n_pts > 200000:
             chunk_size = 100000
@@ -83,6 +86,8 @@ def run_scaling_experiment(
             )
         else:
             prediction = predictor.predict_frame(filt_frame)
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         t_m1 = time.perf_counter()
         ml_inference_ms = (t_m1 - t_m0) * 1000.0
 
