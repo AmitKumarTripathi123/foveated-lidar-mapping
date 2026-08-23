@@ -1,0 +1,34 @@
+{
+  "0": {
+    "class_name": "drivable_terrain",
+    "mean": 69.53,
+    "median": 69.05,
+    "std": 4.98,
+    "min": 63.02,
+    "max": 77.61
+  },
+  "1": {
+    "class_name": "non_drivable_terrain",
+    "mean": 15.94,
+    "median": 12.82,
+    "std": 17.38,
+    "min": 0.0,
+    "max": 50.88
+  },
+  "2": {
+    "class_name": "static_obstacle",
+    "mean": 78.63,
+    "median": 79.17,
+    "std": 2.27,
+    "min": 74.42,
+    "max": 81.64
+  },
+  "3": {
+    "class_name": "dynamic_object",
+    "mean": 43.68,
+    "median": 48.2,
+    "std": 13.11,
+    "min": 25.98,
+    "max": 57.02
+  }
+}

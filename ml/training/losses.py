@@ -1,85 +1,158 @@
-﻿"""Loss Functions and Training-Set Class Weighting Engine (Phase 5).
-
-Supports:
-  1. Plain Cross-Entropy Loss with ignore_index=255
-  2. Class-Weighted Cross-Entropy Loss (weights computed strictly from training split)
+"""
+Phase 13: Advanced Loss Functions for 3D LiDAR Semantic Segmentation.
+Implements:
+- Standard Cross Entropy Loss
+- Class-Weighted Cross Entropy Loss
+- Multi-Class Focal Loss (Lin et al., ICCV 2017)
+- Class-Balanced Focal Loss (Cui et al., CVPR 2019)
+All loss functions strictly support ignore_index=255 and numeric stability.
 """
 
-from typing import Dict, Optional, Union
-import numpy as np
+from typing import Any, Dict, List, Optional, Union
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
-def compute_class_weights(
-    class_counts: Dict[int, int],
-    num_classes: int = 4,
-    strategy: str = "inverse_frequency",
-    epsilon: float = 1e-6,
-) -> torch.Tensor:
-    """Compute per-class weights strictly from training split class counts.
+class FocalLoss(nn.Module):
+    """Multi-class Focal Loss supporting ignore_index and class weights."""
 
-    Args:
-        class_counts: Dictionary mapping class ID (0..num_classes-1) to point count.
-        num_classes: Number of target classes (default: 4).
-        strategy: Weighting strategy ("inverse_frequency", "sqrt_inverse", "median_frequency").
-        epsilon: Small numerical stability constant.
+    def __init__(
+        self,
+        gamma: float = 2.0,
+        alpha: Optional[Union[List[float], torch.Tensor]] = None,
+        ignore_index: int = 255,
+        reduction: str = "mean",
+    ):
+        super().__init__()
+        self.gamma = float(gamma)
+        self.ignore_index = int(ignore_index)
+        self.reduction = reduction
 
-    Returns:
-        torch.Tensor: Normalized weight tensor of shape (num_classes,).
-    """
-    counts = np.zeros(num_classes, dtype=np.float64)
-    for cid in range(num_classes):
-        counts[cid] = class_counts.get(cid, 0)
+        if alpha is not None:
+            if isinstance(alpha, list):
+                self.alpha = torch.tensor(alpha, dtype=torch.float32)
+            else:
+                self.alpha = alpha.float()
+        else:
+            self.alpha = None
 
-    # Handle zero-count classes gracefully
-    counts = np.maximum(counts, 1.0)
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """Compute focal loss between logits (N, C) and targets (N,).
 
-    if strategy == "inverse_frequency":
-        raw_weights = 1.0 / (counts + epsilon)
-    elif strategy == "sqrt_inverse":
-        raw_weights = 1.0 / np.sqrt(counts + epsilon)
-    elif strategy == "median_frequency":
-        median_val = np.median(counts)
-        raw_weights = median_val / (counts + epsilon)
+        Args:
+            logits: Predicted class logits (N, C).
+            targets: Ground-truth class labels (N,).
+
+        Returns:
+            torch.Tensor: Computed scalar focal loss.
+        """
+        valid_mask = targets != self.ignore_index
+        if not valid_mask.any():
+            return torch.tensor(0.0, device=logits.device, requires_grad=True)
+
+        valid_logits = logits[valid_mask]
+        valid_targets = targets[valid_mask]
+
+        log_probs = F.log_softmax(valid_logits, dim=-1)
+        probs = torch.exp(log_probs)
+
+        # Gather target log_probs and probs: (N_valid,)
+        target_log_probs = log_probs.gather(dim=-1, index=valid_targets.unsqueeze(-1)).squeeze(-1)
+        target_probs = probs.gather(dim=-1, index=valid_targets.unsqueeze(-1)).squeeze(-1)
+
+        # Focal modulating factor: (1 - p_t)^gamma
+        focal_weight = torch.pow(1.0 - target_probs + 1e-8, self.gamma)
+
+        # Alpha class balancing
+        if self.alpha is not None:
+            alpha_device = self.alpha.to(valid_logits.device)
+            target_alpha = alpha_device.gather(dim=0, index=valid_targets)
+            loss = -target_alpha * focal_weight * target_log_probs
+        else:
+            loss = -focal_weight * target_log_probs
+
+        if self.reduction == "mean":
+            return loss.mean()
+        elif self.reduction == "sum":
+            return loss.sum()
+        else:
+            return loss
+
+
+def build_loss_function(
+    config: Optional[Dict[str, Any]] = None,
+    class_weights: Optional[Union[List[float], torch.Tensor]] = None,
+    device: Optional[Union[str, torch.device]] = None,
+    loss_type: Optional[str] = None,
+    ignore_index: Optional[int] = None,
+    **kwargs,
+) -> nn.Module:
+    """Build loss function based on experiment configuration or direct arguments."""
+    loss_cfg = config.get("loss", {}) if config is not None else {}
+    l_type = loss_type or loss_cfg.get("type", "cross_entropy")
+    l_type = str(l_type).lower().strip()
+
+    ign_idx = ignore_index if ignore_index is not None else int(loss_cfg.get("ignore_index", 255))
+    weights = class_weights or loss_cfg.get("class_weights")
+
+    weight_tensor = None
+    if weights is not None:
+        if isinstance(weights, torch.Tensor):
+            weight_tensor = weights.float()
+        else:
+            weight_tensor = torch.tensor(weights, dtype=torch.float32)
+        if device is not None:
+            weight_tensor = weight_tensor.to(device)
+
+    if l_type in ("cross_entropy", "ce"):
+        return nn.CrossEntropyLoss(weight=weight_tensor, ignore_index=ign_idx)
+    elif l_type in ("weighted_cross_entropy", "weighted_ce", "w_ce"):
+        assert weight_tensor is not None, "Weighted Cross-Entropy requires non-null class weights"
+        return nn.CrossEntropyLoss(weight=weight_tensor, ignore_index=ign_idx)
+    elif l_type in ("focal", "focal_loss"):
+        gamma = float(kwargs.get("gamma", loss_cfg.get("gamma", 2.0)))
+        return FocalLoss(gamma=gamma, alpha=weight_tensor, ignore_index=ign_idx)
+    elif l_type in ("class_balanced_focal", "balanced_focal", "cb_focal"):
+        gamma = float(kwargs.get("gamma", loss_cfg.get("gamma", 2.0)))
+        assert weight_tensor is not None, "Class Balanced Focal Loss requires class weights (alpha)"
+        return FocalLoss(gamma=gamma, alpha=weight_tensor, ignore_index=ign_idx)
     else:
-        raise ValueError(
-            f"Unknown class weighting strategy '{strategy}'. "
-            f"Supported: 'inverse_frequency', 'sqrt_inverse', 'median_frequency'."
-        )
-
-    # Normalize weights so mean weight == 1.0
-    normalized_weights = raw_weights / np.mean(raw_weights)
-    return torch.from_numpy(normalized_weights.astype(np.float32)).float()
+        raise ValueError(f"Unsupported loss type: {l_type}")
 
 
 def get_loss_function(
     loss_type: str = "cross_entropy",
-    class_weights: Optional[Union[torch.Tensor, np.ndarray]] = None,
+    class_weights: Optional[Union[List[float], torch.Tensor]] = None,
     ignore_index: int = 255,
-    device: Optional[torch.device] = None,
+    device: Optional[Union[str, torch.device]] = None,
+    config: Optional[Dict[str, Any]] = None,
+    **kwargs,
 ) -> nn.Module:
-    """Instantiate loss criterion with ignore_index and optional class weighting.
+    """Legacy alias for build_loss_function supporting direct arguments."""
+    return build_loss_function(
+        config=config,
+        class_weights=class_weights,
+        device=device,
+        loss_type=loss_type,
+        ignore_index=ignore_index,
+        **kwargs,
+    )
 
-    Args:
-        loss_type: Type of loss ("cross_entropy", "weighted_cross_entropy").
-        class_weights: Optional class weight tensor of shape (num_classes,).
-        ignore_index: Semantic index to ignore in loss calculation (default: 255).
-        device: Device to place weight tensor on.
 
-    Returns:
-        nn.Module: PyTorch loss function.
-    """
-    weights_tensor: Optional[torch.Tensor] = None
+def compute_class_weights(
+    dataset_or_counts: Any,
+    num_classes: int = 4,
+    ignore_index: int = 255,
+    strategy: str = "inverse_frequency",
+    device: Optional[Union[str, torch.device]] = None,
+) -> torch.Tensor:
+    """Compute class weights returning torch.Tensor for backward compatibility."""
+    from ml.training.class_weights import get_class_weights
+    strat_clean = "inverse" if "inv" in strategy else strategy
+    w_list = get_class_weights(dataset_or_counts, strategy=strat_clean, num_classes=num_classes, ignore_index=ignore_index)
+    w_tensor = torch.tensor(w_list, dtype=torch.float32)
+    if device is not None:
+        w_tensor = w_tensor.to(device)
+    return w_tensor
 
-    if loss_type in ("weighted_cross_entropy", "weighted_ce") or class_weights is not None:
-        if class_weights is not None:
-            if isinstance(class_weights, np.ndarray):
-                weights_tensor = torch.from_numpy(class_weights).float()
-            elif isinstance(class_weights, torch.Tensor):
-                weights_tensor = class_weights.float()
-
-            if device is not None:
-                weights_tensor = weights_tensor.to(device)
-
-    return nn.CrossEntropyLoss(weight=weights_tensor, ignore_index=ignore_index)
