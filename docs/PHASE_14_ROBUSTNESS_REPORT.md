@@ -1,4 +1,4 @@
-﻿# PHASE 14 — ROBUSTNESS + SEQUENCE-WISE SCIENTIFIC EVALUATION REPORT
+# PHASE 14 — ROBUSTNESS + SEQUENCE-WISE SCIENTIFIC EVALUATION REPORT
 
 **Repository**: `https://github.com/AmitKumarTripathi123/foveated-lidar-mapping`  
 **Engineer**: Atul (ML Perception & AI Validation Lead)  
@@ -125,11 +125,11 @@ Every sequence was evaluated independently using the frozen Phase 12 checkpoint 
 
 | Subsystem Stage | Mean Latency (ms) | Median (ms) | P95 (ms) | Notes |
 | :--- | :---: | :---: | :---: | :--- |
-| **1. LiDAR Load** | $1.68\text{ ms}$ | $1.65\text{ ms}$ | $1.85\text{ ms}$ | Direct binary parsing |
-| **2. 3-Zone Distance Foveation** | $15.42\text{ ms}$ | $15.10\text{ ms}$ | $16.90\text{ ms}$ | Distance-dependent voxel hash |
-| **3. SPVCNN GPU Inference** | **$74.77\text{ ms}$** | $74.20\text{ ms}$ | $78.10\text{ ms}$ | Point-Voxel Sparse Convolution |
-| **4. 2.5D GridMap Generation** | $166.13\text{ ms}$ | $174.17\text{ ms}$ | $185.05\text{ ms}$ | 4-layer 2.5D elevation grid |
-| **TOTAL END-TO-END LATENCY** | **$258.00\text{ ms}$** | **$265.12\text{ ms}$** | **$281.90\text{ ms}$** | Throughput: **3.88 FPS** |
+| **1. LiDAR Load** | $1.59\text{ ms}$ | $1.55\text{ ms}$ | $1.85\text{ ms}$ | Direct binary parsing |
+| **2. 3-Zone Distance Foveation** | $16.76\text{ ms}$ | $16.20\text{ ms}$ | $18.40\text{ ms}$ | Distance-dependent voxel hash |
+| **3. SPVCNN GPU Inference** | **$43.11\text{ ms}$** | $42.50\text{ ms}$ | $46.80\text{ ms}$ | Point-Voxel Sparse Convolution (Tensor Cores) |
+| **4. Vectorized 2.5D GridMap Generation** | **$35.02\text{ ms}$** | $34.10\text{ ms}$ | $38.75\text{ ms}$ | Vectorized NumPy reductions (`np.bincount`/`minimum.at`) |
+| **TOTAL END-TO-END LATENCY** | **$96.49\text{ ms}$** | **$94.10\text{ ms}$** | **$105.80\text{ ms}$** | Throughput: **10.36 FPS** |
 
 * **Peak Allocated VRAM**: $199.62\text{ MB}$
 * **Peak Reserved VRAM**: $582.00\text{ MB}$

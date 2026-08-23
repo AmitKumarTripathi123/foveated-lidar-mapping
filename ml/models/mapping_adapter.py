@@ -1,4 +1,4 @@
-﻿"""ML -> 2.5D Mapping Adapter and Contract Translator (Phase 6 Foundation).
+"""ML -> 2.5D Mapping Adapter and Contract Translator (Phase 6 Foundation).
 
 Connects Atul''s PointNet++ Semantic Segmentation output contract with
 Amit''s 2.5D Elevation & Semantic Occupancy Grid Mapping System.
@@ -190,22 +190,38 @@ class MLToMappingAdapter:
             grid_c = np.clip(grid_c, 0, self.width - 1)
             grid_r = np.clip(grid_r, 0, self.height - 1)
 
-            for i in range(v_xyz.shape[0]):
-                r = grid_r[i]
-                c = grid_c[i]
-                z = v_xyz[i, 2]
-                cf = v_conf[i]
-                cl = v_cls[i]
+            cell_idx = grid_r * self.width + grid_c
+            total_cells = self.height * self.width
+            z = v_xyz[:, 2]
 
-                if np.isnan(elev_min[r, c]) or z < elev_min[r, c]:
-                    elev_min[r, c] = z
-                if np.isnan(elev_max[r, c]) or z > elev_max[r, c]:
-                    elev_max[r, c] = z
+            # 1. Point counts per cell
+            pt_count_1d = np.bincount(cell_idx, minlength=total_cells)
+            obs_1d = pt_count_1d > 0
+            pt_count = pt_count_1d.reshape(grid_shape).astype(np.int32)
 
-                elev_sum[r, c] += z
-                conf_sum[r, c] += cf
-                pt_count[r, c] += 1
-                class_votes[r, c, cl] += 1
+            # 2. Elevation Min / Max (vectorized in-place reduction)
+            elev_min_1d = np.full(total_cells, np.inf, dtype=np.float32)
+            elev_max_1d = np.full(total_cells, -np.inf, dtype=np.float32)
+            np.minimum.at(elev_min_1d, cell_idx, z)
+            np.maximum.at(elev_max_1d, cell_idx, z)
+            elev_min_1d[~obs_1d] = np.nan
+            elev_max_1d[~obs_1d] = np.nan
+            elev_min = elev_min_1d.reshape(grid_shape)
+            elev_max = elev_max_1d.reshape(grid_shape)
+
+            # 3. Elevation Sum & Confidence Sum
+            elev_sum_1d = np.bincount(cell_idx, weights=z, minlength=total_cells).astype(np.float32)
+            conf_sum_1d = np.bincount(cell_idx, weights=v_conf, minlength=total_cells).astype(np.float32)
+            elev_sum = elev_sum_1d.reshape(grid_shape)
+            conf_sum = conf_sum_1d.reshape(grid_shape)
+
+            # 4. Vectorized class votes
+            class_votes_2d = np.zeros((total_cells, self.num_classes), dtype=np.int32)
+            for c_id in range(self.num_classes):
+                c_mask = (v_cls == c_id)
+                if np.any(c_mask):
+                    class_votes_2d[:, c_id] = np.bincount(cell_idx[c_mask], minlength=total_cells)
+            class_votes = class_votes_2d.reshape((self.height, self.width, self.num_classes))
 
         # Compute mean elevation and average confidence
         observed_mask = pt_count > 0
@@ -221,13 +237,9 @@ class MLToMappingAdapter:
             dominant_c = np.argmax(class_votes, axis=-1)
             sem_layer[observed_mask] = dominant_c[observed_mask]
 
-        # Traversability layer: 1.0 (drivable), 0.0 (obstacle/dynamic/non-drivable), -1.0 (unobserved)
+        # Traversability layer: 1.0 (drivable), 0.2 (non-drivable), 0.0 (obstacle/dynamic), -1.0 (unobserved)
         traversability = np.full(grid_shape, -1.0, dtype=np.float32)
         if np.any(observed_mask):
-            # Class 0: drivable terrain -> 1.0
-            # Class 1: non-drivable terrain -> 0.2
-            # Class 2: static obstacle -> 0.0
-            # Class 3: dynamic object -> 0.0
             is_drivable = (sem_layer == 0) & observed_mask
             is_non_drivable = (sem_layer == 1) & observed_mask
             is_obstacle = ((sem_layer == 2) | (sem_layer == 3)) & observed_mask
