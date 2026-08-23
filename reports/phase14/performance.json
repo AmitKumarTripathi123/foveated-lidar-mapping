@@ -1,0 +1,14 @@
+{
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "lidar_load_mean_ms": 1.68,
+  "foveation_mean_ms": 15.42,
+  "spvcnn_inference_mean_ms": 74.77,
+  "gridmap25d_mean_ms": 166.13,
+  "total_latency_mean_ms": 258.0,
+  "total_latency_median_ms": 265.12,
+  "total_latency_p95_ms": 281.9,
+  "fps": 3.88,
+  "peak_vram_allocated_mb": 199.62,
+  "peak_vram_reserved_mb": 582.0
+}
