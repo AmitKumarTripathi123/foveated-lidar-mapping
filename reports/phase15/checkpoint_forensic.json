@@ -1,8 +1,8 @@
 {
-  "checkpoint_path": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
-  "file_size_mb": 1.64,
-  "modification_timestamp": "2026-08-23T03:05:47.914662",
-  "sha256_checksum": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "checkpoint_path": "/Users/amitkumartripathi/Desktop/3d lidar foveated mapping/experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+  "file_size_mb": 0.56,
+  "modification_timestamp": "2026-08-24T00:23:42.133298",
+  "sha256_checksum": "4ce8e3518e860a99806343a7af5037a440da4344c337ef31253d7963abf1aa33",
   "model_architecture": "SPVCNN (Point-Voxel Sparse Convolution)",
   "in_channels": 4,
   "num_classes": 4,
@@ -12,67 +12,13 @@
   "missing_keys": 0,
   "unexpected_keys": 0,
   "shape_mismatches": 0,
-  "optimizer_state_available": true,
-  "scheduler_state_available": true,
+  "optimizer_state_available": false,
+  "scheduler_state_available": false,
   "best_epoch": 5,
   "recorded_val_miou": 53.59,
   "recorded_metrics": {
-    "val_loss": 0.7907,
     "val_miou": 53.59,
-    "overall_accuracy": 77.53,
-    "per_class_iou": {
-      "0": 63.02,
-      "1": 50.88,
-      "2": 74.42,
-      "3": 26.06
-    },
-    "per_class_precision": {
-      "0": 83.96,
-      "1": 86.56,
-      "2": 88.33,
-      "3": 33.13
-    },
-    "per_class_recall": {
-      "0": 71.64,
-      "1": 55.24,
-      "2": 82.52,
-      "3": 54.97
-    },
-    "confusion_matrix": [
-      [
-        3174656,
-        66,
-        849207,
-        407643
-      ],
-      [
-        7,
-        4819,
-        3867,
-        30
-      ],
-      [
-        442026,
-        605,
-        14627622,
-        2654868
-      ],
-      [
-        164291,
-        77,
-        1078564,
-        1517151
-      ]
-    ],
-    "evaluated_points": 25247595,
-    "supervised_points": 24925499,
-    "ignored_points": 322096,
-    "dominant_class": 2,
-    "dominant_class_pct": 66.7,
-    "prediction_entropy": 1.2525,
-    "collapse_warning": false,
-    "peak_vram_allocated_mb": 1592.13,
-    "peak_vram_reserved_mb": 2380.0
+    "overall_accuracy": 77.53
   },
   "integrity_status": "PASS"
 }

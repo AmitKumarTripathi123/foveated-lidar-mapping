@@ -1,6 +1,6 @@
 {
-  "production_checkpoint": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
-  "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "production_checkpoint": "/Users/amitkumartripathi/Desktop/3d lidar foveated mapping/experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+  "sha256": "4ce8e3518e860a99806343a7af5037a440da4344c337ef31253d7963abf1aa33",
   "dataset_total_frames": 2988,
   "held_out_validation_sequence": "02",
   "held_out_validation_frames": 500,

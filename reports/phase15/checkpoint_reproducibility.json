@@ -1,6 +1,6 @@
 {
-  "checkpoint_path": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
-  "max_logit_difference": 3.814697265625e-06,
+  "checkpoint_path": "/Users/amitkumartripathi/Desktop/3d lidar foveated mapping/experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+  "max_logit_difference": 0.0,
   "tolerance": 1e-05,
   "reproducibility_status": "PASS"
 }
