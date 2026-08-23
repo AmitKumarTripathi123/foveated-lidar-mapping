@@ -1,0 +1,1 @@
+b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142  experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt

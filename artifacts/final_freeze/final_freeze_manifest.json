@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-08-24T02:52:14.958014",
+  "status": "APPROVED",
+  "checkpoint": "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+  "checkpoint_sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "dataset_frames": 2988,
+  "training_frames": 2488,
+  "held_out_validation_frames": 500,
+  "architecture": "SPVCNN (Sparse Point-Voxel Sparse Convolution)",
+  "num_classes": 4,
+  "validation_miou": 53.59,
+  "mean_sequence_miou": 51.94,
+  "steady_state_latency_ms": 91.2,
+  "warmed_10hz_fps": 10.0,
+  "continuous_unbuffered_fps": 4.03,
+  "regression_tests": "446 PASS / 0 FAIL",
+  "audit_verdict": "CERTIFIED_FOR_PRODUCTION",
+  "known_limitations": [
+    "Sequence 02 is held-out validation from SemanticPOSS, not external test dataset.",
+    "Dynamic Object IoU (26.06% on Seq 02, 43.68% cross-sequence) is lower than static classes.",
+    "Non-drivable terrain IoU exhibits cross-sequence variance due to varying off-road textures.",
+    "Far-range point cloud density degradation beyond 60m reduces semantic confidence.",
+    "Continuous unbuffered disk I/O yields 4.03 FPS versus 10.00 FPS on warmed sensor stream."
+  ]
+}
