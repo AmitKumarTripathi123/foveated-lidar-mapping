@@ -1,0 +1,31 @@
+{
+  "duration_seconds": 30.06,
+  "total_frames_executed": 121,
+  "mean_latency_ms": 248.36,
+  "median_latency_ms": 253.55,
+  "p95_latency_ms": 301.65,
+  "p99_latency_ms": 359.59,
+  "throughput_fps": 4.03,
+  "initial_ram_mb": 694.86,
+  "final_ram_mb": 579.82,
+  "ram_growth_mb": -115.03,
+  "initial_vram_mb": 8.67,
+  "final_vram_mb": 8.67,
+  "vram_growth_mb": 0.0,
+  "peak_vram_mb": 215.51,
+  "timeline": [
+    {
+      "elapsed_seconds": 10.2,
+      "fps": 4.31,
+      "mean_latency_ms": 231.8,
+      "ram_mb": 698.7
+    },
+    {
+      "elapsed_seconds": 20.2,
+      "fps": 3.9,
+      "mean_latency_ms": 256.42,
+      "ram_mb": 698.71
+    }
+  ],
+  "thermal_stability_status": "PASS (Stable FPS and zero memory growth)"
+}

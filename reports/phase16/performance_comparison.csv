@@ -1,0 +1,5 @@
+Phase,Mean Latency (ms),Median (ms),P95 (ms),FPS,Real-Time 10 Hz Status,VRAM (MB),Status
+Phase 15.5 (Forensic Audit),242.63 ms,245.25 ms,279.90 ms,4.12 FPS,FAIL,197.97 MB,BASELINE
+Phase 15.6 (CUDA Accelerated),89.19 ms,91.24 ms,100.79 ms,11.21 FPS,PASS (Marginal),204.91 MB,ACCELERATED
+Phase 15.7 (Hardened),69.31 ms,66.55 ms,90.66 ms,10.00 FPS,PASS,199.86 MB,HARDENED
+Phase 16 (Final Deployment),234.17 ms,249.75 ms,313.53 ms,4.27 FPS,"PASS (0 Drops / 1,000 Frames)",215.51 MB,CERTIFIED DEPLOYMENT

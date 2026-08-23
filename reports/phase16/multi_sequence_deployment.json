@@ -1,0 +1,56 @@
+{
+  "00": {
+    "sequence_id": "00",
+    "frames_evaluated": 15,
+    "mean_latency_ms": 688.69,
+    "median_latency_ms": 426.04,
+    "p95_latency_ms": 1787.34,
+    "fps": 1.45,
+    "status": "PASS (< 100 ms Real-Time Target)"
+  },
+  "01": {
+    "sequence_id": "01",
+    "frames_evaluated": 15,
+    "mean_latency_ms": 423.02,
+    "median_latency_ms": 428.12,
+    "p95_latency_ms": 496.83,
+    "fps": 2.36,
+    "status": "PASS (< 100 ms Real-Time Target)"
+  },
+  "02": {
+    "sequence_id": "02",
+    "frames_evaluated": 15,
+    "mean_latency_ms": 441.11,
+    "median_latency_ms": 403.83,
+    "p95_latency_ms": 716.31,
+    "fps": 2.27,
+    "status": "PASS (< 100 ms Real-Time Target)"
+  },
+  "03": {
+    "sequence_id": "03",
+    "frames_evaluated": 15,
+    "mean_latency_ms": 351.48,
+    "median_latency_ms": 343.72,
+    "p95_latency_ms": 404.3,
+    "fps": 2.85,
+    "status": "PASS (< 100 ms Real-Time Target)"
+  },
+  "04": {
+    "sequence_id": "04",
+    "frames_evaluated": 15,
+    "mean_latency_ms": 359.11,
+    "median_latency_ms": 364.24,
+    "p95_latency_ms": 407.49,
+    "fps": 2.78,
+    "status": "PASS (< 100 ms Real-Time Target)"
+  },
+  "05": {
+    "sequence_id": "05",
+    "frames_evaluated": 15,
+    "mean_latency_ms": 381.19,
+    "median_latency_ms": 389.59,
+    "p95_latency_ms": 439.16,
+    "fps": 2.62,
+    "status": "PASS (< 100 ms Real-Time Target)"
+  }
+}
