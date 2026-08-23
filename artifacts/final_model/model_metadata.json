@@ -1,0 +1,27 @@
+{
+  "model_name": "SPVCNN (Point-Voxel Sparse Convolution)",
+  "dataset": "SemanticPOSS (2,988 frames, sequences 00-05)",
+  "in_channels": 4,
+  "num_classes": 4,
+  "class_mapping": {
+    "0": "drivable_terrain",
+    "1": "non_drivable_terrain",
+    "2": "static_obstacle",
+    "3": "dynamic_object"
+  },
+  "held_out_validation_sequence": "02",
+  "held_out_validation_miou": 53.59,
+  "cross_sequence_mean_miou": 51.94,
+  "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "total_parameters": 138514,
+  "foveation_config": {
+    "near_field": "0-10m @ 0.05m voxel",
+    "mid_field": "10-40m @ 0.15m voxel",
+    "far_field": "40-100m @ 0.50m voxel"
+  },
+  "target_hardware": "NVIDIA GeForce RTX 4050 Laptop GPU / CUDA 12.4",
+  "latency_end_to_end_ms": 96.49,
+  "throughput_fps": 10.36,
+  "certification_date": "2026-08-23T23:52:10.271004",
+  "scientific_verdict": "CERTIFIED_WITH_LIMITATIONS (Held-out validation on Sequence 02; external independent test set unavailable)"
+}

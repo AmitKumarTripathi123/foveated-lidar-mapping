@@ -1,0 +1,18 @@
+{
+  "train_sequences": [
+    "00",
+    "01",
+    "03",
+    "04",
+    "05"
+  ],
+  "val_sequences": [
+    "02"
+  ],
+  "train_frames_count": 2488,
+  "val_frames_count": 500,
+  "overlap_count": 0,
+  "overlap_frame_ids": [],
+  "independent_test_dataset_status": "UNAVAILABLE (SemanticPOSS Sequence 02 used as HELD-OUT VALIDATION)",
+  "leakage_status": "PASS"
+}
