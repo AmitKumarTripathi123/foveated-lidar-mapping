@@ -1,0 +1,60 @@
+﻿# ============================================================
+# PRODUCTION HARDENED CONFIGURATION (Phase 15.7)
+# ============================================================
+
+pipeline:
+  name: "foveated-lidar-spvcnn-mapping"
+  version: "1.0.0"
+  target_frequency_hz: 10.0
+  frame_interval_ms: 100.0
+
+checkpoint:
+  path: "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt"
+  expected_sha256: "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142"
+  device: "cuda"
+  enable_tf32: true
+  use_inference_mode: true
+
+model:
+  name: "SPVCNN"
+  in_channels: 4
+  num_classes: 4
+  base_channels: 32
+  voxel_size: 0.05
+  ontology:
+    0: "drivable_terrain"
+    1: "non_drivable_terrain"
+    2: "static_obstacle"
+    3: "dynamic_object"
+    255: "ignore"
+
+foveation:
+  near_zone:
+    max_range_m: 10.0
+    voxel_size_m: 0.05
+  mid_zone:
+    max_range_m: 40.0
+    voxel_size_m: 0.15
+  far_zone:
+    max_range_m: 100.0
+    voxel_size_m: 0.50
+  max_sensor_range_m: 100.0
+
+mapping:
+  bounds_x: [-50.0, 50.0]
+  bounds_y: [-50.0, 50.0]
+  resolution_m: 0.20
+  num_classes: 4
+  ignore_index: 255
+
+validation:
+  strict_finite_check: true
+  strict_point_order_preservation: true
+  strict_confidence_bounds: [0.0, 1.0]
+  allow_empty_frames: false
+  fail_fast_on_corruption: true
+
+logging:
+  level: "INFO"
+  log_latency_telemetry: true
+  warn_queue_spillover: true

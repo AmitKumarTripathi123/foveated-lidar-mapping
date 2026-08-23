@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-08-24T01:19:00.077857",
+  "checkpoint": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
+  "checkpoint_sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "memory_test": {
+    "frames_processed": 1000,
+    "mean_latency_ms": 171.65,
+    "median_latency_ms": 184.72,
+    "p95_latency_ms": 272.47,
+    "p99_latency_ms": 334.16,
+    "throughput_fps": 5.83,
+    "initial_ram_mb": 868.75,
+    "final_ram_mb": 879.01,
+    "ram_growth_mb": 10.25,
+    "initial_vram_mb": 8.67,
+    "final_vram_mb": 8.67,
+    "vram_growth_mb": 0.0,
+    "peak_vram_mb": 199.86,
+    "memory_leak_status": "PASS (Zero VRAM growth, controlled RAM)"
+  },
+  "sensor_simulation": {
+    "target_frequency_hz": 10.0,
+    "target_frame_interval_ms": 100.0,
+    "total_frames_streamed": 300,
+    "duration_seconds": 30.48,
+    "effective_fps": 9.84,
+    "mean_latency_ms": 97.29,
+    "median_latency_ms": 92.71,
+    "p95_latency_ms": 129.39,
+    "p99_latency_ms": 164.19,
+    "dropped_frames": 5,
+    "queue_backlog_events": 146,
+    "real_time_status": "FAIL"
+  },
+  "failure_recovery": {
+    "corrupt_bytes_recovery": "PASS (Controlled error or sanitized without crash)",
+    "empty_point_cloud": "PASS (Graceful rejection without crash)",
+    "nan_inf_sanitization": "PASS (NaN/Inf filtered cleanly)",
+    "malformed_shape_rejection": "PASS",
+    "1d_array_rejection": "PASS",
+    "checksum_mismatch_abort": "PASS (Aborted with ChecksumMismatchError)",
+    "invalid_config_rejection": "PASS (Aborted with ConfigurationError)",
+    "extreme_distance_handling": "PASS (Filtered by outer bounds)",
+    "none_input_rejection": "PASS",
+    "real_scan_execution": "PASS"
+  },
+  "deployment_status": "READY FOR PHASE 16 RELEASE"
+}

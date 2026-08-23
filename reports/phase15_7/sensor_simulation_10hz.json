@@ -1,0 +1,14 @@
+{
+  "target_frequency_hz": 10.0,
+  "target_frame_interval_ms": 100.0,
+  "total_frames_streamed": 300,
+  "duration_seconds": 30.48,
+  "effective_fps": 9.84,
+  "mean_latency_ms": 97.29,
+  "median_latency_ms": 92.71,
+  "p95_latency_ms": 129.39,
+  "p99_latency_ms": 164.19,
+  "dropped_frames": 5,
+  "queue_backlog_events": 146,
+  "real_time_status": "FAIL"
+}

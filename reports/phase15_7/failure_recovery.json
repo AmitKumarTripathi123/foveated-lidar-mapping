@@ -1,0 +1,12 @@
+{
+  "corrupt_bytes_recovery": "PASS (Controlled error or sanitized without crash)",
+  "empty_point_cloud": "PASS (Graceful rejection without crash)",
+  "nan_inf_sanitization": "PASS (NaN/Inf filtered cleanly)",
+  "malformed_shape_rejection": "PASS",
+  "1d_array_rejection": "PASS",
+  "checksum_mismatch_abort": "PASS (Aborted with ChecksumMismatchError)",
+  "invalid_config_rejection": "PASS (Aborted with ConfigurationError)",
+  "extreme_distance_handling": "PASS (Filtered by outer bounds)",
+  "none_input_rejection": "PASS",
+  "real_scan_execution": "PASS"
+}

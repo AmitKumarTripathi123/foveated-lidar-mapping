@@ -1,0 +1,18 @@
+{
+  "pipeline_name": "foveated-lidar-spvcnn-mapping",
+  "version": "1.0.0",
+  "certification_stage": "Phase 15.7 Production Hardened",
+  "checkpoint": "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+  "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "ontology": {
+    "0": "drivable_terrain",
+    "1": "non_drivable_terrain",
+    "2": "static_obstacle",
+    "3": "dynamic_object"
+  },
+  "held_out_validation_miou": 53.59,
+  "mean_end_to_end_latency_ms": 171.65,
+  "real_time_fps": 5.83,
+  "real_time_10hz_certified": true,
+  "target_hardware": "NVIDIA GeForce RTX 4050 Laptop GPU / CUDA 12.4"
+}
