@@ -190,27 +190,38 @@ class MLToMappingAdapter:
             grid_c = np.clip(grid_c, 0, self.width - 1)
             grid_r = np.clip(grid_r, 0, self.height - 1)
 
-            # Fast Vectorized Columnar Reductions (eliminates 300ms Python loop)
-            linear_idx = grid_r * self.width + grid_c
+            cell_idx = grid_r * self.width + grid_c
+            total_cells = self.height * self.width
+            z = v_xyz[:, 2]
 
-            # Temporary infinite bounds for min/max accumulation
-            elev_min_tmp = np.full(grid_shape, np.inf, dtype=np.float32)
-            elev_max_tmp = np.full(grid_shape, -np.inf, dtype=np.float32)
+            # 1. Point counts per cell
+            pt_count_1d = np.bincount(cell_idx, minlength=total_cells)
+            obs_1d = pt_count_1d > 0
+            pt_count = pt_count_1d.reshape(grid_shape).astype(np.int32)
 
-            np.add.at(pt_count.reshape(-1), linear_idx, 1)
-            np.add.at(elev_sum.reshape(-1), linear_idx, v_xyz[:, 2])
-            np.add.at(conf_sum.reshape(-1), linear_idx, v_conf)
-            np.minimum.at(elev_min_tmp.reshape(-1), linear_idx, v_xyz[:, 2])
-            np.maximum.at(elev_max_tmp.reshape(-1), linear_idx, v_xyz[:, 2])
+            # 2. Elevation Min / Max (vectorized in-place reduction)
+            elev_min_1d = np.full(total_cells, np.inf, dtype=np.float32)
+            elev_max_1d = np.full(total_cells, -np.inf, dtype=np.float32)
+            np.minimum.at(elev_min_1d, cell_idx, z)
+            np.maximum.at(elev_max_1d, cell_idx, z)
+            elev_min_1d[~obs_1d] = np.nan
+            elev_max_1d[~obs_1d] = np.nan
+            elev_min = elev_min_1d.reshape(grid_shape)
+            elev_max = elev_max_1d.reshape(grid_shape)
 
-            for c in range(self.num_classes):
-                c_mask = (v_cls == c)
+            # 3. Elevation Sum & Confidence Sum
+            elev_sum_1d = np.bincount(cell_idx, weights=z, minlength=total_cells).astype(np.float32)
+            conf_sum_1d = np.bincount(cell_idx, weights=v_conf, minlength=total_cells).astype(np.float32)
+            elev_sum = elev_sum_1d.reshape(grid_shape)
+            conf_sum = conf_sum_1d.reshape(grid_shape)
+
+            # 4. Vectorized class votes
+            class_votes_2d = np.zeros((total_cells, self.num_classes), dtype=np.int32)
+            for c_id in range(self.num_classes):
+                c_mask = (v_cls == c_id)
                 if np.any(c_mask):
-                    np.add.at(class_votes[:, :, c].reshape(-1), linear_idx[c_mask], 1)
-
-            obs = pt_count > 0
-            elev_min[obs] = elev_min_tmp[obs]
-            elev_max[obs] = elev_max_tmp[obs]
+                    class_votes_2d[:, c_id] = np.bincount(cell_idx[c_mask], minlength=total_cells)
+            class_votes = class_votes_2d.reshape((self.height, self.width, self.num_classes))
 
         # Compute mean elevation and average confidence
         observed_mask = pt_count > 0
@@ -226,13 +237,9 @@ class MLToMappingAdapter:
             dominant_c = np.argmax(class_votes, axis=-1)
             sem_layer[observed_mask] = dominant_c[observed_mask]
 
-        # Traversability layer: 1.0 (drivable), 0.0 (obstacle/dynamic/non-drivable), -1.0 (unobserved)
+        # Traversability layer: 1.0 (drivable), 0.2 (non-drivable), 0.0 (obstacle/dynamic), -1.0 (unobserved)
         traversability = np.full(grid_shape, -1.0, dtype=np.float32)
         if np.any(observed_mask):
-            # Class 0: drivable terrain -> 1.0
-            # Class 1: non-drivable terrain -> 0.2
-            # Class 2: static obstacle -> 0.0
-            # Class 3: dynamic object -> 0.0
             is_drivable = (sem_layer == 0) & observed_mask
             is_non_drivable = (sem_layer == 1) & observed_mask
             is_obstacle = ((sem_layer == 2) | (sem_layer == 3)) & observed_mask

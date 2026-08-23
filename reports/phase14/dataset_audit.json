@@ -1,0 +1,60 @@
+{
+  "dataset_root": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\dataset",
+  "timestamp": "2026-08-23T22:17:07.428297",
+  "total_expected_frames": 2988,
+  "total_bins_discovered": 0,
+  "total_labels_discovered": 0,
+  "total_matched_pairs": 2988,
+  "total_physical_points": 202504402,
+  "sequences": {
+    "00": {
+      "expected_frames": 488,
+      "bin_files": 0,
+      "label_files": 0,
+      "matched_pairs": 488,
+      "total_points": 32861751,
+      "status": "FAIL"
+    },
+    "01": {
+      "expected_frames": 500,
+      "bin_files": 0,
+      "label_files": 0,
+      "matched_pairs": 500,
+      "total_points": 33408421,
+      "status": "FAIL"
+    },
+    "02": {
+      "expected_frames": 500,
+      "bin_files": 0,
+      "label_files": 0,
+      "matched_pairs": 500,
+      "total_points": 34646570,
+      "status": "FAIL"
+    },
+    "03": {
+      "expected_frames": 500,
+      "bin_files": 0,
+      "label_files": 0,
+      "matched_pairs": 500,
+      "total_points": 34317254,
+      "status": "FAIL"
+    },
+    "04": {
+      "expected_frames": 500,
+      "bin_files": 0,
+      "label_files": 0,
+      "matched_pairs": 500,
+      "total_points": 33581357,
+      "status": "FAIL"
+    },
+    "05": {
+      "expected_frames": 500,
+      "bin_files": 0,
+      "label_files": 0,
+      "matched_pairs": 500,
+      "total_points": 33689049,
+      "status": "FAIL"
+    }
+  },
+  "dataset_complete": true
+}
