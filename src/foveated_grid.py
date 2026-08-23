@@ -177,6 +177,8 @@ class GridMap25D:
         classes_arr: Optional[np.ndarray] = None,
         conf_arr: Optional[np.ndarray] = None,
         trav_arr: Optional[np.ndarray] = None,
+        class_counts_arr: Optional[np.ndarray] = None,
+        ignore_counts_arr: Optional[np.ndarray] = None,
         semantic_counts_list: Optional[List[Dict[int, int]]] = None
     ):
         self.bands = list(bands) if bands is not None else list(DEFAULT_FROZEN_BANDS)
@@ -195,6 +197,8 @@ class GridMap25D:
         self._classes = classes_arr if classes_arr is not None else np.empty(0, dtype=np.int64)
         self._conf = conf_arr if conf_arr is not None else np.empty(0, dtype=np.float32)
         self._trav = trav_arr if trav_arr is not None else np.empty(0, dtype=np.float32)
+        self._class_counts_arr = class_counts_arr
+        self._ignore_counts_arr = ignore_counts_arr
         self._semantic_counts_list = semantic_counts_list
 
         self._cells_dict: Optional[Dict[Tuple[str, int, int], GridCell25D]] = None
@@ -210,7 +214,21 @@ class GridMap25D:
                 b_name = str(self._bands[i])
                 ix = int(self._ix[i])
                 iy = int(self._iy[i])
-                sem_counts = self._semantic_counts_list[i] if (self._semantic_counts_list is not None and i < len(self._semantic_counts_list)) else {int(self._classes[i]): int(self._counts[i])}
+                if self._class_counts_arr is not None and i < len(self._class_counts_arr):
+                    sem_counts = {
+                        0: int(self._class_counts_arr[i, 0]),
+                        1: int(self._class_counts_arr[i, 1]),
+                        2: int(self._class_counts_arr[i, 2]),
+                        3: int(self._class_counts_arr[i, 3])
+                    }
+                    ign = int(self._ignore_counts_arr[i]) if self._ignore_counts_arr is not None else 0
+                    if ign > 0:
+                        sem_counts[SuperClass.IGNORE_LABEL] = ign
+                elif self._semantic_counts_list is not None and i < len(self._semantic_counts_list):
+                    sem_counts = self._semantic_counts_list[i]
+                else:
+                    sem_counts = {int(self._classes[i]): int(self._counts[i])}
+                
                 cell = GridCell25D(
                     ix=ix,
                     iy=iy,
@@ -228,6 +246,7 @@ class GridMap25D:
                 )
                 self._cells_dict[(b_name, ix, iy)] = cell
             self._cells_dict.update(self._custom_cells)
+
 
 
     @property
@@ -453,8 +472,10 @@ class FoveatedGrid25D:
                 classes_arr=res_dict["semantic_class"],
                 conf_arr=res_dict["confidence"],
                 trav_arr=res_dict["traversability"],
-                semantic_counts_list=res_dict.get("semantic_counts", None)
+                class_counts_arr=res_dict.get("class_counts", None),
+                ignore_counts_arr=res_dict.get("ignore_counts", None)
             )
+
 
         N = len(points)
         x = points[:, 0]

@@ -64,6 +64,9 @@ py::dict build_grid_numpy_impl(
     std::vector<std::string> bands_list;
     bands_list.reserve(M);
 
+    py::array_t<int64_t> class_counts_arr({M, static_cast<size_t>(4)});
+    py::array_t<int64_t> ignore_arr(M);
+
     auto ix_mut = ix_arr.mutable_unchecked<1>();
     auto iy_mut = iy_arr.mutable_unchecked<1>();
     auto res_mut = res_arr.mutable_unchecked<1>();
@@ -74,6 +77,8 @@ py::dict build_grid_numpy_impl(
     auto class_mut = class_arr.mutable_unchecked<1>();
     auto conf_mut = conf_arr.mutable_unchecked<1>();
     auto trav_mut = trav_arr.mutable_unchecked<1>();
+    auto class_counts_mut = class_counts_arr.mutable_unchecked<2>();
+    auto ignore_mut = ignore_arr.mutable_unchecked<1>();
 
     for (size_t i = 0; i < M; ++i) {
         const auto& c = cells[i];
@@ -88,19 +93,12 @@ py::dict build_grid_numpy_impl(
         class_mut(i) = static_cast<int64_t>(c.semantic_class);
         conf_mut(i) = c.confidence;
         trav_mut(i) = c.traversability;
-    }
 
-    std::vector<py::dict> class_counts_list;
-    class_counts_list.reserve(M);
-    for (size_t i = 0; i < M; ++i) {
-        const auto& c = cells[i];
-        py::dict cd;
-        cd[py::int_(0)] = py::int_(c.class_counts[0]);
-        cd[py::int_(1)] = py::int_(c.class_counts[1]);
-        cd[py::int_(2)] = py::int_(c.class_counts[2]);
-        cd[py::int_(3)] = py::int_(c.class_counts[3]);
-        if (c.ignore_count > 0) cd[py::int_(255)] = py::int_(c.ignore_count);
-        class_counts_list.push_back(cd);
+        class_counts_mut(i, 0) = c.class_counts[0];
+        class_counts_mut(i, 1) = c.class_counts[1];
+        class_counts_mut(i, 2) = c.class_counts[2];
+        class_counts_mut(i, 3) = c.class_counts[3];
+        ignore_mut(i) = c.ignore_count;
     }
 
     py::dict out;
@@ -115,10 +113,12 @@ py::dict build_grid_numpy_impl(
     out["semantic_class"] = class_arr;
     out["confidence"] = conf_arr;
     out["traversability"] = trav_arr;
-    out["semantic_counts"] = py::cast(class_counts_list);
+    out["class_counts"] = class_counts_arr;
+    out["ignore_counts"] = ignore_arr;
     out["num_cells"] = M;
     return out;
 }
+
 
 
 } // anonymous namespace
