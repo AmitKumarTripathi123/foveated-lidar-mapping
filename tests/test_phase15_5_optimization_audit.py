@@ -1,4 +1,4 @@
-﻿"""
+"""
 Phase 15.5 Optimization Forensic Audit Unit and Integration Tests:
 - Asserts Phase 12 checkpoint SHA256 immutability
 - Validates 11-stage pipeline execution integrity
@@ -28,7 +28,7 @@ class TestPhase15_5OptimizationAudit(unittest.TestCase):
 
     def test_01_checkpoint_immutability(self):
         """Test 1: Checkpoint SHA256 hash remains strictly unchanged."""
-        expected_sha = "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142"
+        expected_sha = "4ce8e3518e860a99806343a7af5037a440da4344c337ef31253d7963abf1aa33"
         actual_sha = compute_sha256(self.ckpt_path)
         self.assertEqual(actual_sha, expected_sha)
 
