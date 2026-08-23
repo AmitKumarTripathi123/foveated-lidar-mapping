@@ -23,6 +23,9 @@ struct CellAccumulator {
     double sum_conf{0.0};
     uint8_t best_class{SuperClass::IGNORE_LABEL};
     int best_priority{-1};
+    std::array<int64_t, 4> class_counts{0, 0, 0, 0};
+    int64_t ignore_count{0};
+    double class_conf_sum[4]{0.0, 0.0, 0.0, 0.0};
 
     inline void add_point(float z, uint8_t class_id, float conf, int priority) {
         count++;
@@ -30,6 +33,13 @@ struct CellAccumulator {
         if (z < min_z) min_z = z;
         if (z > max_z) max_z = z;
         sum_conf += conf;
+
+        if (class_id < 4) {
+            class_counts[class_id]++;
+            class_conf_sum[class_id] += conf;
+        } else {
+            ignore_count++;
+        }
 
         if (priority > best_priority) {
             best_priority = priority;
@@ -95,12 +105,22 @@ public:
                 acc.sum_conf = conf;
                 acc.best_class = class_id;
                 acc.best_priority = priority;
+                acc.class_counts.fill(0);
+                acc.ignore_count = 0;
+                for (int c = 0; c < 4; ++c) acc.class_conf_sum[c] = 0.0;
+                if (class_id < 4) {
+                    acc.class_counts[class_id] = 1;
+                    acc.class_conf_sum[class_id] = conf;
+                } else {
+                    acc.ignore_count = 1;
+                }
                 active_indices_.push_back(idx);
                 return;
             }
             idx = (idx + 1) & mask_;
         }
     }
+
 
     const std::vector<size_t>& active_indices() const { return active_indices_; }
     const Entry& get_entry(size_t idx) const { return entries_[idx]; }
@@ -248,7 +268,10 @@ std::vector<GridCell> FoveatedGridEngine::build_grid_raw(
         cell.semantic_class = acc.best_class;
         cell.confidence = (acc.count > 0) ? static_cast<float>(acc.sum_conf / acc.count) : 0.0f;
         cell.traversability = calculate_traversability(acc.best_class);
+        cell.class_counts = acc.class_counts;
+        cell.ignore_count = acc.ignore_count;
         result.push_back(cell);
+
     }
 
     // Deterministic sorting matching Python reference: (band_name, iy, ix)

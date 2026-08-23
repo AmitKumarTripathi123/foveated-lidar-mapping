@@ -199,6 +199,7 @@ class GridCell25D:
     traversability: float = 0.0
     state: CellState = CellState.UNKNOWN
     band_name: str = ""
+    semantic_counts: Dict[int, int] = field(default_factory=dict)
 
     @property
     def bounds(self) -> Tuple[float, float, float, float]:
@@ -221,10 +222,59 @@ class GridCell25D:
             return float("nan")
         return float(self.elevation_max - self.elevation_min)
 
+    @property
+    def valid_semantic_count(self) -> int:
+        """Returns count of valid semantic points (excluding IGNORE_LABEL)."""
+        if not self.semantic_counts:
+            return self.point_count if self.point_count > 0 else 0
+        valid = sum(cnt for cid, cnt in self.semantic_counts.items() if cid != SuperClass.IGNORE_LABEL)
+        return valid if valid > 0 else self.semantic_counts.get(SuperClass.IGNORE_LABEL, 0)
+
+    @property
+    def dominant_class(self) -> Optional[int]:
+        """Returns the dominant class based on semantic counts with priority tie-breaking."""
+        if not self.semantic_counts:
+            return self.semantic_class if self.semantic_class != SuperClass.IGNORE_LABEL else None
+        
+        p_weights = {
+            SuperClass.DYNAMIC_OBJECT: 4,
+            SuperClass.STATIC_OBSTACLE: 3,
+            SuperClass.NON_DRIVABLE_TERRAIN: 2,
+            SuperClass.DRIVABLE_TERRAIN: 1,
+            SuperClass.IGNORE_LABEL: 0,
+        }
+        best_c = None
+        max_c = -1
+        best_p = -1
+        for cid, cnt in self.semantic_counts.items():
+            if cid == SuperClass.IGNORE_LABEL and len(self.semantic_counts) > 1:
+                continue
+            p = p_weights.get(cid, 0)
+            if cnt > max_c or (cnt == max_c and p > best_p):
+                max_c = cnt
+                best_c = cid
+                best_p = p
+        return best_c if best_c is not None else self.semantic_class
+
+    def class_probability(self, class_id: int) -> float:
+        """Calculates class probability: semantic_counts[c] / valid_semantic_count."""
+        total_valid = self.valid_semantic_count
+        if total_valid <= 0:
+            if class_id == SuperClass.IGNORE_LABEL and self.semantic_counts.get(SuperClass.IGNORE_LABEL, 0) > 0:
+                return 1.0
+            return 0.0
+        return float(self.semantic_counts.get(class_id, 0)) / float(total_valid)
+
+    @property
+    def semantic_confidence(self) -> float:
+        """Returns mean confidence associated with the cell."""
+        return float(self.confidence)
+
     def contains_point(self, x: float, y: float) -> bool:
         """Verifies spatial invariant: ix*s <= x < (ix+1)*s and iy*s <= y < (iy+1)*s."""
         min_x, max_x, min_y, max_y = self.bounds
         return (min_x <= x < max_x) and (min_y <= y < max_y)
+
 
 
 

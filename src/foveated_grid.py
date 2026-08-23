@@ -176,7 +176,8 @@ class GridMap25D:
         max_z_arr: Optional[np.ndarray] = None,
         classes_arr: Optional[np.ndarray] = None,
         conf_arr: Optional[np.ndarray] = None,
-        trav_arr: Optional[np.ndarray] = None
+        trav_arr: Optional[np.ndarray] = None,
+        semantic_counts_list: Optional[List[Dict[int, int]]] = None
     ):
         self.bands = list(bands) if bands is not None else list(DEFAULT_FROZEN_BANDS)
         self.frame_id = frame_id
@@ -194,6 +195,7 @@ class GridMap25D:
         self._classes = classes_arr if classes_arr is not None else np.empty(0, dtype=np.int64)
         self._conf = conf_arr if conf_arr is not None else np.empty(0, dtype=np.float32)
         self._trav = trav_arr if trav_arr is not None else np.empty(0, dtype=np.float32)
+        self._semantic_counts_list = semantic_counts_list
 
         self._cells_dict: Optional[Dict[Tuple[str, int, int], GridCell25D]] = None
         self._custom_cells: Dict[Tuple[str, int, int], GridCell25D] = {}
@@ -208,6 +210,7 @@ class GridMap25D:
                 b_name = str(self._bands[i])
                 ix = int(self._ix[i])
                 iy = int(self._iy[i])
+                sem_counts = self._semantic_counts_list[i] if (self._semantic_counts_list is not None and i < len(self._semantic_counts_list)) else {int(self._classes[i]): int(self._counts[i])}
                 cell = GridCell25D(
                     ix=ix,
                     iy=iy,
@@ -220,10 +223,12 @@ class GridMap25D:
                     confidence=float(self._conf[i]),
                     traversability=float(self._trav[i]),
                     state=CellState.OCCUPIED,
-                    band_name=b_name
+                    band_name=b_name,
+                    semantic_counts=sem_counts
                 )
                 self._cells_dict[(b_name, ix, iy)] = cell
             self._cells_dict.update(self._custom_cells)
+
 
     @property
     def cells(self) -> Dict[Tuple[str, int, int], GridCell25D]:
@@ -447,7 +452,8 @@ class FoveatedGrid25D:
                 max_z_arr=res_dict["elevation_max"],
                 classes_arr=res_dict["semantic_class"],
                 conf_arr=res_dict["confidence"],
-                trav_arr=res_dict["traversability"]
+                trav_arr=res_dict["traversability"],
+                semantic_counts_list=res_dict.get("semantic_counts", None)
             )
 
         N = len(points)
@@ -479,6 +485,7 @@ class FoveatedGrid25D:
         all_classes = []
         all_conf = []
         all_trav = []
+        all_semantic_counts = []
 
         OFFSET = 50000  # Coordinate hashing bias
 
@@ -525,14 +532,26 @@ class FoveatedGrid25D:
             sum_c = np.bincount(inverse_idx, weights=bc, minlength=num_cells)
             mean_c = sum_c / counts
 
-            # 5. Obstacle-preserving semantic class aggregation
+            # 5. Semantic distribution counts per cell
+            c0 = np.bincount(inverse_idx[bl == 0], minlength=num_cells) if np.any(bl == 0) else np.zeros(num_cells, dtype=np.int64)
+            c1 = np.bincount(inverse_idx[bl == 1], minlength=num_cells) if np.any(bl == 1) else np.zeros(num_cells, dtype=np.int64)
+            c2 = np.bincount(inverse_idx[bl == 2], minlength=num_cells) if np.any(bl == 2) else np.zeros(num_cells, dtype=np.int64)
+            c3 = np.bincount(inverse_idx[bl == 3], minlength=num_cells) if np.any(bl == 3) else np.zeros(num_cells, dtype=np.int64)
+            c255 = np.bincount(inverse_idx[bl == 255], minlength=num_cells) if np.any(bl == 255) else np.zeros(num_cells, dtype=np.int64)
+            for ci in range(num_cells):
+                cd = {0: int(c0[ci]), 1: int(c1[ci]), 2: int(c2[ci]), 3: int(c3[ci])}
+                if c255[ci] > 0:
+                    cd[255] = int(c255[ci])
+                all_semantic_counts.append(cd)
+
+            # 6. Obstacle-preserving semantic class aggregation
             ranks = p_weights[np.clip(bl, 0, 255)]
             sort_order = np.lexsort((-ranks, inverse_idx))
             _, first_idx = np.unique(inverse_idx[sort_order], return_index=True)
             best_idx = sort_order[first_idx]
             agg_labels = bl[best_idx]
 
-            # 6. Vectorized traversability mapping
+            # 7. Vectorized traversability mapping
             trav = np.zeros(num_cells, dtype=np.float32)
             trav[agg_labels == SuperClass.DRIVABLE_TERRAIN] = 1.0
             trav[agg_labels == SuperClass.NON_DRIVABLE_TERRAIN] = 0.2
@@ -572,5 +591,7 @@ class FoveatedGrid25D:
             max_z_arr=np.concatenate(all_max_z),
             classes_arr=np.concatenate(all_classes),
             conf_arr=np.concatenate(all_conf),
-            trav_arr=np.concatenate(all_trav)
+            trav_arr=np.concatenate(all_trav),
+            semantic_counts_list=all_semantic_counts
         )
+

@@ -90,6 +90,19 @@ py::dict build_grid_numpy_impl(
         trav_mut(i) = c.traversability;
     }
 
+    std::vector<py::dict> class_counts_list;
+    class_counts_list.reserve(M);
+    for (size_t i = 0; i < M; ++i) {
+        const auto& c = cells[i];
+        py::dict cd;
+        cd[py::int_(0)] = py::int_(c.class_counts[0]);
+        cd[py::int_(1)] = py::int_(c.class_counts[1]);
+        cd[py::int_(2)] = py::int_(c.class_counts[2]);
+        cd[py::int_(3)] = py::int_(c.class_counts[3]);
+        if (c.ignore_count > 0) cd[py::int_(255)] = py::int_(c.ignore_count);
+        class_counts_list.push_back(cd);
+    }
+
     py::dict out;
     out["bands"] = py::cast(bands_list);
     out["ix"] = ix_arr;
@@ -102,9 +115,11 @@ py::dict build_grid_numpy_impl(
     out["semantic_class"] = class_arr;
     out["confidence"] = conf_arr;
     out["traversability"] = trav_arr;
+    out["semantic_counts"] = py::cast(class_counts_list);
     out["num_cells"] = M;
     return out;
 }
+
 
 } // anonymous namespace
 
@@ -164,7 +179,22 @@ PYBIND11_MODULE(foveated_grid_cpp, m) {
         .def("max_x", &GridCell::max_x)
         .def("min_y", &GridCell::min_y)
         .def("max_y", &GridCell::max_y)
-        .def("height_range", &GridCell::height_range);
+        .def("height_range", &GridCell::height_range)
+        .def_property_readonly("class_counts", [](const GridCell& c) {
+            py::dict d;
+            d[py::int_(0)] = py::int_(c.class_counts[0]);
+            d[py::int_(1)] = py::int_(c.class_counts[1]);
+            d[py::int_(2)] = py::int_(c.class_counts[2]);
+            d[py::int_(3)] = py::int_(c.class_counts[3]);
+            if (c.ignore_count > 0) d[py::int_(255)] = py::int_(c.ignore_count);
+            return d;
+        })
+
+        .def_readwrite("ignore_count", &GridCell::ignore_count)
+        .def("valid_semantic_count", &GridCell::valid_semantic_count)
+        .def("class_probability", &GridCell::class_probability, py::arg("class_id"))
+        .def("dominant_class", &GridCell::dominant_class);
+
 
 
     // FoveatedGridEngine class
