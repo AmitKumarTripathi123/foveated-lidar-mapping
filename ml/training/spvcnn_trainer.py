@@ -22,6 +22,8 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, _LRScheduler
 from torch.utils.data import DataLoader
 
 from ml.data.spvcnn_adapter import SPVCNNInputAdapter
+from ml.data.augmentation import LidarAugmentor
+from ml.training.losses import build_loss_function
 from ml.models.spvcnn import SPVCNN, load_spvcnn_checkpoint
 
 
@@ -64,12 +66,12 @@ class SPVCNNTrainer:
         self.num_classes = int(config.get("model", {}).get("num_classes", 4))
         self.voxel_size = float(config.get("model", {}).get("voxel_size", 0.05))
 
+        # Advanced loss function setup
         class_weights = config.get("loss", {}).get("class_weights")
-        if class_weights is not None:
-            weights_tensor = torch.tensor(class_weights, dtype=torch.float32, device=self.device)
-            self.criterion = nn.CrossEntropyLoss(weight=weights_tensor, ignore_index=self.ignore_index)
-        else:
-            self.criterion = nn.CrossEntropyLoss(ignore_index=self.ignore_index)
+        self.criterion = build_loss_function(config, class_weights=class_weights, device=self.device)
+
+        # Training-only augmentation
+        self.augmentor = LidarAugmentor(config, is_training=True)
 
         opt_name = train_cfg.get("optimizer", "adam").lower()
         if opt_name == "adamw":
@@ -102,8 +104,11 @@ class SPVCNNTrainer:
             batch_loss = torch.tensor(0.0, device=self.device, requires_grad=True)
 
             for pts, lbls in zip(pts_batch, lbls_batch):
-                pts_t = pts.to(self.device).float()
-                lbls_t = lbls.to(self.device).long()
+                # Apply training augmentation
+                aug_pts, aug_lbls = self.augmentor.augment(pts, lbls)
+
+                pts_t = (aug_pts if isinstance(aug_pts, torch.Tensor) else torch.from_numpy(aug_pts)).to(self.device).float()
+                lbls_t = (aug_lbls if isinstance(aug_lbls, torch.Tensor) else torch.from_numpy(aug_lbls)).to(self.device).long()
 
                 bundle = self.input_adapter.prepare_input(pts_t, device=self.device)
                 logits = self.model(
