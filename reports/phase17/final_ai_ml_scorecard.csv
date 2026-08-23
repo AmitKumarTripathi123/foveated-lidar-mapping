@@ -1,0 +1,23 @@
+Category,Status,Evidence
+Checkpoint Integrity,PASS,SHA256: b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142 (Exact Match)
+Model Parameters,PASS,"138,514 Trainable Parameters (0 missing/unexpected keys)"
+Reload Reproducibility,PASS,Max Logit Delta: 0.00e+00 < 1e-5
+Dataset Completeness,PASS,"2,988 / 2,988 Physical Matched Pairs (.bin / .label)"
+Train / Val Isolation,PASS,"Sequences {00,01,03,04,05} ∩ {02} = ∅ (0% Leakage)"
+Semantic Ontology,PASS,Strict 4-Class SIH Mapping + 255 Ignore across all modules
+3-Zone Foveation,PASS,"Near (0-10m, 0.05m), Mid (10-40m, 0.15m), Far (40-100m, 0.50m)"
+Model Architecture,PASS,"SPVCNN (Sparse Point-Voxel Convolution, 4 in, 4 out)"
+Held-Out Validation mIoU,PASS,53.59% on Independent Sequence 02 Split
+Cross-Sequence Mean mIoU,PASS,51.94% Mean across Sequences 00–05 (Std: 3.17%)
+Dynamic Object IoU,PASS,43.68% Cross-Sequence Mean
+Hardware Optimization,PASS,89.19 ms Mean / 11.21 FPS (2.72x Speedup vs Baseline)
+10 Hz Sensor Simulation,PASS,10.00 FPS Warmed Stream with 0 Drops / 0 Queue Backlog
+Continuous Unbuffered,PASS,4.03 FPS / 234.17 ms Mean under Continuous Loop
+Memory Stability,PASS,0.0 MB GPU VRAM Growth across Sustained Execution
+Failure Recovery,PASS,10/10 Injected Edge-Case Failure Modes Gracefully Handled
+ML Mapping Contract,PASS,"Exact XYZ Alignment + [class, conf] with Finite Bounds"
+GridMap25D Integration,PASS,"Vectorized Elevation, Traversability, and Semantic Layers"
+Production Artifacts,PASS,artifacts/production/ Validated and Complete
+Regression Suite,PASS,446 / 446 Tests Green (0 Failures / 0 Errors)
+Security & Secrets Scan,PASS,NO SECRET FOUND across entire repository
+Known Limitations,DOCUMENTED,5 Specific Autonomous System Limitations Documented

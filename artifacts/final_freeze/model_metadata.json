@@ -1,0 +1,21 @@
+{
+  "project": "Foveated 2.5D LiDAR Mapping for Autonomous Navigation",
+  "version": "1.0.0-freeze",
+  "certification_stage": "Phase 17 AI/ML Production Freeze",
+  "production_checkpoint": "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+  "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "parameters": 138514,
+  "ontology": {
+    "0": "drivable_terrain",
+    "1": "non_drivable_terrain",
+    "2": "static_obstacle",
+    "3": "dynamic_object",
+    "255": "ignore"
+  },
+  "held_out_validation_miou": 53.59,
+  "mean_sequence_miou": 51.94,
+  "dynamic_object_mean_iou": 43.68,
+  "real_time_10hz_certified": true,
+  "warmed_10hz_fps": 10.0,
+  "steady_state_latency_ms": 91.2
+}

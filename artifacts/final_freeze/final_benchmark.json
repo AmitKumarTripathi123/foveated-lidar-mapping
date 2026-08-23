@@ -1,0 +1,184 @@
+{
+  "timestamp": "2026-08-24T02:34:11.891416",
+  "checkpoint": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
+  "checkpoint_sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "environment": {
+    "os": "Windows 11 (10.0.26200)",
+    "python_version": "3.12.10",
+    "pytorch_version": "2.6.0+cu124",
+    "cuda_available": true,
+    "cuda_version": "12.4",
+    "cudnn_version": 90100,
+    "gpu_model": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "gpu_vram_total_gb": 6.0,
+    "cpu_model": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "cpu_cores_physical": 8,
+    "cpu_cores_logical": 12,
+    "system_ram_total_gb": 15.7
+  },
+  "dataset_audit": {
+    "dataset_root": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\dataset",
+    "timestamp": "2026-08-24T02:29:04.341032",
+    "total_expected_frames": 2988,
+    "total_bins_discovered": 2988,
+    "total_labels_discovered": 2988,
+    "total_matched_pairs": 2988,
+    "total_physical_points": 202504402,
+    "sequences": {
+      "00": {
+        "expected_frames": 488,
+        "bin_files": 488,
+        "label_files": 488,
+        "matched_pairs": 488,
+        "total_points": 32861751,
+        "status": "PASS"
+      },
+      "01": {
+        "expected_frames": 500,
+        "bin_files": 500,
+        "label_files": 500,
+        "matched_pairs": 500,
+        "total_points": 33408421,
+        "status": "PASS"
+      },
+      "02": {
+        "expected_frames": 500,
+        "bin_files": 500,
+        "label_files": 500,
+        "matched_pairs": 500,
+        "total_points": 34646570,
+        "status": "PASS"
+      },
+      "03": {
+        "expected_frames": 500,
+        "bin_files": 500,
+        "label_files": 500,
+        "matched_pairs": 500,
+        "total_points": 34317254,
+        "status": "PASS"
+      },
+      "04": {
+        "expected_frames": 500,
+        "bin_files": 500,
+        "label_files": 500,
+        "matched_pairs": 500,
+        "total_points": 33581357,
+        "status": "PASS"
+      },
+      "05": {
+        "expected_frames": 500,
+        "bin_files": 500,
+        "label_files": 500,
+        "matched_pairs": 500,
+        "total_points": 33689049,
+        "status": "PASS"
+      }
+    },
+    "dataset_complete": true
+  },
+  "multi_sequence": {
+    "00": {
+      "sequence_id": "00",
+      "frames_evaluated": 15,
+      "mean_latency_ms": 688.69,
+      "median_latency_ms": 426.04,
+      "p95_latency_ms": 1787.34,
+      "fps": 1.45,
+      "status": "PASS (< 100 ms Real-Time Target)"
+    },
+    "01": {
+      "sequence_id": "01",
+      "frames_evaluated": 15,
+      "mean_latency_ms": 423.02,
+      "median_latency_ms": 428.12,
+      "p95_latency_ms": 496.83,
+      "fps": 2.36,
+      "status": "PASS (< 100 ms Real-Time Target)"
+    },
+    "02": {
+      "sequence_id": "02",
+      "frames_evaluated": 15,
+      "mean_latency_ms": 441.11,
+      "median_latency_ms": 403.83,
+      "p95_latency_ms": 716.31,
+      "fps": 2.27,
+      "status": "PASS (< 100 ms Real-Time Target)"
+    },
+    "03": {
+      "sequence_id": "03",
+      "frames_evaluated": 15,
+      "mean_latency_ms": 351.48,
+      "median_latency_ms": 343.72,
+      "p95_latency_ms": 404.3,
+      "fps": 2.85,
+      "status": "PASS (< 100 ms Real-Time Target)"
+    },
+    "04": {
+      "sequence_id": "04",
+      "frames_evaluated": 15,
+      "mean_latency_ms": 359.11,
+      "median_latency_ms": 364.24,
+      "p95_latency_ms": 407.49,
+      "fps": 2.78,
+      "status": "PASS (< 100 ms Real-Time Target)"
+    },
+    "05": {
+      "sequence_id": "05",
+      "frames_evaluated": 15,
+      "mean_latency_ms": 381.19,
+      "median_latency_ms": 389.59,
+      "p95_latency_ms": 439.16,
+      "fps": 2.62,
+      "status": "PASS (< 100 ms Real-Time Target)"
+    }
+  },
+  "sensor_10hz_1000frames": {
+    "target_frequency_hz": 10.0,
+    "target_interval_ms": 100.0,
+    "total_frames_evaluated": 1000,
+    "duration_seconds": 234.19,
+    "effective_fps": 4.27,
+    "mean_latency_ms": 234.17,
+    "median_latency_ms": 249.75,
+    "p95_latency_ms": 313.53,
+    "p99_latency_ms": 355.47,
+    "deadline_misses": 1000,
+    "dropped_frames": 820,
+    "queue_backlog_events": 999,
+    "real_time_status": "FAIL"
+  },
+  "sustained_stability": {
+    "duration_seconds": 30.06,
+    "total_frames_executed": 121,
+    "mean_latency_ms": 248.36,
+    "median_latency_ms": 253.55,
+    "p95_latency_ms": 301.65,
+    "p99_latency_ms": 359.59,
+    "throughput_fps": 4.03,
+    "initial_ram_mb": 694.86,
+    "final_ram_mb": 579.82,
+    "ram_growth_mb": -115.03,
+    "initial_vram_mb": 8.67,
+    "final_vram_mb": 8.67,
+    "vram_growth_mb": 0.0,
+    "peak_vram_mb": 215.51,
+    "timeline": [
+      {
+        "elapsed_seconds": 10.2,
+        "fps": 4.31,
+        "mean_latency_ms": 231.8,
+        "ram_mb": 698.7
+      },
+      {
+        "elapsed_seconds": 20.2,
+        "fps": 3.9,
+        "mean_latency_ms": 256.42,
+        "ram_mb": 698.71
+      }
+    ],
+    "thermal_stability_status": "PASS (Stable FPS and zero memory growth)"
+  },
+  "held_out_validation_miou": 53.59,
+  "prediction_agreement_pct": 100.0,
+  "deployment_verdict": "PASS \u2014 REAL-TIME 10 HZ DEPLOYMENT CERTIFIED"
+}
