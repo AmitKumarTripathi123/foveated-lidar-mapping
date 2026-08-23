@@ -244,17 +244,24 @@ class GridCell25D:
             SuperClass.IGNORE_LABEL: 0,
         }
         best_c = None
-        max_c = -1
+        max_c = 0
         best_p = -1
         for cid, cnt in self.semantic_counts.items():
-            if cid == SuperClass.IGNORE_LABEL and len(self.semantic_counts) > 1:
+            if cid == SuperClass.IGNORE_LABEL:
+                continue
+            if cnt <= 0:
                 continue
             p = p_weights.get(cid, 0)
             if cnt > max_c or (cnt == max_c and p > best_p):
                 max_c = cnt
                 best_c = cid
                 best_p = p
-        return best_c if best_c is not None else self.semantic_class
+        if best_c is not None:
+            return best_c
+        if self.semantic_counts.get(SuperClass.IGNORE_LABEL, 0) > 0:
+            return SuperClass.IGNORE_LABEL
+        return self.semantic_class if self.semantic_class != SuperClass.IGNORE_LABEL else None
+
 
     def class_probability(self, class_id: int) -> float:
         """Calculates class probability: semantic_counts[c] / valid_semantic_count."""

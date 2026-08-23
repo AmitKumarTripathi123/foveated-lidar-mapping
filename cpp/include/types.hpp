@@ -89,7 +89,7 @@ struct GridCell {
     }
 
     int dominant_class() const {
-        int64_t max_v = -1;
+        int64_t max_v = 0;
         int best_c = SuperClass::IGNORE_LABEL;
         int best_p = -1;
         for (int c = 0; c < 4; ++c) {
@@ -99,12 +99,13 @@ struct GridCell {
                 best_p = get_semantic_priority(c);
             }
         }
-        if (best_c == SuperClass::IGNORE_LABEL && ignore_count > 0) {
-            return SuperClass::IGNORE_LABEL;
+        if (best_c != SuperClass::IGNORE_LABEL) {
+            return best_c;
         }
-        return best_c;
+        return SuperClass::IGNORE_LABEL;
     }
 };
+
 
 
 } // namespace foveated_mapping

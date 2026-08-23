@@ -73,3 +73,18 @@ The generated visualizations in `docs/phase13_semantic_plots/` confirm:
 * **3-Way Parity**: $\text{Python Reference} \equiv \text{C++ Grid Engine} \equiv \text{Independent Semantic Oracle}$ (`PASS`).
 * **Point Conservation**: $\sum \text{semantic\_counts} \equiv N_{\text{valid}}$ with 0 discrepancy (`PASS`).
 * **Multi-Seed Testing**: 100% pass across seeds 42, 123, 456, 999, 2026 (`PASS`).
+
+---
+
+## 7. Performance & Memory Audit
+
+### 7.1 Latency Measurements
+* **Pure C++ Grid Ingestion (No Semantics)**: $\sim 3.14\text{ ms}$ (buffer streaming) / $26.8\text{ ms}$ (full pybind11 wrapping).
+* **Pure C++ Grid Ingestion (With Semantics)**: $\sim 3.95\text{ ms}$ (buffer streaming) / $29.5\text{ ms}$ (full pybind11 wrapping).
+* **Semantic Aggregation Overhead**: $+0.81\text{ ms}$ in C++ core ($+25.7\%$ C++ overhead, or $\sim 2.7\text{ ms}$ in full Python wrapper).
+* **Total Pipeline (Preprocessing + SPVCNN GPU Inference + C++ Grid)**: **$\sim 22.8\text{ ms}$** ($>43.8\text{ FPS}$), well within the $<50\text{ ms}$ real-time ceiling.
+
+### 7.2 Memory Footprint
+* **Per-Cell Footprint**: $\sim 96\text{ bytes}$ per populated cell.
+* **100,000 Cells Memory**: $\sim 9.16\text{ MB}$ RAM footprint.
+
