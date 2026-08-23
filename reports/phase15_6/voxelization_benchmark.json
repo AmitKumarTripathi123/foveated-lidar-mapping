@@ -1,0 +1,8 @@
+{
+  "component": "SPVCNN Voxelization Preprocessing",
+  "baseline_ms": 72.1,
+  "optimized_mean_ms": 14.79,
+  "optimized_median_ms": 14.84,
+  "speedup": 4.88,
+  "correctness": "PASS (Exact point-order and inverse mapping verified)"
+}

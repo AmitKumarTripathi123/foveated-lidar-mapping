@@ -1,0 +1,8 @@
+{
+  "component": "3-Zone Distance Foveation",
+  "baseline_ms": 49.25,
+  "optimized_mean_ms": 19.19,
+  "optimized_median_ms": 19.3,
+  "speedup": 2.57,
+  "correctness": "PASS (Exact 0-10m, 10-40m, 40-100m band equivalence)"
+}

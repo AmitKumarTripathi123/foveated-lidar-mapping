@@ -215,13 +215,10 @@ class MLToMappingAdapter:
             elev_sum = elev_sum_1d.reshape(grid_shape)
             conf_sum = conf_sum_1d.reshape(grid_shape)
 
-            # 4. Vectorized class votes
-            class_votes_2d = np.zeros((total_cells, self.num_classes), dtype=np.int32)
-            for c_id in range(self.num_classes):
-                c_mask = (v_cls == c_id)
-                if np.any(c_mask):
-                    class_votes_2d[:, c_id] = np.bincount(cell_idx[c_mask], minlength=total_cells)
-            class_votes = class_votes_2d.reshape((self.height, self.width, self.num_classes))
+            # 4. Ultra-fast joint class vote calculation
+            vote_keys = cell_idx * self.num_classes + v_cls
+            vote_counts = np.bincount(vote_keys, minlength=total_cells * self.num_classes)
+            class_votes = vote_counts.reshape((self.height, self.width, self.num_classes))
 
         # Compute mean elevation and average confidence
         observed_mask = pt_count > 0

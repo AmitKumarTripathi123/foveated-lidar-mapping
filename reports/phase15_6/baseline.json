@@ -1,0 +1,7 @@
+{
+  "checkpoint": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
+  "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "baseline_latency_ms": 242.63,
+  "baseline_fps": 4.12,
+  "hardware": "NVIDIA GeForce RTX 4050 Laptop GPU"
+}

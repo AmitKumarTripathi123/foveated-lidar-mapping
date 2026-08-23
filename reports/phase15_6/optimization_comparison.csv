@@ -1,0 +1,8 @@
+Subsystem / Stage,Phase 15.5 Baseline (ms),Phase 15.6 Optimized (ms),Speedup,Status
+1. LiDAR Loading & Parsing,2.52 ms,1.96 ms,1.3x,PASS
+2. 3-Zone Distance Foveation,49.25 ms,21.02 ms,2.3x,PASS
+3. SPVCNN Voxelization,72.10 ms,15.40 ms,4.7x,PASS
+4. SPVCNN CUDA Forward Pass,28.29 ms,13.88 ms,2.0x,PASS
+5. Prediction Postprocessing,5.36 ms,1.15 ms,4.7x,PASS
+6. Vectorized GridMap25D,72.50 ms,35.76 ms,2.0x,PASS
+TOTAL END-TO-END PIPELINE,242.63 ms (4.12 FPS),89.19 ms (11.21 FPS),2.72x Faster,PASS (< 100ms Achieved)
