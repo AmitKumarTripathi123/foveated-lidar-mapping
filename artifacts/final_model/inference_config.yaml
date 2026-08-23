@@ -1,0 +1,22 @@
+foveation:
+  far_dist: 100.0
+  far_voxel: 0.5
+  mid_dist: 40.0
+  mid_voxel: 0.15
+  near_dist: 10.0
+  near_voxel: 0.05
+mapping:
+  bounds_x:
+  - -50.0
+  - 50.0
+  bounds_y:
+  - -50.0
+  - 50.0
+  resolution: 0.2
+model:
+  base_channels: 32
+  checkpoint_path: artifacts/final_model/best_checkpoint.pt
+  in_channels: 4
+  name: spvcnn
+  num_classes: 4
+  voxel_size: 0.05

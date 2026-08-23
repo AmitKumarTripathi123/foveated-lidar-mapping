@@ -1,0 +1,45 @@
+{
+  "description": "Representative failure cases with lowest mIoU, class confusion, or extreme distance",
+  "worst_frames": [
+    {
+      "frame_id": "05_000422",
+      "miou": 32.22,
+      "accuracy": 69.24,
+      "dynamic_iou": 7.55,
+      "points": 50589,
+      "mean_confidence": 0.8677
+    },
+    {
+      "frame_id": "05_000421",
+      "miou": 32.25,
+      "accuracy": 69.33,
+      "dynamic_iou": 7.57,
+      "points": 50598,
+      "mean_confidence": 0.8666
+    },
+    {
+      "frame_id": "02_000001",
+      "miou": 33.16,
+      "accuracy": 68.36,
+      "dynamic_iou": 20.56,
+      "points": 48214,
+      "mean_confidence": 0.8341
+    },
+    {
+      "frame_id": "05_000435",
+      "miou": 33.17,
+      "accuracy": 69.47,
+      "dynamic_iou": 12.23,
+      "points": 49699,
+      "mean_confidence": 0.8747
+    },
+    {
+      "frame_id": "05_000436",
+      "miou": 33.64,
+      "accuracy": 69.97,
+      "dynamic_iou": 13.49,
+      "points": 48807,
+      "mean_confidence": 0.8744
+    }
+  ]
+}

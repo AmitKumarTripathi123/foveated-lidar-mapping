@@ -1,0 +1,136 @@
+{
+  "production_checkpoint": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
+  "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "dataset_total_frames": 2988,
+  "held_out_validation_sequence": "02",
+  "held_out_validation_frames": 500,
+  "held_out_validation_miou": 53.59,
+  "held_out_validation_accuracy": 77.53,
+  "cross_sequence_summary": {
+    "mean_miou": 51.94,
+    "median_miou": 52.62,
+    "std_miou": 3.17,
+    "min_miou": 45.6,
+    "max_miou": 55.68,
+    "worst_sequence": "03",
+    "best_sequence": "00",
+    "per_class_statistics": {
+      "0": {
+        "class_name": "drivable_terrain",
+        "mean": 69.53,
+        "median": 69.05,
+        "std": 4.98,
+        "min": 63.02,
+        "max": 77.61
+      },
+      "1": {
+        "class_name": "non_drivable_terrain",
+        "mean": 15.94,
+        "median": 12.82,
+        "std": 17.38,
+        "min": 0.0,
+        "max": 50.88
+      },
+      "2": {
+        "class_name": "static_obstacle",
+        "mean": 78.63,
+        "median": 79.17,
+        "std": 2.27,
+        "min": 74.42,
+        "max": 81.64
+      },
+      "3": {
+        "class_name": "dynamic_object",
+        "mean": 43.68,
+        "median": 48.2,
+        "std": 13.11,
+        "min": 25.98,
+        "max": 57.02
+      }
+    }
+  },
+  "worst_5_frames": [
+    {
+      "frame_id": "05_000422",
+      "miou": 32.22,
+      "accuracy": 69.24,
+      "dynamic_iou": 7.55,
+      "points": 50589,
+      "mean_confidence": 0.8677
+    },
+    {
+      "frame_id": "05_000421",
+      "miou": 32.25,
+      "accuracy": 69.33,
+      "dynamic_iou": 7.57,
+      "points": 50598,
+      "mean_confidence": 0.8666
+    },
+    {
+      "frame_id": "02_000001",
+      "miou": 33.16,
+      "accuracy": 68.36,
+      "dynamic_iou": 20.56,
+      "points": 48214,
+      "mean_confidence": 0.8341
+    },
+    {
+      "frame_id": "05_000435",
+      "miou": 33.17,
+      "accuracy": 69.47,
+      "dynamic_iou": 12.23,
+      "points": 49699,
+      "mean_confidence": 0.8747
+    },
+    {
+      "frame_id": "05_000436",
+      "miou": 33.64,
+      "accuracy": 69.97,
+      "dynamic_iou": 13.49,
+      "points": 48807,
+      "mean_confidence": 0.8744
+    }
+  ],
+  "best_5_frames": [
+    {
+      "frame_id": "00_000358",
+      "miou": 85.39,
+      "accuracy": 89.74,
+      "dynamic_iou": 66.51,
+      "points": 47682,
+      "mean_confidence": 0.9156
+    },
+    {
+      "frame_id": "00_000357",
+      "miou": 85.17,
+      "accuracy": 89.53,
+      "dynamic_iou": 65.98,
+      "points": 48058,
+      "mean_confidence": 0.9149
+    },
+    {
+      "frame_id": "00_000355",
+      "miou": 84.57,
+      "accuracy": 88.93,
+      "dynamic_iou": 64.6,
+      "points": 48788,
+      "mean_confidence": 0.912
+    },
+    {
+      "frame_id": "00_000356",
+      "miou": 84.38,
+      "accuracy": 88.96,
+      "dynamic_iou": 64.48,
+      "points": 48516,
+      "mean_confidence": 0.9129
+    },
+    {
+      "frame_id": "00_000348",
+      "miou": 81.72,
+      "accuracy": 86.45,
+      "dynamic_iou": 54.81,
+      "points": 49650,
+      "mean_confidence": 0.8999
+    }
+  ]
+}
