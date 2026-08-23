@@ -91,9 +91,10 @@ def xy_to_cell(x: float, y: float, resolution: float) -> Tuple[int, int]:
     """
     if not math.isfinite(x) or not math.isfinite(y) or resolution <= 0.0:
         raise ValueError(f"Invalid inputs to xy_to_cell: x={x}, y={y}, resolution={resolution}")
-    ix = int(math.floor(x / resolution))
-    iy = int(math.floor(y / resolution))
+    ix = int(math.floor(round(x / resolution, 9)))
+    iy = int(math.floor(round(y / resolution, 9)))
     return (ix, iy)
+
 
 
 def cell_to_bounds(ix: int, iy: int, resolution: float) -> Tuple[float, float, float, float]:
