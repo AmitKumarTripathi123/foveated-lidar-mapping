@@ -122,11 +122,11 @@ class MLToMappingAdapter:
         if np.isnan(conf).any() or np.isinf(conf).any():
             raise ValueError("NaN or Inf detected in confidence scores!")
 
-        # 3. Class value range checks strictly in {0, 1, 2, 3}
-        unique_classes = set(np.unique(pred_cls))
-        allowed_classes = set(range(self.num_classes))
-        if not unique_classes.issubset(allowed_classes):
-            raise ValueError(f"Predicted classes {unique_classes} contain values outside allowed {allowed_classes}")
+        # 3. Fast class value range checks strictly in [0, num_classes-1]
+        c_min = int(pred_cls.min())
+        c_max = int(pred_cls.max())
+        if c_min < 0 or c_max >= self.num_classes:
+            raise ValueError(f"Predicted class values out of bounds: [{c_min}, {c_max}] outside [0, {self.num_classes-1}]")
 
         # 4. Confidence range checks strictly in [0.0, 1.0]
         if (conf < 0.0).any() or (conf > 1.0).any():
