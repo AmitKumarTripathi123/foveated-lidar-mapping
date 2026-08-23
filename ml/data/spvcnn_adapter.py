@@ -1,4 +1,4 @@
-﻿"""SPVCNN Input Adapter and Point-Voxel Index Mapping (Phase 12).
+"""SPVCNN Input Adapter and Point-Voxel Index Mapping (Phase 12).
 
 Converts raw and foveated 3D LiDAR point clouds into SPVCNN-compatible sparse
 point-voxel representations while maintaining strict bidirectional index maps
@@ -62,10 +62,26 @@ class SPVCNNInputAdapter:
         # 1. Quantize 3D coordinates into integer voxel grid
         v_coords = np.floor(xyz / self.voxel_size).astype(np.int64)
 
-        # 2. Extract unique voxels and inverse point-to-voxel mapping
-        unique_voxels, voxel_to_pt, pt_to_voxel = np.unique(
-            v_coords, axis=0, return_index=True, return_inverse=True
-        )
+        # 2. Extract unique voxels and inverse point-to-voxel mapping (Accelerated 64-bit packed hash)
+        v_min = np.min(v_coords, axis=0)
+        v_shifted = v_coords - v_min
+        v_max = np.max(v_shifted, axis=0) + 1
+
+        max_idx = int(v_max[0]) * int(v_max[1]) * int(v_max[2])
+        if max_idx < (1 << 62):
+            keys = (
+                v_shifted[:, 0]
+                + v_shifted[:, 1] * v_max[0]
+                + v_shifted[:, 2] * (v_max[0] * v_max[1])
+            )
+            _, voxel_to_pt, pt_to_voxel = np.unique(
+                keys, return_index=True, return_inverse=True
+            )
+            unique_voxels = v_coords[voxel_to_pt]
+        else:
+            unique_voxels, voxel_to_pt, pt_to_voxel = np.unique(
+                v_coords, axis=0, return_index=True, return_inverse=True
+            )
         n_voxels = unique_voxels.shape[0]
 
         # 3. Build PyTorch tensors

@@ -1,4 +1,4 @@
-﻿"""Amit Foveated Voxel Sampling Adapter (Phase 2 -> Phase 3 Bridge).
+"""Amit Foveated Voxel Sampling Adapter (Phase 2 -> Phase 3 Bridge).
 
 Implements 3-Zone Variable-Resolution Foveated Voxel Downsampling:
   - Zone 1 (Near-Field, 0m <= d < 10m)   : voxel_size = 0.05m
@@ -151,11 +151,18 @@ class FoveatedVoxelSampler:
             )
             return points, labels, empty_report
 
-        # Compute 3D Euclidean distances
-        distances = np.linalg.norm(points[:, :3], axis=1)
+        # Compute squared 3D Euclidean distances (avoids expensive sqrt)
+        x = points[:, 0]
+        y = points[:, 1]
+        z = points[:, 2]
+        d2 = x * x + y * y + z * z
+
+        n_d2 = self.near_dist * self.near_dist
+        m_d2 = self.mid_dist * self.mid_dist
+        f_d2 = self.far_dist * self.far_dist
 
         # 1. Near-Field Zone (0 <= d < 10m)
-        near_mask = (distances >= 0.0) & (distances < self.near_dist)
+        near_mask = (d2 >= 0.0) & (d2 < n_d2)
         near_pts = points[near_mask]
         near_lbls = labels[near_mask] if labels is not None else None
         near_down_pts, near_down_lbls = voxel_grid_downsample(
@@ -163,7 +170,7 @@ class FoveatedVoxelSampler:
         )
 
         # 2. Mid-Field Zone (10m <= d < 40m)
-        mid_mask = (distances >= self.near_dist) & (distances < self.mid_dist)
+        mid_mask = (d2 >= n_d2) & (d2 < m_d2)
         mid_pts = points[mid_mask]
         mid_lbls = labels[mid_mask] if labels is not None else None
         mid_down_pts, mid_down_lbls = voxel_grid_downsample(
@@ -171,7 +178,7 @@ class FoveatedVoxelSampler:
         )
 
         # 3. Far-Field Zone (40m <= d <= 100m)
-        far_mask = (distances >= self.mid_dist) & (distances <= self.far_dist)
+        far_mask = (d2 >= m_d2) & (d2 <= f_d2)
         far_pts = points[far_mask]
         far_lbls = labels[far_mask] if labels is not None else None
         far_down_pts, far_down_lbls = voxel_grid_downsample(
@@ -179,7 +186,7 @@ class FoveatedVoxelSampler:
         )
 
         # 4. Out-of-bounds (> 100m)
-        out_mask = distances > self.far_dist
+        out_mask = d2 > f_d2
         out_count = int(out_mask.sum())
 
         # Concatenate foveated zones

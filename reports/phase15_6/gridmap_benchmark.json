@@ -1,0 +1,8 @@
+{
+  "component": "GridMap25D Generation",
+  "baseline_ms": 72.5,
+  "optimized_mean_ms": 42.29,
+  "optimized_median_ms": 41.21,
+  "speedup": 1.71,
+  "correctness": "PASS"
+}
