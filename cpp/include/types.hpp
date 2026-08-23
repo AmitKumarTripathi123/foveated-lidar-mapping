@@ -54,7 +54,9 @@ struct GridCell {
     float max_x() const { return static_cast<float>(ix + 1) * resolution; }
     float min_y() const { return static_cast<float>(iy) * resolution; }
     float max_y() const { return static_cast<float>(iy + 1) * resolution; }
+    float height_range() const { return (point_count > 0) ? (elevation_max - elevation_min) : 0.0f; }
 };
+
 
 inline int get_semantic_priority(uint8_t class_id) {
     switch (class_id) {

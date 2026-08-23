@@ -163,7 +163,9 @@ PYBIND11_MODULE(foveated_grid_cpp, m) {
         .def("min_x", &GridCell::min_x)
         .def("max_x", &GridCell::max_x)
         .def("min_y", &GridCell::min_y)
-        .def("max_y", &GridCell::max_y);
+        .def("max_y", &GridCell::max_y)
+        .def("height_range", &GridCell::height_range);
+
 
     // FoveatedGridEngine class
     py::class_<FoveatedGridEngine>(m, "FoveatedGridEngine")

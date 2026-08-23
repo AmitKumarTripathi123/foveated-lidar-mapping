@@ -6,7 +6,9 @@ Strictly adheres to the project interface contract.
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from typing import Dict, List, Optional, Tuple, Any
+import math
 import numpy as np
+
 
 
 class SuperClass(IntEnum):
@@ -212,10 +214,18 @@ class GridCell25D:
         """Returns cell center (x, y) in physical meters."""
         return ((self.ix + 0.5) * self.resolution, (self.iy + 0.5) * self.resolution)
 
+    @property
+    def height_range(self) -> float:
+        """Calculates vertical geometric span: height_range = elevation_max - elevation_min."""
+        if math.isnan(self.elevation_max) or math.isnan(self.elevation_min):
+            return float("nan")
+        return float(self.elevation_max - self.elevation_min)
+
     def contains_point(self, x: float, y: float) -> bool:
         """Verifies spatial invariant: ix*s <= x < (ix+1)*s and iy*s <= y < (iy+1)*s."""
         min_x, max_x, min_y, max_y = self.bounds
         return (min_x <= x < max_x) and (min_y <= y < max_y)
+
 
 
 @dataclass
