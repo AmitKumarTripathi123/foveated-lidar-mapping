@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-08-24T03:41:51.318299",
+  "checkpoint": "C:\\Users\\atuls\\OneDrive\\Desktop\\Lidar\\experiments\\phase12_full_semanticposs_spvcnn\\best_checkpoint.pt",
+  "checkpoint_sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "device": "cuda",
+  "gpu_model": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "spatial_coverage": {
+    "domain_x_m": [
+      -50.0,
+      50.0
+    ],
+    "domain_y_m": [
+      -50.0,
+      50.0
+    ],
+    "max_sensor_range_m": 100.0,
+    "uniform_resolution_m": 0.05,
+    "foveated_zones": {
+      "near": {
+        "range_m": [
+          0.0,
+          10.0
+        ],
+        "resolution_m": 0.05
+      },
+      "mid": {
+        "range_m": [
+          10.0,
+          40.0
+        ],
+        "resolution_m": 0.15
+      },
+      "far": {
+        "range_m": [
+          40.0,
+          100.0
+        ],
+        "resolution_m": 0.5
+      }
+    }
+  },
+  "uniform": {
+    "voxel_size_m": 0.05,
+    "retained_points": 64151,
+    "voxel_count": 64151,
+    "grid_shape": [
+      2000,
+      2000
+    ],
+    "total_grid_cells": 4000000,
+    "occupied_grid_cells": 44130,
+    "grid_memory_mb": 76.29,
+    "voxelization_ms": 22.71,
+    "inference_ms": 66.8,
+    "gridmap_ms": 1049.77,
+    "total_latency_ms": 1139.28
+  },
+  "foveated": {
+    "retained_points": 45260,
+    "voxel_count": 44155,
+    "near_zone_points": 9038,
+    "mid_zone_points": 32512,
+    "far_zone_points": 3710,
+    "grid_shape": [
+      500,
+      500
+    ],
+    "total_grid_cells": 250000,
+    "occupied_grid_cells": 13274,
+    "grid_memory_mb": 4.77,
+    "voxelization_ms": 74.38,
+    "inference_ms": 84.37,
+    "gridmap_ms": 139.24,
+    "total_latency_ms": 297.98
+  },
+  "comparison": {
+    "point_reduction_percent": 24.91,
+    "voxel_reduction_percent": 26.69,
+    "total_grid_cell_reduction_percent": 93.75,
+    "grid_memory_reduction_percent": 93.75,
+    "latency_reduction_percent": 80.78,
+    "speedup_factor": 5.41,
+    "sih_target_met": true,
+    "sih_req_h_status": "PASS (>= 75% Memory Reduction Verified)"
+  },
+  "sequence_breakdown": {
+    "00": {
+      "sequence": "00",
+      "raw_points": 66658,
+      "uniform_voxels": 62789,
+      "foveated_voxels": 46107,
+      "voxel_reduction_pct": 26.57,
+      "uniform_latency_ms": 491.41,
+      "foveated_latency_ms": 91.33,
+      "speedup_factor": 5.56
+    },
+    "01": {
+      "sequence": "01",
+      "raw_points": 67093,
+      "uniform_voxels": 62299,
+      "foveated_voxels": 47509,
+      "voxel_reduction_pct": 23.74,
+      "uniform_latency_ms": 446.02,
+      "foveated_latency_ms": 85.43,
+      "speedup_factor": 5.23
+    },
+    "02": {
+      "sequence": "02",
+      "raw_points": 68065,
+      "uniform_voxels": 63914,
+      "foveated_voxels": 47324,
+      "voxel_reduction_pct": 25.96,
+      "uniform_latency_ms": 1390.18,
+      "foveated_latency_ms": 289.92,
+      "speedup_factor": 5.0
+    },
+    "03": {
+      "sequence": "03",
+      "raw_points": 69186,
+      "uniform_voxels": 66487,
+      "foveated_voxels": 50909,
+      "voxel_reduction_pct": 23.43,
+      "uniform_latency_ms": 1451.47,
+      "foveated_latency_ms": 285.47,
+      "speedup_factor": 5.31
+    },
+    "04": {
+      "sequence": "04",
+      "raw_points": 66303,
+      "uniform_voxels": 62350,
+      "foveated_voxels": 44095,
+      "voxel_reduction_pct": 29.28,
+      "uniform_latency_ms": 1389.65,
+      "foveated_latency_ms": 252.81,
+      "speedup_factor": 5.67
+    },
+    "05": {
+      "sequence": "05",
+      "raw_points": 66534,
+      "uniform_voxels": 64151,
+      "foveated_voxels": 44155,
+      "voxel_reduction_pct": 31.17,
+      "uniform_latency_ms": 918.5,
+      "foveated_latency_ms": 169.09,
+      "speedup_factor": 5.68
+    }
+  }
+}

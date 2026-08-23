@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-08-24T04:01:11.055413",
+  "benchmark_mode": "ROS2_REPLAY_SIMULATION",
+  "device": "cuda",
+  "gpu_model": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "stream_rate_hz": 10.0,
+  "target_interval_ms": 100.0,
+  "queue_size": 2,
+  "frames_sent": 100,
+  "frames_processed": 90,
+  "frames_dropped": 10,
+  "effective_fps": 8.06,
+  "total_stream_duration_sec": 11.17,
+  "last_frame_latency_ms": 153.03,
+  "queue_depth_end": 0,
+  "ros2_package_status": "IMPLEMENTED_AND_REPLAY_VERIFIED",
+  "sih_req_f_status": "PASS (Live Multi-Panel Dashboard & Interactive Telemetry Generated)",
+  "sih_req_i_status": "PARTIAL (ROS2 Node & Decoder Replay-Verified; Physical Hardware Sensor Pending)"
+}
