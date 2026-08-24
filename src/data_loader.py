@@ -88,13 +88,14 @@ class LiDARDataLoader:
         if not scan_path.exists():
             raise FileNotFoundError(f"Scan file does not exist: {scan_path}")
 
-        # 1. Load points: float32 [N, 4] -> [x, y, z, intensity]
         if scan_path.suffix == ".bin":
-            raw_scan = np.fromfile(str(scan_path), dtype=np.float32)
-            if raw_scan.size % 4 != 0:
-                msg = f"Binary scan size {raw_scan.size} is not divisible by 4 (float32 x,y,z,i)."
+            file_bytes = os.path.getsize(str(scan_path))
+            if file_bytes % 16 != 0:
+                msg = f"Binary scan file size ({file_bytes} bytes) is not divisible by 16 (4 float32s per point)."
                 return self._handle_invalid_frame(frame_id, str(scan_path), msg)
-            points = raw_scan.reshape(-1, 4)
+            raw_scan = np.fromfile(str(scan_path), dtype=np.float32)
+            points = raw_scan.reshape(-1, 4) if raw_scan.size > 0 else np.empty((0, 4), dtype=np.float32)
+
         elif scan_path.suffix in [".npy", ".npz"]:
             data = np.load(str(scan_path))
             if isinstance(data, np.lib.npyio.NpzFile):
