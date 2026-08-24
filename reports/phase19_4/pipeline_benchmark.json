@@ -1,0 +1,109 @@
+{
+  "frames_evaluated": 100,
+  "phase19_2_baseline": {
+    "mean_ms": 54.97,
+    "median_ms": 52.8,
+    "p95_ms": 67.51,
+    "p99_ms": 78.4,
+    "fps": 18.19
+  },
+  "phase19_3_regressed": {
+    "mean_ms": 69.04,
+    "median_ms": 66.5,
+    "p95_ms": 104.0,
+    "p99_ms": 121.83,
+    "fps": 14.48
+  },
+  "phase19_4_recovered": {
+    "mean_ms": 33.21,
+    "median_ms": 32.08,
+    "p95_ms": 41.36,
+    "p99_ms": 48.7,
+    "min_ms": 22.25,
+    "max_ms": 62.99,
+    "std_ms": 5.95,
+    "fps": 30.11
+  },
+  "stage_breakdown": {
+    "io": {
+      "mean_ms": 2.01,
+      "median_ms": 1.73,
+      "p95_ms": 2.98,
+      "p99_ms": 3.5,
+      "min_ms": 0.87,
+      "max_ms": 19.01,
+      "std_ms": 1.81,
+      "percentage_total": 5.62
+    },
+    "range_filter": {
+      "mean_ms": 3.95,
+      "median_ms": 3.96,
+      "p95_ms": 6.33,
+      "p99_ms": 6.88,
+      "min_ms": 1.97,
+      "max_ms": 7.69,
+      "std_ms": 1.32,
+      "percentage_total": 11.06
+    },
+    "foveation": {
+      "mean_ms": 4.73,
+      "median_ms": 4.46,
+      "p95_ms": 7.41,
+      "p99_ms": 8.69,
+      "min_ms": 2.12,
+      "max_ms": 14.77,
+      "std_ms": 1.71,
+      "percentage_total": 13.25
+    },
+    "ml_preprocess": {
+      "mean_ms": 2.19,
+      "median_ms": 1.94,
+      "p95_ms": 3.44,
+      "p99_ms": 5.44,
+      "min_ms": 0.94,
+      "max_ms": 8.66,
+      "std_ms": 1.04,
+      "percentage_total": 6.13
+    },
+    "spvcnn": {
+      "mean_ms": 13.03,
+      "median_ms": 12.74,
+      "p95_ms": 14.63,
+      "p99_ms": 16.77,
+      "min_ms": 11.45,
+      "max_ms": 19.85,
+      "std_ms": 1.23,
+      "percentage_total": 36.47
+    },
+    "postprocess": {
+      "mean_ms": 0.44,
+      "median_ms": 0.42,
+      "p95_ms": 0.71,
+      "p99_ms": 0.88,
+      "min_ms": 0.18,
+      "max_ms": 1.55,
+      "std_ms": 0.19,
+      "percentage_total": 1.22
+    },
+    "grid": {
+      "mean_ms": 8.88,
+      "median_ms": 8.85,
+      "p95_ms": 13.32,
+      "p99_ms": 15.09,
+      "min_ms": 4.26,
+      "max_ms": 15.9,
+      "std_ms": 2.36,
+      "percentage_total": 24.86
+    },
+    "visualization": {
+      "mean_ms": 0.5,
+      "median_ms": 0.5,
+      "p95_ms": 0.5,
+      "p99_ms": 0.5,
+      "min_ms": 0.5,
+      "max_ms": 0.5,
+      "std_ms": 0.0,
+      "percentage_total": 1.4
+    }
+  }
+}

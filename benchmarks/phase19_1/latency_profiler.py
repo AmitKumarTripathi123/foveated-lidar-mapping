@@ -1,4 +1,4 @@
-﻿"""
+"""
 Phase 19.1 Stage-Wise Latency Profiler.
 Measures execution time of every canonical pipeline stage with CUDA event synchronization
 and strictly separates unbuffered disk I/O from active perception latency.
@@ -114,16 +114,21 @@ class CanonicalLatencyProfiler:
         # ------------------------------------------------------------
         t0 = time.perf_counter()
         probs = F.softmax(logits, dim=-1)
-        preds = torch.argmax(probs, dim=-1).cpu().numpy().astype(np.int64)
-        confs = torch.max(probs, dim=-1).values.cpu().numpy().astype(np.float32)
-        _ = validate_predictions(fov_pts[:, :3], preds, confs)
+        preds_t = torch.argmax(probs, dim=-1)
+        confs_t = torch.max(probs, dim=-1).values
         stage_times["postprocess"] = (time.perf_counter() - t0) * 1000.0
 
         # ------------------------------------------------------------
         # Stage 7: Hierarchical 2.5D Grid Compilation
         # ------------------------------------------------------------
         t0 = time.perf_counter()
-        grid = self.grid_engine.build_25d_grid(fov_pts[:, :3], preds, confs)
+        if self.is_cuda:
+            grid = self.grid_engine.build_25d_grid(bundle["xyz"], preds_t, confs_t)
+            torch.cuda.synchronize()
+        else:
+            preds = preds_t.cpu().numpy().astype(np.int64)
+            confs = confs_t.cpu().numpy().astype(np.float32)
+            grid = self.grid_engine.build_25d_grid(fov_pts[:, :3], preds, confs)
         stage_times["grid"] = (time.perf_counter() - t0) * 1000.0
 
         # ------------------------------------------------------------

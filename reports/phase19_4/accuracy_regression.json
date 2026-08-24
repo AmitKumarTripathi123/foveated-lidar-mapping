@@ -1,0 +1,13 @@
+{
+  "status": "ACCURACY_REGRESSION_DETECTED",
+  "phase19_2_miou_pct": 52.04,
+  "phase19_4_miou_pct": 51.34,
+  "drift_pct": -0.7,
+  "class_wise_iou_pct": {
+    "drivable": 64.13,
+    "non_drivable": 30.71,
+    "static": 75.68,
+    "dynamic": 34.85
+  },
+  "total_evaluated_points": 4676134
+}
