@@ -1,0 +1,73 @@
+﻿# ============================================================
+# CANONICAL SYSTEM CONFIGURATION — SINGLE SOURCE OF TRUTH
+# Smart India Hackathon (SIH) Problem Statement PS 26130
+# Foveated 2.5D LiDAR Mapping for Autonomous Navigation
+# ============================================================
+
+project:
+  name: "Foveated LiDAR Mapping"
+  version: "2.0"
+  description: "Canonical Foveated 2.5D LiDAR Mapping for Autonomous Navigation (SIH PS 26130)"
+  canonical_architecture: "Phase 18 Frozen"
+
+lidar:
+  min_range: 0.5
+  max_range: 100.0
+  coordinate_frame: "sensor"
+  expected_channels: 4  # [x, y, z, intensity]
+
+foveation:
+  near:
+    radius: 10.0
+    resolution: 0.05
+    name: "near_zone"
+    level: 0
+  mid:
+    radius: 40.0
+    resolution: 0.15
+    name: "mid_zone"
+    level: 1
+  far:
+    radius: 100.0
+    resolution: 0.50
+    name: "far_zone"
+    level: 2
+
+semantic_classes:
+  drivable: 0
+  non_drivable: 1
+  static: 2
+  dynamic: 3
+  ignore: 255
+
+class_names:
+  0: "drivable_terrain"
+  1: "non_drivable_terrain"
+  2: "static_obstacle"
+  3: "dynamic_object"
+  255: "ignore"
+
+model:
+  name: "spvcnn"
+  in_channels: 4
+  num_classes: 4
+  checkpoint_path: "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt"
+  checkpoint_sha256: "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142"
+  device: "cuda"
+  allow_tf32: true
+  batch_size: 1
+
+grid:
+  bounds_x: [-50.0, 50.0]
+  bounds_y: [-50.0, 50.0]
+  resolution: 0.20
+  height_layers: true
+  confidence: true
+  traversability: true
+  fill_unobserved: true
+
+benchmark:
+  target_fps: 10.0
+  target_interval_ms: 100.0
+  warmup_frames: 30
+  max_queue_size: 2

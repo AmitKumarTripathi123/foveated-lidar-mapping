@@ -1,12 +1,9 @@
-﻿# Global Model Selection Configuration
-
-primary_model:
-  name: "spvcnn"
-  config_path: "configs/spvcnn.yaml"
-  pretrained: true
-  checkpoint: "checkpoints/spvcnn_pretrained.pt"
-
-legacy_baseline_models:
-  - name: "pointnet2_legacy"
-    config_path: "configs/phase2.yaml"
-    description: "PointNet++ set abstraction baseline model"
+﻿# Model configuration reference (extends system_config.yaml)
+model:
+  architecture: "SPVCNN"
+  in_channels: 4
+  num_classes: 4
+  checkpoint_path: "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt"
+  expected_sha256: "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142"
+  device: "cuda"
+  allow_tf32: true

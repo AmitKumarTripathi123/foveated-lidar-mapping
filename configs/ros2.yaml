@@ -1,0 +1,10 @@
+﻿# ROS2 node & topic configuration (extends system_config.yaml)
+ros2:
+  node_name: "foveated_mapping_node"
+  input_topic: "/velodyne_points"
+  output_semantic_pc_topic: "/semantic_pointcloud"
+  output_gridmap_topic: "/foveated_grid_map_25d"
+  output_traversability_topic: "/traversability_map"
+  output_telemetry_topic: "/telemetry"
+  max_queue_size: 2
+  target_frequency_hz: 10.0
