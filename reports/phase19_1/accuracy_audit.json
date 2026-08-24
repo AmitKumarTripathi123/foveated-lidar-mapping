@@ -1,0 +1,38 @@
+{
+  "overall": {
+    "miou": 0.5204,
+    "point_accuracy": 0.8063,
+    "mean_class_accuracy": 0.6182,
+    "total_valid_points": 4675813
+  },
+  "classes": {
+    "drivable": {
+      "iou": 0.6634,
+      "precision": 0.8346,
+      "recall": 0.7638,
+      "f1": 0.7977,
+      "support": 1038983
+    },
+    "non_drivable": {
+      "iou": 0.2728,
+      "precision": 0.8791,
+      "recall": 0.2835,
+      "f1": 0.4287,
+      "support": 3898
+    },
+    "static": {
+      "iou": 0.7696,
+      "precision": 0.8544,
+      "recall": 0.8858,
+      "f1": 0.8698,
+      "support": 2931833
+    },
+    "dynamic": {
+      "iou": 0.3756,
+      "precision": 0.5528,
+      "recall": 0.5395,
+      "f1": 0.5461,
+      "support": 701099
+    }
+  }
+}

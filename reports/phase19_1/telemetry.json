@@ -1,0 +1,27 @@
+{
+  "gpu": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "allocated_mb": 8.67,
+    "reserved_mb": 408.0,
+    "peak_allocated_mb": 200.1,
+    "utilization_pct": {
+      "available": false,
+      "reason": "NVML query unavailable on Windows WDDM"
+    },
+    "temperature_c": {
+      "available": false,
+      "reason": "NVML thermal sensor unavailable"
+    }
+  },
+  "cpu": {
+    "cpu_utilization_pct": 60.2,
+    "process_rss_mb": 1153.27,
+    "system_ram_used_pct": 88.5
+  },
+  "runtime": {
+    "fps": 10.627116788825374,
+    "dropped_frames": 0,
+    "queue_depth": 0
+  }
+}
