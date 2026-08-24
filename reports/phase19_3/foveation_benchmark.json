@@ -1,0 +1,27 @@
+{
+  "frames_evaluated": 100,
+  "reference_python": {
+    "mean_ms": 24.4,
+    "median_ms": 24.08,
+    "p95_ms": 33.47,
+    "p99_ms": 34.43,
+    "min_ms": 12.38,
+    "max_ms": 37.42,
+    "std_ms": 4.97
+  },
+  "native_cpp_llvm": {
+    "mean_ms": 5.58,
+    "median_ms": 5.51,
+    "p95_ms": 7.65,
+    "p99_ms": 7.87,
+    "min_ms": 3.2,
+    "max_ms": 8.12,
+    "std_ms": 1.23
+  },
+  "speedup_multiplier": 4.37,
+  "target_met": {
+    "mandatory_under_8ms": true,
+    "strong_under_5ms": false,
+    "stretch_under_2_5ms": false
+  }
+}

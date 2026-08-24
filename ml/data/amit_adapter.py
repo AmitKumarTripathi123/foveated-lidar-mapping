@@ -122,20 +122,42 @@ class FoveatedVoxelSampler:
         self.far_dist = far_dist
         self.far_voxel = far_voxel
 
+        from src.core.native_foveation import NativeFoveationAccelerator
+        self.native_accelerator = NativeFoveationAccelerator(
+            near_dist=near_dist,
+            near_voxel=near_voxel,
+            mid_dist=mid_dist,
+            mid_voxel=mid_voxel,
+            far_dist=far_dist,
+            far_voxel=far_voxel,
+        )
+
     def sample(
         self,
         points: np.ndarray,
         labels: Optional[np.ndarray] = None,
+        use_native: bool = True,
     ) -> Tuple[np.ndarray, Optional[np.ndarray], FoveatedSamplingReport]:
         """Apply 3-zone foveated downsampling to points and corresponding labels.
 
         Args:
             points: Point cloud array of shape (N, 4) with [x, y, z, intensity].
             labels: Optional label array of shape (N,).
+            use_native: Whether to use native C++/LLVM acceleration (default: True).
 
         Returns:
             Tuple: (foveated_points, foveated_labels, report)
         """
+        if use_native:
+            return self.native_accelerator.sample(points, labels)
+        return self.sample_reference_python(points, labels)
+
+    def sample_reference_python(
+        self,
+        points: np.ndarray,
+        labels: Optional[np.ndarray] = None,
+    ) -> Tuple[np.ndarray, Optional[np.ndarray], FoveatedSamplingReport]:
+        """Reference Python NumPy implementation of 3-zone foveated downsampling."""
         orig_count = points.shape[0]
         if labels is not None:
             validate_point_label_alignment(points, labels)

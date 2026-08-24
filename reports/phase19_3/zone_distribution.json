@@ -1,0 +1,35 @@
+{
+  "frames_evaluated": 100,
+  "mean_per_frame": {
+    "raw_points": 68781.6,
+    "range_filtered_points": 67549.4,
+    "foveated_retained_points": 47908.1,
+    "overall_reduction_pct": 29.08
+  },
+  "zone_breakdown": {
+    "near_field_0_10m": {
+      "mean_input_points": 9244.0,
+      "mean_output_points": 7642.6,
+      "input_share_pct": 13.68,
+      "retention_pct": 82.68,
+      "reduction_pct": 17.32,
+      "voxel_size_m": 0.05
+    },
+    "mid_field_10_40m": {
+      "mean_input_points": 47604.6,
+      "mean_output_points": 33051.3,
+      "input_share_pct": 70.47,
+      "retention_pct": 69.43,
+      "reduction_pct": 30.57,
+      "voxel_size_m": 0.15
+    },
+    "far_field_40_100m": {
+      "mean_input_points": 10700.9,
+      "mean_output_points": 7214.2,
+      "input_share_pct": 15.84,
+      "retention_pct": 67.42,
+      "reduction_pct": 32.58,
+      "voxel_size_m": 0.5
+    }
+  }
+}
