@@ -8,6 +8,7 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
+import torch
 import yaml
 
 from src.core.types import (
@@ -68,6 +69,13 @@ class HierarchicalFoveatedGridEngine:
         self.width = int(round((self.bounds_x[1] - self.bounds_x[0]) / self.resolution))
         self.height = int(round((self.bounds_y[1] - self.bounds_y[0]) / self.resolution))
         self.grid_shape = (self.height, self.width)
+        
+        from src.core.native_grid import NativeGridMapRasterizer
+        self.native_rasterizer = NativeGridMapRasterizer(
+            bounds_x=self.bounds_x,
+            bounds_y=self.bounds_y,
+            resolution=self.resolution,
+        )
 
     def build_hierarchical_cells(
         self,
@@ -115,11 +123,30 @@ class HierarchicalFoveatedGridEngine:
 
     def build_25d_grid(
         self,
+        xyz: Union[np.ndarray, torch.Tensor],
+        classes: Union[np.ndarray, torch.Tensor],
+        confidences: Union[np.ndarray, torch.Tensor],
+        use_native: bool = True,
+    ) -> GridMap25D:
+        """High-performance compilation of multi-layer GridMap25D from point predictions."""
+        if use_native:
+            return self.native_rasterizer.rasterize(xyz, classes, confidences)
+        return self.build_25d_grid_reference_python(xyz, classes, confidences)
+
+    def build_25d_grid_reference_python(
+        self,
         xyz: np.ndarray,
         classes: np.ndarray,
         confidences: np.ndarray,
     ) -> GridMap25D:
-        """Vectorized compilation of multi-layer GridMap25D from point predictions."""
+        """Reference NumPy compilation of multi-layer GridMap25D."""
+        if isinstance(xyz, torch.Tensor):
+            xyz = xyz.cpu().numpy()
+        if isinstance(classes, torch.Tensor):
+            classes = classes.cpu().numpy()
+        if isinstance(confidences, torch.Tensor):
+            confidences = confidences.cpu().numpy()
+
         if xyz.shape[0] == 0:
             return GridMap25D(
                 bounds_x=self.bounds_x, bounds_y=self.bounds_y, resolution=self.resolution,

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Canonical Core Data Types for Foveated LiDAR Mapping (SIH PS 26130).
 Single source of truth for point definitions, hierarchical cell keys, and grid cell states.
 """
@@ -71,6 +71,22 @@ class GridCell:
     confidence: float = 0.0
     traversability: float = -1.0
     point_count: int = 0
+
+
+@dataclass
+class GridMap25D:
+    """Canonical 2.5D Multi-Layer Grid Map representation."""
+    bounds_x: Tuple[float, float]
+    bounds_y: Tuple[float, float]
+    resolution: float
+    grid_shape: Tuple[int, int]
+    elevation_min: np.ndarray        # (H, W) float32
+    elevation_max: np.ndarray        # (H, W) float32
+    elevation_mean: np.ndarray       # (H, W) float32
+    semantic_layer: np.ndarray       # (H, W) int64
+    confidence_layer: np.ndarray     # (H, W) float32
+    traversability_layer: np.ndarray # (H, W) float32
+    point_count_layer: np.ndarray    # (H, W) int32
 
 
 @dataclass
