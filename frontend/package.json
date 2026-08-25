@@ -1,0 +1,33 @@
+{
+  "name": "foveated-lidar-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.102.0",
+    "@react-three/fiber": "^8.16.0",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.359.0",
+    "next": "14.1.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.2.2",
+    "three": "^0.162.0",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.70",
+    "@types/react-dom": "^18.2.22",
+    "@types/three": "^0.162.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.4.3"
+  }
+}

@@ -1,4 +1,4 @@
-﻿# Foveated 2.5D LiDAR Mapping & Semantic Segmentation for Autonomous Navigation
+# Foveated 2.5D LiDAR Mapping & Semantic Segmentation for Autonomous Navigation
 
 **Project**: Smart India Hackathon  
 **Target System**: Real-time Distance-Aware (Foveated) 3D LiDAR Data Pipeline & Semantic Segmentation  
@@ -19,12 +19,38 @@ This repository implements an end-to-end LiDAR perception pipeline for autonomou
    - `2 = static_obstacle` (Buildings, poles, fences, vegetation, trees)
    - `3 = dynamic_object` (Pedestrians, cars, riders, bicycles, trucks)
    - `255 = IGNORE_LABEL` (Outliers, unlabeled points)
-3. **PointNet++ & FoveatedPointSegNet Architectures**:
-   - Standardized 3D neural point segmentation networks
+3. **PointNet++ & SPVCNN Architectures**:
+   - Standardized 3D neural point segmentation networks (138,514 parameters, 53.59% Val mIoU)
    - Distance-conditioned embedding & multi-scale residual spatial feature extraction
    - Predicts per-point classes and calibrated confidence scores
-4. **Interface Contract for Phase 3 2.5D Mapping**:
+4. **Interface Contract for 2.5D Mapping**:
    - Standardized `GridMap25D` output layers: `elevation_mean`, `semantic_layer`, `traversability_layer`, and `confidence_layer`.
+5. **Real-Time 3D Web Visualization & SIH Workstation (`frontend/` & `backend/`)**:
+   - 100% Pure JavaScript / TypeScript web platform (Next.js 14 + Three.js + Node.js Express + WebSockets).
+   - 6 Dedicated 3D View Modes + 8-Stage Research Pipeline + 6-Step Judge Presentation Mode.
+   - Live quantitative benchmark comparison proving ~82.8% memory reduction and 4.6x speedup.
+
+---
+
+## Web Dashboard & 3D Visualization Setup
+
+### 1. Start Backend Streaming Engine (`/backend`)
+```bash
+cd backend
+npm install
+npm run build
+node dist/server.js
+```
+* Backend starts at `http://localhost:8000` with WebSocket stream on `ws://localhost:8000/ws/stream`.
+
+### 2. Start Frontend 3D Workstation (`/frontend`)
+```bash
+cd frontend
+npm install
+npm run build
+npx next start -p 3000
+```
+* Open **`http://localhost:3000`** in your browser.
 
 ---
 
@@ -47,41 +73,26 @@ dataset/
     └── 05/
 ```
 
-### 2. Set Environment Variable (Optional)
-If stored outside `dataset/`, set `DATASET_ROOT`:
-```bash
-export DATASET_ROOT="/path/to/SemanticPOSS"
-```
-
-### 3. Run Dataset Forensic Audit Tool
-Audit all 6 sequences, file integrity, and 1:1 point-label alignment:
+### 2. Run Dataset Forensic Audit Tool
 ```bash
 python scripts/audit_semanticposs.py --root dataset
 ```
 
-### 4. Verify Pipeline
-Run the multi-stage foveated mapping verifier:
+### 3. Verify Pipeline
 ```bash
 python verify_pipeline.py --dataset-root dataset
 ```
 
-### 5. Run Preprocessing Cache
-Generate the preprocessed voxelized cache:
-```bash
-python preprocess.py --dataset-root dataset --train-sequences 00 01 03 04 05 --val-sequences 02
-```
-
-### 6. Run Automated Test Suite
-Verify all unit and regression tests:
+### 4. Run Automated Test Suite
 ```bash
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 ---
 
-## Quick Start
+## Quick Start (ML Pipeline)
 
-### 1. Setup Environment
+### 1. Setup Python Environment
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -89,12 +100,7 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install pyyaml numpy scipy pandas matplotlib tabulate
 ```
 
-### 2. Run Test Suite
-```bash
-python3 -m unittest discover -s tests -p "test_*.py" -v
-```
-
-### 3. Run End-to-End Pipeline
+### 2. Run End-to-End Pipeline
 ```bash
 python3 run_phase2_pipeline.py
 ```

@@ -24,3 +24,12 @@ checkpoints/
 *.pt
 *.pth
 
+# Node.js & Next.js Web Dashboard
+node_modules/
+.next/
+dist/
+.env.local
+.env*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
