@@ -147,9 +147,11 @@ def rasterize_grid_cuda_tensor(
             torch.zeros((height, width), device=xyz.device, dtype=torch.int32)
         )
 
-    x_v, y_v, z_v = x[mask], y[mask], z[mask]
-    c_v = classes[mask]
-    conf_v = confs[mask]
+    x_v = x[mask].float()
+    y_v = y[mask].float()
+    z_v = z[mask].float()
+    c_v = classes[mask].long()
+    conf_v = confs[mask].float()
 
     ix = torch.clamp(((x_v - bounds_x[0]) / resolution).long(), 0, width - 1)
     iy = torch.clamp(((y_v - bounds_y[0]) / resolution).long(), 0, height - 1)

@@ -81,18 +81,21 @@ class CanonicalLatencyProfiler:
         # Stage 4: ML Preprocessing (Voxel Quantization & Hash Packing)
         # ------------------------------------------------------------
         t0 = time.perf_counter()
-        fov_tensor = torch.from_numpy(fov_pts).to(self.device).float()
+        is_fp16 = getattr(self.predictor, "fp16", False)
+        fov_tensor = torch.from_numpy(fov_pts).to(self.device).half() if is_fp16 else torch.from_numpy(fov_pts).to(self.device).float()
         bundle = self.spvcnn_adapter.prepare_input(fov_tensor, device=self.device)
         stage_times["ml_preprocess"] = (time.perf_counter() - t0) * 1000.0
 
         # ------------------------------------------------------------
         # Stage 5: SPVCNN CUDA Forward Pass (CUDA Event Timing)
         # ------------------------------------------------------------
+        feat = bundle["features"]
+
         if self.is_cuda:
             self.start_event.record()
             with torch.inference_mode():
                 logits = self.predictor.model(
-                    features=bundle["features"],
+                    features=feat,
                     point_to_voxel_idx=bundle["point_to_voxel_idx"],
                     num_voxels=bundle["num_voxels"],
                 )
@@ -103,7 +106,7 @@ class CanonicalLatencyProfiler:
             t0 = time.perf_counter()
             with torch.inference_mode():
                 logits = self.predictor.model(
-                    features=bundle["features"],
+                    features=feat,
                     point_to_voxel_idx=bundle["point_to_voxel_idx"],
                     num_voxels=bundle["num_voxels"],
                 )
@@ -113,7 +116,7 @@ class CanonicalLatencyProfiler:
         # Stage 6: Semantic Postprocessing (Softmax & DTO Validation)
         # ------------------------------------------------------------
         t0 = time.perf_counter()
-        probs = F.softmax(logits, dim=-1)
+        probs = F.softmax(logits.float(), dim=-1)
         preds_t = torch.argmax(probs, dim=-1)
         confs_t = torch.max(probs, dim=-1).values
         stage_times["postprocess"] = (time.perf_counter() - t0) * 1000.0

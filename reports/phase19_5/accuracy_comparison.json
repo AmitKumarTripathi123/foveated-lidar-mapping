@@ -1,0 +1,43 @@
+{
+  "baseline_miou_pct": 52.04,
+  "fused_fp16_miou_pct": 52.05,
+  "absolute_drift_percentage_points": 0.01,
+  "prediction_agreement_pct": 99.93,
+  "class_comparison": {
+    "drivable": {
+      "fp32_base_iou_pct": 66.36,
+      "fp16_fused_iou_pct": 66.38,
+      "drift_pct": 0.02
+    },
+    "non_drivable": {
+      "fp32_base_iou_pct": 27.29,
+      "fp16_fused_iou_pct": 27.31,
+      "drift_pct": 0.02
+    },
+    "static": {
+      "fp32_base_iou_pct": 76.96,
+      "fp16_fused_iou_pct": 76.95,
+      "drift_pct": -0.01
+    },
+    "dynamic": {
+      "fp32_base_iou_pct": 37.55,
+      "fp16_fused_iou_pct": 37.56,
+      "drift_pct": 0.01
+    }
+  },
+  "distance_zones": {
+    "near_0_10m": {
+      "fp32": 66.9,
+      "fp16": 66.95
+    },
+    "mid_10_40m": {
+      "fp32": 42.89,
+      "fp16": 42.88
+    },
+    "far_40_100m": {
+      "fp32": 36.98,
+      "fp16": 36.99
+    }
+  },
+  "status": "DRIFT_WITHIN_GATE"
+}

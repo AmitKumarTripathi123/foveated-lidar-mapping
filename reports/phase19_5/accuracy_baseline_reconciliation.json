@@ -1,0 +1,12 @@
+{
+  "investigation": "Reconciliation between Phase 19.1 reported 52.04% and Phase 19.4 reported 51.34%",
+  "findings": [
+    "Phase 19.1 evaluated frames 10..109 (100 measured frames after 10 warmup frames), yielding exactly 52.04% mIoU over 4,675,813 points.",
+    "Phase 19.4 standalone accuracy script evaluated frames 0..99 (un-skipped frames 0..9 without warmup offset), yielding 51.34% mIoU over 4,676,134 points.",
+    "When evaluated on identical canonical frames 10..109, Phase 19.5 reproduces 52.04% mIoU exactly (0.00% drift).",
+    "Conclusion: No model degradation occurred in Phase 19.4 or 19.5; the 0.70% difference was purely an artifact of evaluation frame window slicing (0..99 vs 10..109)."
+  ],
+  "canonical_baseline_miou_pct": 52.04,
+  "canonical_total_points": 4675813,
+  "status": "RECONCILED_EXACT"
+}

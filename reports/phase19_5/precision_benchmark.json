@@ -1,0 +1,99 @@
+{
+  "evaluation_frames": 100,
+  "warmup_frames": 10,
+  "baseline_fp32_eager": {
+    "name": "FP32 Base Eager",
+    "mean_ms": 40.86,
+    "median_ms": 39.8,
+    "p95_ms": 52.39,
+    "p99_ms": 74.01,
+    "min_ms": 25.67,
+    "max_ms": 98.6,
+    "std_ms": 9.74,
+    "overall_miou_pct": 52.04,
+    "point_acc_pct": 80.63,
+    "class_wise_iou_pct": {
+      "drivable": 66.36,
+      "non_drivable": 27.29,
+      "static": 76.96,
+      "dynamic": 37.55
+    },
+    "near_miou_pct": 66.9,
+    "mid_miou_pct": 42.89,
+    "far_miou_pct": 36.98,
+    "total_points": 4675813
+  },
+  "fused_fp32": {
+    "name": "FP32 Fused",
+    "mean_ms": 25.18,
+    "median_ms": 25.66,
+    "p95_ms": 33.02,
+    "p99_ms": 36.92,
+    "min_ms": 15.69,
+    "max_ms": 49.69,
+    "std_ms": 5.43,
+    "overall_miou_pct": 52.04,
+    "point_acc_pct": 80.63,
+    "class_wise_iou_pct": {
+      "drivable": 66.36,
+      "non_drivable": 27.29,
+      "static": 76.96,
+      "dynamic": 37.55
+    },
+    "near_miou_pct": 66.9,
+    "mid_miou_pct": 42.89,
+    "far_miou_pct": 36.98,
+    "total_points": 4675813,
+    "prediction_agreement_pct": 100.0,
+    "accuracy_drift_pct": 0.0
+  },
+  "fused_amp": {
+    "name": "AMP Float16 Autocast",
+    "mean_ms": 35.1,
+    "median_ms": 34.88,
+    "p95_ms": 48.83,
+    "p99_ms": 58.04,
+    "min_ms": 19.65,
+    "max_ms": 67.64,
+    "std_ms": 8.59,
+    "overall_miou_pct": 52.05,
+    "point_acc_pct": 80.63,
+    "class_wise_iou_pct": {
+      "drivable": 66.38,
+      "non_drivable": 27.31,
+      "static": 76.95,
+      "dynamic": 37.56
+    },
+    "near_miou_pct": 66.95,
+    "mid_miou_pct": 42.88,
+    "far_miou_pct": 36.99,
+    "total_points": 4675813,
+    "prediction_agreement_pct": 99.93,
+    "accuracy_drift_pct": 0.01
+  },
+  "fused_fp16_native": {
+    "name": "FP16 Native Model.half()",
+    "mean_ms": 24.34,
+    "median_ms": 23.92,
+    "p95_ms": 33.33,
+    "p99_ms": 38.84,
+    "min_ms": 15.65,
+    "max_ms": 40.62,
+    "std_ms": 5.68,
+    "overall_miou_pct": 52.05,
+    "point_acc_pct": 80.63,
+    "class_wise_iou_pct": {
+      "drivable": 66.38,
+      "non_drivable": 27.31,
+      "static": 76.95,
+      "dynamic": 37.56
+    },
+    "near_miou_pct": 66.95,
+    "mid_miou_pct": 42.88,
+    "far_miou_pct": 36.99,
+    "total_points": 4675813,
+    "prediction_agreement_pct": 99.93,
+    "accuracy_drift_pct": 0.01
+  },
+  "speedup_fp16_vs_base_fp32": 1.68
+}

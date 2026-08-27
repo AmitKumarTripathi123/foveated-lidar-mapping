@@ -1,4 +1,4 @@
-﻿"""
+"""
 Canonical SPVCNN Inference Predictor (SIH PS 26130).
 Loads certified frozen checkpoint with cryptographic SHA256 validation.
 """
@@ -13,6 +13,7 @@ import yaml
 
 from ml.data.spvcnn_adapter import SPVCNNInputAdapter
 from ml.models.spvcnn import SPVCNN, build_spvcnn
+from ml.models.fused_spvcnn import FusedSPVCNN, build_fused_spvcnn
 
 
 def verify_sha256(filepath: Path, expected_hash: str) -> bool:
@@ -29,13 +30,20 @@ def verify_sha256(filepath: Path, expected_hash: str) -> bool:
 class CanonicalPredictor:
     """Production SPVCNN predictor executing GPU tensor-core accelerated inference."""
 
-    def __init__(self, config_path: Union[str, Path] = "configs/system_config.yaml"):
+    def __init__(
+        self,
+        config_path: Union[str, Path] = "configs/system_config.yaml",
+        use_fused: bool = True,
+        fp16: bool = True,
+    ):
         cfg_file = Path(config_path)
         with open(cfg_file, "r", encoding="utf-8") as f:
             self.cfg = yaml.safe_load(f)
 
         m_cfg = self.cfg.get("model", {})
         self.device = torch.device(m_cfg.get("device", "cuda") if torch.cuda.is_available() else "cpu")
+        self.fp16 = fp16 and (self.device.type == "cuda")
+        self.use_fused = use_fused
 
         # Resolve checkpoint path relative to repo root
         root = cfg_file.parent.parent
@@ -49,12 +57,24 @@ class CanonicalPredictor:
             torch.backends.cuda.matmul.allow_tf32 = True
             torch.backends.cudnn.allow_tf32 = True
 
-        self.model = build_spvcnn(
-            num_classes=m_cfg.get("num_classes", 4),
-            in_channels=m_cfg.get("in_channels", 4),
-            pretrained_path=str(ckpt_p),
-            device=self.device,
-        )
+        if self.use_fused:
+            self.model = build_fused_spvcnn(
+                num_classes=m_cfg.get("num_classes", 4),
+                in_channels=m_cfg.get("in_channels", 4),
+                pretrained_path=str(ckpt_p),
+                device=self.device,
+                fp16=self.fp16,
+            )
+        else:
+            self.model = build_spvcnn(
+                num_classes=m_cfg.get("num_classes", 4),
+                in_channels=m_cfg.get("in_channels", 4),
+                pretrained_path=str(ckpt_p),
+                device=self.device,
+            )
+            if self.fp16:
+                self.model = self.model.half()
+
         self.model.eval()
         self.input_adapter = SPVCNNInputAdapter(voxel_size=0.05)
 
@@ -73,13 +93,14 @@ class CanonicalPredictor:
         pts_tensor = torch.from_numpy(points).to(self.device).float()
         bundle = self.input_adapter.prepare_input(pts_tensor, device=self.device)
 
+        feat = bundle["features"].half() if self.fp16 else bundle["features"]
         with torch.inference_mode():
             logits = self.model(
-                features=bundle["features"],
+                features=feat,
                 point_to_voxel_idx=bundle["point_to_voxel_idx"],
                 num_voxels=bundle["num_voxels"],
             )
-            probs = F.softmax(logits, dim=-1)
+            probs = F.softmax(logits.float(), dim=-1)
             preds = torch.argmax(probs, dim=-1).cpu().numpy().astype(np.int64)
             confs = torch.max(probs, dim=-1).values.cpu().numpy().astype(np.float32)
 

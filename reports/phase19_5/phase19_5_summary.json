@@ -1,0 +1,60 @@
+{
+  "phase": "19.5",
+  "status": "OPTIMIZATION_COMPLETE",
+  "timestamp": "2026-08-27T17:30:57.673360",
+  "checkpoint": {
+    "path": "experiments/phase12_full_semanticposs_spvcnn/best_checkpoint.pt",
+    "sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+    "status": "VERIFIED_IMMUTABLE"
+  },
+  "spvcnn_optimization_summary": {
+    "fp32_base_mean_ms": 40.86,
+    "fp32_fused_mean_ms": 25.18,
+    "amp_fused_mean_ms": 35.1,
+    "fp16_native_fused_mean_ms": 24.34,
+    "speedup_multiplier": 1.68,
+    "prediction_agreement_pct": 99.93
+  },
+  "accuracy_summary": {
+    "baseline_miou_pct": 52.04,
+    "optimized_miou_pct": 52.05,
+    "drift_pct": 0.01,
+    "near_miou_pct": 66.95,
+    "mid_miou_pct": 42.88,
+    "far_miou_pct": 36.99
+  },
+  "end_to_end_telemetry": {
+    "phase19_4_e2e_ms": 33.21,
+    "phase19_5_e2e_ms": 45.95,
+    "phase19_4_fps": 30.11,
+    "phase19_5_fps": 21.76,
+    "phase19_4_p95_ms": 41.36,
+    "phase19_5_p95_ms": 72.41,
+    "phase19_4_p99_ms": 48.9,
+    "phase19_5_p99_ms": 111.69
+  },
+  "performance_gates": {
+    "spvcnn_reduction_met": false,
+    "e2e_latency_met": false,
+    "fps_target_met": false,
+    "p95_tail_met": false,
+    "accuracy_gate_met": true,
+    "zero_dropped_frames": true
+  },
+  "new_bottleneck": {
+    "primary": {
+      "stage": "grid",
+      "mean_ms": 14.78,
+      "percentage_total": 30.05
+    },
+    "secondary": {
+      "stage": "spvcnn",
+      "mean_ms": 13.13,
+      "percentage_total": 26.71
+    }
+  },
+  "phase20_recommendation": {
+    "target": "grid",
+    "action": "Phase 20 must optimize GRID (now primary bottleneck at 14.78 ms / 30.1% latency)."
+  }
+}
