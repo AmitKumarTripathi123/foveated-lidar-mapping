@@ -1,0 +1,11 @@
+{
+  "ram_start_mb": 1267.9,
+  "ram_end_mb": 995.1,
+  "ram_growth_mb": -272.8,
+  "vram_start_mb": 11.9,
+  "vram_end_mb": 12.1,
+  "vram_peak_mb": 127.0,
+  "vram_growth_mb": 0.2,
+  "leak_detected": false,
+  "status": "MEMORY_STABLE_NO_LEAK_PASS"
+}

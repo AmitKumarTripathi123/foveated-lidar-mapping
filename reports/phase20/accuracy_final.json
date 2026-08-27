@@ -1,0 +1,20 @@
+{
+  "canonical_baseline_miou_pct": 52.04,
+  "final_optimized_miou_pct": 52.05,
+  "absolute_drift_percentage_points": 0.01,
+  "point_accuracy_pct": 80.63,
+  "prediction_agreement_pct": 99.89,
+  "total_evaluated_points": 4675813,
+  "class_wise_iou_pct": {
+    "drivable": 66.38,
+    "non_drivable": 27.32,
+    "static": 76.95,
+    "dynamic": 37.56
+  },
+  "distance_zones_miou_pct": {
+    "near_0_10m": 66.97,
+    "mid_10_40m": 42.88,
+    "far_40_100m": 36.99
+  },
+  "status": "PASS"
+}

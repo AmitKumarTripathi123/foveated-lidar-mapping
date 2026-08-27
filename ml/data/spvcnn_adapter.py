@@ -45,12 +45,24 @@ class SPVCNNInputAdapter:
         # ------------------------------------------------------------
         if isinstance(points, torch.Tensor) and (points.is_cuda or (device is not None and "cuda" in str(device))):
             pts_t = points if points.is_cuda else points.to(device)
+            if pts_t.shape[0] == 0:
+                return {
+                    "points": pts_t,
+                    "xyz": pts_t[:, :3].float(),
+                    "features": pts_t,
+                    "voxel_coords": torch.zeros((0, 3), dtype=torch.int64, device=pts_t.device),
+                    "point_to_voxel_idx": torch.zeros(0, dtype=torch.int64, device=pts_t.device),
+                    "voxel_to_point_idx": None,
+                    "num_points": 0,
+                    "num_voxels": 0,
+                }
+
             if pts_t.shape[1] == 3:
                 zeros = torch.zeros((pts_t.shape[0], 1), device=pts_t.device, dtype=pts_t.dtype)
                 pts_t = torch.cat([pts_t, zeros], dim=-1)
 
             xyz = pts_t[:, :3]
-            v_coords = torch.floor(xyz / self.voxel_size).long()
+            v_coords = torch.floor(xyz.float() / self.voxel_size).long()
 
             v_min = torch.min(v_coords, dim=0).values
             v_shifted = v_coords - v_min

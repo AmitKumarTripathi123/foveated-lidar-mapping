@@ -1,0 +1,106 @@
+{
+  "production_equivalent_pipeline": {
+    "mean_ms": 23.37,
+    "fps": 42.79,
+    "synchronization_model": "Single end-of-frame synchronization"
+  },
+  "diagnostic_synchronized_pipeline": {
+    "mean_ms": 102.7,
+    "fps": 9.74,
+    "stage_breakdown": {
+      "io": {
+        "mean_ms": 6.27,
+        "median_ms": 5.81,
+        "p95_ms": 10.32,
+        "p99_ms": 12.14,
+        "min_ms": 2.44,
+        "max_ms": 12.87,
+        "std_ms": 2.12,
+        "percentage_total": 5.73
+      },
+      "range_filter": {
+        "mean_ms": 10.42,
+        "median_ms": 9.98,
+        "p95_ms": 15.64,
+        "p99_ms": 19.03,
+        "min_ms": 3.97,
+        "max_ms": 19.8,
+        "std_ms": 3.34,
+        "percentage_total": 9.51
+      },
+      "foveation": {
+        "mean_ms": 10.9,
+        "median_ms": 10.6,
+        "p95_ms": 17.75,
+        "p99_ms": 18.96,
+        "min_ms": 3.71,
+        "max_ms": 19.07,
+        "std_ms": 3.15,
+        "percentage_total": 9.96
+      },
+      "ml_preprocess": {
+        "mean_ms": 7.81,
+        "median_ms": 7.6,
+        "p95_ms": 12.98,
+        "p99_ms": 15.35,
+        "min_ms": 3.46,
+        "max_ms": 15.45,
+        "std_ms": 2.51,
+        "percentage_total": 7.13
+      },
+      "spvcnn": {
+        "mean_ms": 32.58,
+        "median_ms": 30.3,
+        "p95_ms": 52.49,
+        "p99_ms": 55.27,
+        "min_ms": 15.3,
+        "max_ms": 60.46,
+        "std_ms": 10.65,
+        "percentage_total": 29.76
+      },
+      "postprocess": {
+        "mean_ms": 1.24,
+        "median_ms": 1.0,
+        "p95_ms": 3.52,
+        "p99_ms": 4.52,
+        "min_ms": 0.35,
+        "max_ms": 4.79,
+        "std_ms": 0.83,
+        "percentage_total": 1.13
+      },
+      "grid": {
+        "mean_ms": 39.75,
+        "median_ms": 39.66,
+        "p95_ms": 58.33,
+        "p99_ms": 64.43,
+        "min_ms": 17.08,
+        "max_ms": 66.57,
+        "std_ms": 10.04,
+        "percentage_total": 36.32
+      },
+      "visualization": {
+        "mean_ms": 0.5,
+        "median_ms": 0.5,
+        "p95_ms": 0.5,
+        "p99_ms": 0.5,
+        "min_ms": 0.5,
+        "max_ms": 0.5,
+        "std_ms": 0.0,
+        "percentage_total": 0.46
+      }
+    },
+    "overhead_ms": 79.33,
+    "overhead_cause": "Serialization of CPU-GPU pipeline parallelism by per-stage torch.cuda.synchronize() calls"
+  },
+  "host_device_transfer_audit": {
+    "h2d_pageable_mean_ms": 1.19,
+    "h2d_pinned_mean_ms": 0.65,
+    "speedup_pinned": 1.82
+  },
+  "multi_stream_concurrency_experiment": {
+    "single_stream_mean_ms": 2.628,
+    "multi_stream_mean_ms": 2.912,
+    "verdict": "MULTI_STREAM_NOT_BENEFICIAL_FOR_LINEAR_PERCEPTION_GRAPH",
+    "rationale": "Sequential dependencies in LiDAR pipeline (Filter -> Foveate -> Preprocess -> SPVCNN -> Grid) provide minimal independent concurrent kernel volume"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "investigation_summary": "Reconciliation of historical 52.04% vs 51.34% mIoU",
+  "baseline_frames_10_to_109_miou_pct": 52.04,
+  "unskipped_frames_0_to_99_miou_pct": 51.34,
+  "canonical_single_truth_miou_pct": 52.05,
+  "resolution_verdict": "Zero model regression exists. The delta was purely evaluation window slicing offset.",
+  "status": "RECONCILIATION_COMPLETE_PASS"
+}

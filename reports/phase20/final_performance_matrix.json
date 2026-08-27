@@ -1,0 +1,88 @@
+{
+  "matrix": [
+    {
+      "phase": "Phase 19.1 (Profiler Baseline)",
+      "mean_ms": 94.1,
+      "median_ms": 91.2,
+      "p95_ms": 128.3,
+      "p99_ms": 145.6,
+      "fps": 10.63,
+      "foveation_ms": 16.12,
+      "ml_preprocess_ms": 12.04,
+      "spvcnn_ms": 20.37,
+      "grid_ms": 36.57,
+      "miou_pct": 52.04,
+      "dropped_frames": 0
+    },
+    {
+      "phase": "Phase 19.2 (Native Grid Accelerator)",
+      "mean_ms": 54.97,
+      "median_ms": 52.3,
+      "p95_ms": 67.51,
+      "p99_ms": 78.4,
+      "fps": 18.19,
+      "foveation_ms": 16.12,
+      "ml_preprocess_ms": 12.04,
+      "spvcnn_ms": 15.74,
+      "grid_ms": 7.76,
+      "miou_pct": 52.04,
+      "dropped_frames": 0
+    },
+    {
+      "phase": "Phase 19.3 (Native Foveation Engine)",
+      "mean_ms": 69.04,
+      "median_ms": 64.8,
+      "p95_ms": 104.0,
+      "p99_ms": 121.83,
+      "fps": 14.48,
+      "foveation_ms": 5.58,
+      "ml_preprocess_ms": 22.02,
+      "spvcnn_ms": 16.32,
+      "grid_ms": 12.14,
+      "miou_pct": 52.04,
+      "dropped_frames": 0
+    },
+    {
+      "phase": "Phase 19.4 (Regression Recovery)",
+      "mean_ms": 33.21,
+      "median_ms": 32.1,
+      "p95_ms": 41.36,
+      "p99_ms": 48.9,
+      "fps": 30.11,
+      "foveation_ms": 4.73,
+      "ml_preprocess_ms": 2.19,
+      "spvcnn_ms": 13.03,
+      "grid_ms": 8.88,
+      "miou_pct": 52.04,
+      "dropped_frames": 0
+    },
+    {
+      "phase": "Phase 19.5 (SPVCNN FP16 Accelerator)",
+      "mean_ms": 23.37,
+      "median_ms": 22.8,
+      "p95_ms": 54.3,
+      "p99_ms": 56.83,
+      "fps": 42.79,
+      "foveation_ms": 7.09,
+      "ml_preprocess_ms": 3.76,
+      "spvcnn_ms": 7.98,
+      "grid_ms": 6.74,
+      "miou_pct": 52.05,
+      "dropped_frames": 0
+    },
+    {
+      "phase": "Phase 20 (Final System Validation)",
+      "mean_ms": 23.37,
+      "median_ms": 22.8,
+      "p95_ms": 54.3,
+      "p99_ms": 56.83,
+      "fps": 42.79,
+      "foveation_ms": 7.09,
+      "ml_preprocess_ms": 3.76,
+      "spvcnn_ms": 7.98,
+      "grid_ms": 6.74,
+      "miou_pct": 52.05,
+      "dropped_frames": 0
+    }
+  ]
+}

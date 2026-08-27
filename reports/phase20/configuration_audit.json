@@ -1,0 +1,17 @@
+{
+  "config_path": "configs\\system_config.yaml",
+  "config_sha256": "1843245440e5ee66b54f74cd39dc648c6b11b8fac135b0a3b64ce9cc4b00dac4",
+  "validation_checks": {
+    "range_min_is_0_5m": true,
+    "range_max_is_100m": true,
+    "near_radius_10m": true,
+    "near_res_5cm": true,
+    "mid_radius_40m": true,
+    "mid_res_15cm": true,
+    "far_radius_100m": true,
+    "far_res_50cm": true,
+    "grid_resolution_0_2m": true,
+    "semantic_classes_4": true
+  },
+  "status": "CONFIGURATION_VALID_PASS"
+}

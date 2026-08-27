@@ -1,0 +1,38 @@
+{
+  "range_filter_boundaries": {
+    "checks": {
+      "0_4999m_filtered_out": true,
+      "0_5000m_kept": true,
+      "0_5001m_kept": true,
+      "99_9999m_kept": true,
+      "100_0000m_kept": true,
+      "100_0001m_filtered_out": true
+    },
+    "status": "PASS"
+  },
+  "foveation_zone_boundaries": {
+    "checks": {
+      "near_boundary_sampled": true,
+      "all_orthogonal_boundary_points_retained": true
+    },
+    "foveated_count": 8,
+    "status": "PASS"
+  },
+  "coordinate_edge_cases": {
+    "checks": {
+      "origin_quantized": true,
+      "negative_coords_indexed": true,
+      "grid_rasterized_valid": true
+    },
+    "status": "PASS"
+  },
+  "empty_cloud_invariants": {
+    "checks": {
+      "empty_range_filter_zero": true,
+      "empty_foveation_zero": true,
+      "empty_bundle_zero": true
+    },
+    "status": "PASS"
+  },
+  "overall_status": "ALL_BOUNDARY_CHECKS_PASSED"
+}
