@@ -1,0 +1,25 @@
+{
+  "config": "system_config.yaml",
+  "config_hash": "1843245440e5ee66b54f74cd39dc648c6b11b8fac135b0a3b64ce9cc4b00dac4",
+  "checkpoint_sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+  "checkpoint_verified": true,
+  "timestamp": "2026-08-24T22:28:56.253742",
+  "frames": 100,
+  "fps": 6.45,
+  "latency_mean_ms": 128.3,
+  "latency_p50_ms": 127.56,
+  "latency_p95_ms": 153.83,
+  "latency_p99_ms": 167.09,
+  "memory_mb": 4.77,
+  "cell_count": 17484,
+  "raw_points_mean": 68693,
+  "foveated_points_mean": 47895,
+  "dropped_frames": 0,
+  "foveation_tiers": {
+    "near": "0-10m @ 0.05m",
+    "mid": "10-40m @ 0.15m",
+    "far": "40-100m @ 0.50m"
+  },
+  "target_fps": 10.0,
+  "status": "CANONICAL_BENCHMARK_PASSED"
+}

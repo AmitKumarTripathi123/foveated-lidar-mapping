@@ -1,0 +1,128 @@
+{
+  "status": "CORRECTNESS_AUDIT_PASSED",
+  "all_tests_passed": true,
+  "total_test_cases": 11,
+  "test_results": {
+    "random_seed_0": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 49853,
+      "original_points": 50000
+    },
+    "random_seed_1": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 49842,
+      "original_points": 50000
+    },
+    "random_seed_2": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 49849,
+      "original_points": 50000
+    },
+    "random_seed_42": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 49868,
+      "original_points": 50000
+    },
+    "random_seed_100": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 49858,
+      "original_points": 50000
+    },
+    "boundary_points_audit": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 7,
+      "original_points": 12
+    },
+    "negative_coordinates_test": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 5,
+      "original_points": 6
+    },
+    "dense_near_field": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 9987,
+      "original_points": 10000
+    },
+    "sparse_far_field": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 4976,
+      "original_points": 5000
+    },
+    "empty_input": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 0,
+      "original_points": 0
+    },
+    "single_point": {
+      "passed": true,
+      "count_match": true,
+      "points_match": true,
+      "max_point_err": 0.0,
+      "labels_match": true,
+      "zone_match": true,
+      "filtered_match": true,
+      "retained_points": 1,
+      "original_points": 1
+    }
+  }
+}

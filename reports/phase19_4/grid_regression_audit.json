@@ -1,0 +1,22 @@
+{
+  "status": "GRID_REGRESSION_ACTIVE",
+  "phase19_2_baseline_ms": 7.76,
+  "phase19_3_regressed_ms": 12.14,
+  "phase19_4_measured_ms": 8.78,
+  "phase19_4_p95_ms": 11.7,
+  "target_met": false,
+  "equivalence": {
+    "passed": true,
+    "cell_set_match": true,
+    "point_count_match": true,
+    "elevation_mean_match": true,
+    "max_elevation_mean_err": 3.814697265625e-06,
+    "elevation_min_match": true,
+    "elevation_max_match": true,
+    "semantic_layer_match": true,
+    "confidence_layer_match": true,
+    "max_confidence_err": 5.960464477539063e-08,
+    "traversability_layer_match": true,
+    "occupied_cells": 42648
+  }
+}

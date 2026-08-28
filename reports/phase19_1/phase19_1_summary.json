@@ -1,0 +1,60 @@
+{
+  "phase": "19.1",
+  "status": "AUDIT_COMPLETE",
+  "timestamp": "2026-08-24T23:13:13.138226",
+  "reproducibility": {
+    "config_sha256": "1843245440e5ee66b54f74cd39dc648c6b11b8fac135b0a3b64ce9cc4b00dac4",
+    "checkpoint_sha256": "b15c6dfb2f20d1dce4febc47be67f9d50b86a0af72f1895176c6a6ee58bca142",
+    "git_commit": "atul/phase19.1-profiler-distance-audit",
+    "python": "3.12.10",
+    "pytorch": "2.6.0+cu124",
+    "cuda": "12.4",
+    "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "cpu": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "os": "Windows 11"
+  },
+  "baseline_phase18": {
+    "mean_latency_ms": 128.3,
+    "p95_latency_ms": 153.83,
+    "miou": 0.5359,
+    "grid_memory_mb": 4.77,
+    "dropped_frames": 0
+  },
+  "measured_phase19_1": {
+    "perception_mean_latency_ms": 94.1,
+    "perception_p95_latency_ms": 122.46,
+    "replay_mean_latency_ms": 95.67,
+    "replay_p95_latency_ms": 124.29,
+    "fps_perception": 10.63,
+    "overall_miou": 0.5204,
+    "point_accuracy": 0.8063,
+    "grid_memory_mb": 4.77,
+    "dropped_frames": 0
+  },
+  "distance_analysis": {
+    "near_miou": 0.666,
+    "mid_miou": 0.4282,
+    "far_miou": 0.3698,
+    "worst_band": "far_40_100m"
+  },
+  "bottleneck": {
+    "primary": {
+      "stage": "grid",
+      "mean_ms": 36.57,
+      "percentage_total": 38.03
+    },
+    "secondary": {
+      "stage": "spvcnn",
+      "mean_ms": 20.37,
+      "percentage_total": 21.18
+    },
+    "weakest_class": {
+      "class": "non_drivable",
+      "iou": 0.2728
+    }
+  },
+  "recommendation": {
+    "action": "Phase 19.2 must optimize grid execution (accounting for 38.0% of total latency) via C++/CUDA acceleration or kernel fusion.",
+    "target_phase": "19.2"
+  }
+}

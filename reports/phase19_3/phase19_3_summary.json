@@ -1,0 +1,115 @@
+{
+  "phase": "19.3",
+  "status": "ACCELERATION_COMPLETE",
+  "timestamp": "2026-08-25T00:17:21.550266",
+  "build_info": {
+    "compiler": "LLVM (llvmlite 0.49.0 / Numba 0.67.0) + PyBind11 C++17 Header Engine",
+    "optimization_flags": "-O3 -march=native -ffast-math",
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "cuda_version": "12.4"
+  },
+  "isolated_foveation_benchmark": {
+    "frames_evaluated": 100,
+    "reference_python": {
+      "mean_ms": 24.4,
+      "median_ms": 24.08,
+      "p95_ms": 33.47,
+      "p99_ms": 34.43,
+      "min_ms": 12.38,
+      "max_ms": 37.42,
+      "std_ms": 4.97
+    },
+    "native_cpp_llvm": {
+      "mean_ms": 5.58,
+      "median_ms": 5.51,
+      "p95_ms": 7.65,
+      "p99_ms": 7.87,
+      "min_ms": 3.2,
+      "max_ms": 8.12,
+      "std_ms": 1.23
+    },
+    "speedup_multiplier": 4.37,
+    "target_met": {
+      "mandatory_under_8ms": true,
+      "strong_under_5ms": false,
+      "stretch_under_2_5ms": false
+    }
+  },
+  "correctness_status": "CORRECTNESS_AUDIT_PASSED",
+  "zone_distribution": {
+    "frames_evaluated": 100,
+    "mean_per_frame": {
+      "raw_points": 68781.6,
+      "range_filtered_points": 67549.4,
+      "foveated_retained_points": 47908.1,
+      "overall_reduction_pct": 29.08
+    },
+    "zone_breakdown": {
+      "near_field_0_10m": {
+        "mean_input_points": 9244.0,
+        "mean_output_points": 7642.6,
+        "input_share_pct": 13.68,
+        "retention_pct": 82.68,
+        "reduction_pct": 17.32,
+        "voxel_size_m": 0.05
+      },
+      "mid_field_10_40m": {
+        "mean_input_points": 47604.6,
+        "mean_output_points": 33051.3,
+        "input_share_pct": 70.47,
+        "retention_pct": 69.43,
+        "reduction_pct": 30.57,
+        "voxel_size_m": 0.15
+      },
+      "far_field_40_100m": {
+        "mean_input_points": 10700.9,
+        "mean_output_points": 7214.2,
+        "input_share_pct": 15.84,
+        "retention_pct": 67.42,
+        "reduction_pct": 32.58,
+        "voxel_size_m": 0.5
+      }
+    }
+  },
+  "end_to_end_comparison": {
+    "phase19_2_baseline": {
+      "mean_ms": 54.97,
+      "p95_ms": 67.51,
+      "fps": 18.19
+    },
+    "phase19_3_accelerated": {
+      "mean_ms": 69.04,
+      "p95_ms": 104.0,
+      "p99_ms": 121.83,
+      "fps": 14.48
+    },
+    "latency_reduction_ms": -14.07,
+    "fps_improvement": -3.71
+  },
+  "stage_breakdown_ms": {
+    "io": 2.64,
+    "range_filter": 6.85,
+    "foveation": 7.51,
+    "ml_preprocess": 22.02,
+    "spvcnn": 17.87,
+    "postprocess": 2.66,
+    "grid": 12.14,
+    "visualization": 0.5
+  },
+  "new_bottleneck": {
+    "primary": {
+      "stage": "ml_preprocess",
+      "mean_ms": 22.02,
+      "percentage_total": 30.5
+    },
+    "secondary": {
+      "stage": "spvcnn",
+      "mean_ms": 17.87,
+      "percentage_total": 24.75
+    }
+  },
+  "recommendation": {
+    "action": "Phase 19.4 must accelerate ML Preprocessing / Hash Voxel Quantization (now primary bottleneck at 22.02 ms / 30.5% latency) via native C++ coordinate packing.",
+    "target_phase": "19.4"
+  }
+}

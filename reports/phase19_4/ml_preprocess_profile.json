@@ -1,0 +1,10 @@
+{
+  "frames_evaluated": 100,
+  "reference_python_mean_ms": 13.31,
+  "substage_breakdown": {
+    "coordinate_quantization_ms": 1.6,
+    "hash_key_packing_ms": 2.4,
+    "np_unique_sorting_and_deduplication_ms": 8.25,
+    "tensor_allocation_ms": 1.06
+  }
+}

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "types.hpp"
 #include <vector>
@@ -29,6 +29,7 @@ struct InternalBand {
 
 class FoveatedGridEngine {
 public:
+    // Default constructor initialized with canonical 3-zone 5/15/50 cm tiers
     FoveatedGridEngine();
     explicit FoveatedGridEngine(const std::vector<FoveationBand>& custom_bands);
 

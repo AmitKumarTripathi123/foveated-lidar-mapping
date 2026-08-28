@@ -1,0 +1,80 @@
+{
+  "total_layer_forward_mean_ms": 22.74,
+  "layers": {
+    "stem": {
+      "mean_ms": 1.05,
+      "p95_ms": 1.9,
+      "percentage_of_forward": 4.6
+    },
+    "inv_counts_precalc": {
+      "mean_ms": 1.59,
+      "p95_ms": 2.99,
+      "percentage_of_forward": 7.0
+    },
+    "stage1_pt_branch": {
+      "mean_ms": 1.0,
+      "p95_ms": 2.56,
+      "percentage_of_forward": 4.4
+    },
+    "stage1_voxel_branch": {
+      "mean_ms": 1.97,
+      "p95_ms": 2.92,
+      "percentage_of_forward": 8.7
+    },
+    "stage1_fusion": {
+      "mean_ms": 1.41,
+      "p95_ms": 2.71,
+      "percentage_of_forward": 6.2
+    },
+    "stage2_pt_branch": {
+      "mean_ms": 0.98,
+      "p95_ms": 2.19,
+      "percentage_of_forward": 4.3
+    },
+    "stage2_voxel_branch": {
+      "mean_ms": 2.11,
+      "p95_ms": 3.12,
+      "percentage_of_forward": 9.3
+    },
+    "stage2_fusion": {
+      "mean_ms": 1.47,
+      "p95_ms": 2.75,
+      "percentage_of_forward": 6.5
+    },
+    "stage3_pt_branch": {
+      "mean_ms": 0.95,
+      "p95_ms": 2.35,
+      "percentage_of_forward": 4.2
+    },
+    "stage3_voxel_branch": {
+      "mean_ms": 2.23,
+      "p95_ms": 3.57,
+      "percentage_of_forward": 9.8
+    },
+    "stage3_fusion": {
+      "mean_ms": 1.58,
+      "p95_ms": 3.29,
+      "percentage_of_forward": 6.9
+    },
+    "stage4_pt_branch": {
+      "mean_ms": 0.93,
+      "p95_ms": 1.97,
+      "percentage_of_forward": 4.1
+    },
+    "stage4_voxel_branch": {
+      "mean_ms": 2.23,
+      "p95_ms": 4.22,
+      "percentage_of_forward": 9.8
+    },
+    "stage4_fusion": {
+      "mean_ms": 1.4,
+      "p95_ms": 2.77,
+      "percentage_of_forward": 6.2
+    },
+    "classifier": {
+      "mean_ms": 1.85,
+      "p95_ms": 3.33,
+      "percentage_of_forward": 8.1
+    }
+  }
+}

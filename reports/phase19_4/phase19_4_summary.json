@@ -1,0 +1,70 @@
+{
+  "phase": "19.4",
+  "status": "REGRESSION_RECOVERY_COMPLETE",
+  "timestamp": "2026-08-25T01:08:13.091231",
+  "build_info": {
+    "compiler": "LLVM + PyBind11 C++17 Header Engine",
+    "optimization_flags": "-O3 -march=native -ffast-math",
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "cuda_version": "12.4"
+  },
+  "regression_recovery_scorecard": {
+    "ml_preprocessing": {
+      "phase19_2_ms": 12.04,
+      "phase19_3_ms": 22.02,
+      "phase19_4_ms": 2.19,
+      "status": "RECOVERED"
+    },
+    "grid": {
+      "phase19_2_ms": 7.76,
+      "phase19_3_ms": 12.14,
+      "phase19_4_ms": 8.88,
+      "status": "REGRESSED"
+    },
+    "foveation": {
+      "phase19_2_ms": 16.12,
+      "phase19_3_ms": 7.51,
+      "phase19_4_ms": 4.73,
+      "status": "PRESERVED"
+    },
+    "end_to_end_latency": {
+      "phase19_2_ms": 54.97,
+      "phase19_3_ms": 69.04,
+      "phase19_4_ms": 33.21,
+      "status": "RECOVERED"
+    },
+    "throughput_fps": {
+      "phase19_2_fps": 18.19,
+      "phase19_3_fps": 14.48,
+      "phase19_4_fps": 30.11,
+      "status": "RECOVERED"
+    },
+    "p95_tail_latency": {
+      "phase19_2_ms": 67.51,
+      "phase19_3_ms": 104.0,
+      "phase19_4_ms": 41.36,
+      "status": "RECOVERED"
+    },
+    "accuracy_miou": {
+      "phase19_2_pct": 52.04,
+      "phase19_4_pct": 51.34,
+      "status": "REGRESSED"
+    }
+  },
+  "new_bottleneck": {
+    "primary": {
+      "stage": "spvcnn",
+      "mean_ms": 13.03,
+      "percentage_total": 36.47
+    },
+    "secondary": {
+      "stage": "grid",
+      "mean_ms": 8.88,
+      "percentage_total": 24.86
+    }
+  },
+  "recommendation": {
+    "action": "Phase 19.5 must optimize SPVCNN (now primary bottleneck at 13.03 ms / 36.5% latency) via TorchScript / FP16 sparse conv kernel acceleration.",
+    "target_phase": "19.5"
+  }
+}

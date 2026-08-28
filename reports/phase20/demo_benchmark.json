@@ -1,0 +1,10 @@
+{
+  "startup_time_ms": 85.33,
+  "steady_state_fps": 24.57,
+  "mean_latency_ms": 40.7,
+  "p95_ms": 56.54,
+  "p99_ms": 92.19,
+  "vram_mb": 11.9,
+  "ram_mb": 1541.2,
+  "status": "DEMO_PATH_CERTIFIED_PASS"
+}

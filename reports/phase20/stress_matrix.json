@@ -1,0 +1,50 @@
+{
+  "LOW_LOAD": {
+    "input_points": 10000,
+    "mean_foveated_points": 9996,
+    "mean_voxels": 9995,
+    "mean_latency_ms": 15.03,
+    "p95_ms": 21.59,
+    "p99_ms": 23.35,
+    "fps": 66.54,
+    "vram_allocated_mb": 9.1,
+    "ram_rss_mb": 1387.9,
+    "dropped_frames": 0
+  },
+  "NORMAL_LOAD": {
+    "input_points": 68000,
+    "mean_foveated_points": 67812,
+    "mean_voxels": 67799,
+    "mean_latency_ms": 31.87,
+    "p95_ms": 38.29,
+    "p99_ms": 38.44,
+    "fps": 31.38,
+    "vram_allocated_mb": 13.3,
+    "ram_rss_mb": 1393.1,
+    "dropped_frames": 0
+  },
+  "HIGH_LOAD": {
+    "input_points": 100000,
+    "mean_foveated_points": 99572,
+    "mean_voxels": 99543,
+    "mean_latency_ms": 43.74,
+    "p95_ms": 49.27,
+    "p99_ms": 49.7,
+    "fps": 22.86,
+    "vram_allocated_mb": 15.6,
+    "ram_rss_mb": 1395.6,
+    "dropped_frames": 0
+  },
+  "EXTREME_LOAD": {
+    "input_points": 200000,
+    "mean_foveated_points": 198387,
+    "mean_voxels": 198272,
+    "mean_latency_ms": 77.52,
+    "p95_ms": 91.5,
+    "p99_ms": 97.33,
+    "fps": 12.9,
+    "vram_allocated_mb": 23.1,
+    "ram_rss_mb": 1403.3,
+    "dropped_frames": 0
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "near_0_10m": {
+    "points": 789038,
+    "valid_points": 788766,
+    "miou": 0.666,
+    "point_accuracy": 0.7558,
+    "mean_class_accuracy": 0.7923,
+    "drivable_iou": 0.7864,
+    "non_drivable_iou": 0.9444,
+    "static_iou": 0.4034,
+    "dynamic_iou": 0.53,
+    "confidence": {
+      "mean": 0.8247,
+      "median": 0.8919,
+      "p10": 0.5469,
+      "p90": 0.9933
+    },
+    "grid_statistics": {
+      "occupied_cells": 703254,
+      "mean_points_per_cell": 1.12
+    }
+  },
+  "mid_10_40m": {
+    "points": 3282440,
+    "valid_points": 3282440,
+    "miou": 0.4282,
+    "point_accuracy": 0.8068,
+    "mean_class_accuracy": 0.5218,
+    "drivable_iou": 0.6122,
+    "non_drivable_iou": 0.0,
+    "static_iou": 0.7833,
+    "dynamic_iou": 0.3172,
+    "confidence": {
+      "mean": 0.8848,
+      "median": 0.964,
+      "p10": 0.6158,
+      "p90": 0.9999
+    },
+    "grid_statistics": {
+      "occupied_cells": 2849954,
+      "mean_points_per_cell": 1.15
+    }
+  },
+  "far_40_100m": {
+    "points": 719334,
+    "valid_points": 604607,
+    "miou": 0.3698,
+    "point_accuracy": 0.869,
+    "mean_class_accuracy": 0.4487,
+    "drivable_iou": 0.4048,
+    "non_drivable_iou": 0.0,
+    "static_iou": 0.8712,
+    "dynamic_iou": 0.2032,
+    "confidence": {
+      "mean": 0.8899,
+      "median": 0.9919,
+      "p10": 0.5919,
+      "p90": 1.0
+    },
+    "grid_statistics": {
+      "occupied_cells": 617708,
+      "mean_points_per_cell": 1.16
+    }
+  }
+}

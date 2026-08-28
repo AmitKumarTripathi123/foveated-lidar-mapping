@@ -1,0 +1,89 @@
+{
+  "frames": 100,
+  "perception_latency_mean_ms": 94.1,
+  "perception_latency_p95_ms": 122.46,
+  "replay_latency_mean_ms": 95.67,
+  "replay_latency_p95_ms": 124.29,
+  "stages": {
+    "io": {
+      "mean_ms": 1.57,
+      "median_ms": 1.53,
+      "p95_ms": 2.39,
+      "p99_ms": 2.53,
+      "min_ms": 0.91,
+      "max_ms": 2.79,
+      "std_ms": 0.44,
+      "percentage_total": 1.64
+    },
+    "range_filter": {
+      "mean_ms": 3.68,
+      "median_ms": 3.45,
+      "p95_ms": 5.43,
+      "p99_ms": 5.96,
+      "min_ms": 2.06,
+      "max_ms": 6.39,
+      "std_ms": 0.96,
+      "percentage_total": 3.82
+    },
+    "foveation": {
+      "mean_ms": 17.76,
+      "median_ms": 17.76,
+      "p95_ms": 22.61,
+      "p99_ms": 31.27,
+      "min_ms": 10.68,
+      "max_ms": 35.32,
+      "std_ms": 3.79,
+      "percentage_total": 18.46
+    },
+    "ml_preprocess": {
+      "mean_ms": 13.67,
+      "median_ms": 13.2,
+      "p95_ms": 17.29,
+      "p99_ms": 23.81,
+      "min_ms": 8.56,
+      "max_ms": 32.42,
+      "std_ms": 2.91,
+      "percentage_total": 14.22
+    },
+    "spvcnn": {
+      "mean_ms": 20.37,
+      "median_ms": 14.93,
+      "p95_ms": 37.89,
+      "p99_ms": 39.79,
+      "min_ms": 11.56,
+      "max_ms": 39.85,
+      "std_ms": 9.1,
+      "percentage_total": 21.18
+    },
+    "postprocess": {
+      "mean_ms": 2.06,
+      "median_ms": 1.98,
+      "p95_ms": 3.06,
+      "p99_ms": 3.82,
+      "min_ms": 0.89,
+      "max_ms": 3.93,
+      "std_ms": 0.62,
+      "percentage_total": 2.14
+    },
+    "grid": {
+      "mean_ms": 36.57,
+      "median_ms": 36.72,
+      "p95_ms": 45.7,
+      "p99_ms": 49.82,
+      "min_ms": 21.48,
+      "max_ms": 51.58,
+      "std_ms": 5.78,
+      "percentage_total": 38.03
+    },
+    "visualization": {
+      "mean_ms": 0.5,
+      "median_ms": 0.5,
+      "p95_ms": 0.5,
+      "p99_ms": 0.5,
+      "min_ms": 0.5,
+      "max_ms": 0.5,
+      "std_ms": 0.0,
+      "percentage_total": 0.52
+    }
+  }
+}
