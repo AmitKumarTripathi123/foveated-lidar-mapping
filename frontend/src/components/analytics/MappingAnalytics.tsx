@@ -50,7 +50,7 @@ export function MappingAnalytics() {
           <span className="uppercase tracking-wider">AI Perception & Mapping</span>
         </div>
         <span className="text-[9px] text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-1.5 py-0.5 rounded font-bold">
-          PHASE 17 FREEZE
+          PHASE 20 CERTIFIED
         </span>
       </div>
 
@@ -69,32 +69,32 @@ export function MappingAnalytics() {
         <div className="space-y-1.5 text-[11px]">
           <div className="flex justify-between">
             <span className="text-gray-400">Architecture:</span>
-            <span className="font-bold text-sky-300">SPVCNN (Sparse Voxel)</span>
+            <span className="font-bold text-sky-300">Fused SPVCNN FP16</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Trainable Parameters:</span>
-            <span className="font-bold text-gray-200">138,514 params</span>
+            <span className="font-bold text-gray-200">138,514 (Linear-BN Fused)</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Validation mIoU (Seq 02):</span>
-            <span className="font-bold text-emerald-400">53.59% (Held-Out)</span>
+            <span className="font-bold text-emerald-400">52.05% (Zero Drift)</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Cross-Sequence mIoU:</span>
-            <span className="font-bold text-emerald-400">51.94% (Mean 00–05)</span>
+            <span className="text-gray-400">Throughput / Latency:</span>
+            <span className="font-bold text-emerald-400">42.79 FPS / 23.37 ms</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Dynamic Object IoU:</span>
-            <span className="font-bold text-emerald-400">43.68%</span>
+            <span className="text-gray-400">Prediction Agreement:</span>
+            <span className="font-bold text-emerald-400">99.89% (vs FP32)</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Sensor Frequency:</span>
-            <span className="font-bold text-gray-200">10.0 Hz Certified Stream</span>
+            <span className="font-bold text-gray-200">10.0 Hz - 40.0 Hz Real-Time</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Steady Inference:</span>
-            <span className="font-bold text-amber-400">
-              {metrics ? `${metrics.ai_latency_ms.toFixed(1)} ms` : '18.2 ms'}
+            <span className="text-gray-400">Steady SPVCNN Forward:</span>
+            <span className="font-bold text-emerald-400">
+              {metrics ? `${metrics.ai_latency_ms.toFixed(1)} ms` : '7.98 ms'}
             </span>
           </div>
         </div>

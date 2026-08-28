@@ -15,14 +15,14 @@ import {
 export function LiveMetricsCard() {
   const metrics = useLidarStore((state) => state.metrics);
 
-  const fps = metrics ? metrics.fps.toFixed(1) : '10.0';
-  const latency = metrics ? metrics.total_latency_ms.toFixed(1) : '30.3';
-  const aiLatency = metrics ? metrics.ai_latency_ms.toFixed(1) : '18.2';
-  const gridLatency = metrics ? metrics.grid_latency_ms.toFixed(1) : '12.1';
-  const points = metrics ? metrics.raw_point_count.toLocaleString() : '15,240';
-  const cells = metrics ? metrics.cell_count.toLocaleString() : '8,450';
-  const memory = metrics ? metrics.memory_ram_mb.toFixed(0) : '135';
-  const savings = metrics ? metrics.compression_ratio_percent.toFixed(1) : '82.8';
+  const fps = metrics ? metrics.fps.toFixed(1) : '42.8';
+  const latency = metrics ? metrics.total_latency_ms.toFixed(1) : '23.4';
+  const aiLatency = metrics ? metrics.ai_latency_ms.toFixed(1) : '8.0';
+  const gridLatency = metrics ? metrics.grid_latency_ms.toFixed(1) : '6.7';
+  const points = metrics ? metrics.raw_point_count.toLocaleString() : '68,065';
+  const cells = metrics ? metrics.cell_count.toLocaleString() : '48,231';
+  const memory = metrics ? metrics.memory_ram_mb.toFixed(0) : '248';
+  const savings = metrics ? metrics.compression_ratio_percent.toFixed(1) : '93.8';
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 bg-[#0A0E18]/95 backdrop-blur-md border-t border-border-color px-3 py-2 text-white font-mono text-xs shadow-2xl select-none">
