@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useEffect, useState } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useLidarStore } from '@/stores/useLidarStore';
 import {
@@ -25,11 +25,9 @@ export function FoveatedGridMesh() {
 
   const instancedMeshRef = useRef<THREE.InstancedMesh>(null);
   const wireframeMeshRef = useRef<THREE.InstancedMesh>(null);
-  const highlightMeshRef = useRef<THREE.Mesh>(null);
 
-  // Take up to 20,000 structured variable grid cells
   const displayCells = useMemo(() => {
-    return cells.slice(0, 20000);
+    return cells.slice(0, 25000);
   }, [cells]);
 
   useEffect(() => {
@@ -39,19 +37,19 @@ export function FoveatedGridMesh() {
 
     for (let i = 0; i < displayCells.length; i++) {
       const cell = displayCells[i];
-      const res = cell.cellSize || cell.resolution || 0.05;
+      const res = cell.cellSize || cell.resolution || 0.10;
 
-      let height = 0.06;
-      let centerZ = -1.58;
+      let height = 0.08;
+      let centerZ = -1.56;
 
       if (gridRenderStyle === 'extruded_3d' || viewMode3D === 'foveated_elevation' && colorMode === 'elevation') {
         // 3D Column Extrusion
-        height = Math.max(0.10, cell.elevation - zBase);
+        height = Math.max(0.12, cell.elevation - zBase);
         centerZ = zBase + height / 2;
       } else {
-        // 2D Planar XY Grid Tile with slight elevation offset
-        height = 0.06;
-        centerZ = Math.max(-1.62, cell.elevation * 0.15 - 1.58);
+        // 2.5D Planar Grid Tile on Ground
+        height = 0.08;
+        centerZ = -1.56;
       }
 
       // Exact square cell dimensions: res x res
@@ -64,26 +62,33 @@ export function FoveatedGridMesh() {
         wireframeMeshRef.current.setMatrixAt(i, tempObject.matrix);
       }
 
-      // Semantic or Elevation coloring
-      let rgb: [number, number, number] = [0.13, 0.77, 0.37];
+      // Dynamic Semantic / Zone / Elevation coloring
       if (colorMode === 'elevation') {
-        rgb = getElevationColor(cell.elevation);
-      } else if (colorMode === 'traversability') {
-        rgb = getTraversabilityColor(cell.traversability);
-      } else {
-        rgb = getSemanticColor(cell.semantic_class);
-      }
-
-      // Subtle brightness modulation by elevation for 2D map depth perception
-      if (colorMode === 'semantic') {
-        const heightMod = Math.min(1.25, Math.max(0.75, 1.0 + (cell.elevation + 1.6) * 0.15));
-        tempColor.setRGB(
-          Math.min(1.0, rgb[0] * heightMod),
-          Math.min(1.0, rgb[1] * heightMod),
-          Math.min(1.0, rgb[2] * heightMod)
-        );
-      } else {
+        const rgb = getElevationColor(cell.elevation);
         tempColor.setRGB(rgb[0], rgb[1], rgb[2]);
+      } else if (colorMode === 'traversability') {
+        const rgb = getTraversabilityColor(cell.traversability);
+        tempColor.setRGB(rgb[0], rgb[1], rgb[2]);
+      } else {
+        // Check for purple static obstacles / red dynamic vehicles
+        if (cell.semantic_class === 2) {
+          tempColor.setHex(0x8B5CF6); // Purple
+        } else if (cell.semantic_class === 3) {
+          tempColor.setHex(0xEF4444); // Red
+        } else if (cell.semantic_class === 1) {
+          tempColor.setHex(0xCA8A04); // Yellow Non-Drivable
+        } else if (cell.semantic_class === 4) {
+          tempColor.setHex(0x15803D); // Vegetation
+        } else {
+          // Drivable Terrain colored by Foveation Zone (matching reference image)
+          if (cell.zone_id === 0) {
+            tempColor.setHex(0x0284C7); // Blue Zone 0
+          } else if (cell.zone_id === 1) {
+            tempColor.setHex(0x16A34A); // Green Zone 1
+          } else {
+            tempColor.setHex(0xF59E0B); // Orange/Yellow Zone 2
+          }
+        }
       }
 
       instancedMeshRef.current.setColorAt(i, tempColor);
@@ -105,7 +110,7 @@ export function FoveatedGridMesh() {
 
   return (
     <group>
-      {/* 1. Solid Geometric 2.5D Grid Cell Tiles */}
+      {/* 1. Solid Geometric 3D/2.5D Grid Cell Mesh */}
       <instancedMesh
         ref={instancedMeshRef}
         args={[undefined, undefined, displayCells.length]}
@@ -134,21 +139,19 @@ export function FoveatedGridMesh() {
         />
       </instancedMesh>
 
-      {/* 2. Structured Variable-Resolution Cell Outlines (Grid Boundaries) */}
-      {layers.adaptiveGridWireframe && (
-        <instancedMesh
-          ref={wireframeMeshRef}
-          args={[undefined, undefined, displayCells.length]}
-        >
-          <boxGeometry args={[1, 1, 1]} />
-          <meshBasicMaterial
-            color="#38BDF8"
-            wireframe
-            transparent
-            opacity={0.35}
-          />
-        </instancedMesh>
-      )}
+      {/* 2. Crisp Dark Cell Outlines (Grid Boundaries) */}
+      <instancedMesh
+        ref={wireframeMeshRef}
+        args={[undefined, undefined, displayCells.length]}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial
+          color="#05070D"
+          wireframe
+          transparent
+          opacity={0.85}
+        />
+      </instancedMesh>
 
       {/* 3. Selected Cell Glowing Border Highlight */}
       {selectedCell && (
