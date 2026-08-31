@@ -7,11 +7,10 @@ export async function fetchHealth() {
   return res.json();
 }
 
-export async function fetchDatasets(): Promise<DatasetInfo[]> {
+export async function fetchDatasets(): Promise<{ datasets: DatasetInfo[]; active_dataset: string }> {
   const res = await fetch(`${API_BASE_URL}/api/v1/datasets`);
   if (!res.ok) throw new Error('Failed to fetch datasets');
-  const data = await res.json();
-  return data.datasets;
+  return res.json();
 }
 
 export async function loadDataset(datasetId: string) {
@@ -23,6 +22,8 @@ export async function loadDataset(datasetId: string) {
   if (!res.ok) throw new Error('Failed to load dataset sequence');
   return res.json();
 }
+
+export const switchDataset = loadDataset;
 
 export async function startPlayback(targetFps: number = 10, mode: string = 'foveated') {
   const res = await fetch(`${API_BASE_URL}/api/v1/processing/start`, {

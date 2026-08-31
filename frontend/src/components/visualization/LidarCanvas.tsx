@@ -40,7 +40,10 @@ export function LidarCanvas() {
     setCameraPreset(preset);
     if (controlsRef.current) {
       const config = CAMERA_POSITIONS[preset];
-      controlsRef.current.object.position.set(...config.pos);
+      if (controlsRef.current.object) {
+        controlsRef.current.object.up.set(0, 0, 1);
+        controlsRef.current.object.position.set(...config.pos);
+      }
       controlsRef.current.target.set(...config.target);
       controlsRef.current.update();
     }
@@ -64,12 +67,12 @@ export function LidarCanvas() {
       {/* 3D WebGL Canvas */}
       <Canvas
         gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-        camera={{ position: DEFAULT_CAMERA_POSITION, fov: 45, near: 0.1, far: 500 }}
+        camera={{ position: DEFAULT_CAMERA_POSITION, fov: 45, near: 0.1, far: 500, up: [0, 0, 1] }}
       >
         {/* Scientific Studio Lighting */}
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[30, -30, 50]} intensity={1.4} />
-        <pointLight position={[0, 0, 15]} intensity={0.9} />
+        <ambientLight intensity={0.9} />
+        <directionalLight position={[30, -30, 50]} intensity={1.5} />
+        <pointLight position={[0, 0, 20]} intensity={1.0} />
 
         {/* Camera Orbit Controls */}
         <OrbitControls
@@ -84,14 +87,14 @@ export function LidarCanvas() {
         {/* Reference Coordinate Ground Plane Grid */}
         <Grid
           position={[0, 35, -1.65]}
-          args={[120, 120]}
+          args={[140, 140]}
           cellSize={5}
           cellThickness={0.5}
           cellColor="#172554"
           sectionSize={20}
           sectionThickness={1}
           sectionColor="#1E3A8A"
-          fadeDistance={140}
+          fadeDistance={150}
           rotation={[-Math.PI / 2, 0, 0]}
         />
 
@@ -152,7 +155,7 @@ export function LidarCanvas() {
                 ? 'bg-brand-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
-            title="Top-Down Bird's Eye View"
+            title="Top-Down Bird's Eye View (BEV)"
           >
             TOP (BEV)
           </button>
@@ -163,7 +166,7 @@ export function LidarCanvas() {
                 ? 'bg-brand-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
-            title="Front Vehicle View"
+            title="Front Windshield View"
           >
             FRONT
           </button>
@@ -174,7 +177,7 @@ export function LidarCanvas() {
                 ? 'bg-brand-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
-            title="Side Cross-Section View"
+            title="Side Cross-Section Elevation View"
           >
             SIDE
           </button>
@@ -185,7 +188,7 @@ export function LidarCanvas() {
           <button
             onClick={resetCamera}
             className="p-1 rounded text-gray-400 hover:text-white hover:bg-surface-highlight transition-colors"
-            title="Reset Camera View"
+            title="Reset Camera View to Default"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>

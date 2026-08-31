@@ -16,6 +16,7 @@ export function FoveatedGridMesh() {
   const cells = useLidarStore((state) => state.cells);
   const layers = useLidarStore((state) => state.layers);
   const colorMode = useLidarStore((state) => state.colorMode);
+  const viewMode3D = useLidarStore((state) => state.viewMode3D);
   const gridOpacity = useLidarStore((state) => state.gridOpacity);
   const setSelectedCell = useLidarStore((state) => state.setSelectedCell);
   const setHoveredCell = useLidarStore((state) => state.setHoveredCell);
@@ -23,22 +24,37 @@ export function FoveatedGridMesh() {
   const instancedMeshRef = useRef<THREE.InstancedMesh>(null);
   const wireframeMeshRef = useRef<THREE.InstancedMesh>(null);
 
-  // Group cells or render up to 12,000 active cells via InstancedMesh
+  // Group cells or render up to 15,000 active cells via InstancedMesh
   const displayCells = useMemo(() => {
-    return cells.slice(0, 12000);
+    return cells.slice(0, 15000);
   }, [cells]);
 
   useEffect(() => {
     if (!instancedMeshRef.current || displayCells.length === 0) return;
 
+    const zBase = -1.65; // Standard ground datum height
+
     for (let i = 0; i < displayCells.length; i++) {
       const cell = displayCells[i];
       const res = cell.resolution;
 
-      // Position box at cell center
-      const height = Math.max(0.08, res * 0.4);
-      tempObject.position.set(cell.x, cell.y, cell.elevation);
-      tempObject.scale.set(res * 0.96, res * 0.96, height);
+      // True 2.5D Elevation Column Height Calculation
+      let height = 0.12;
+      let centerZ = cell.elevation;
+
+      if (viewMode3D === 'foveated_elevation' || colorMode === 'elevation') {
+        // In 2.5D elevation mode, extrude column from ground datum (-1.65m) up to cell elevation
+        const columnHeight = Math.max(0.12, cell.elevation - zBase);
+        height = columnHeight;
+        centerZ = zBase + height / 2;
+      } else {
+        // In foveated voxel mode, height scaled according to distance resolution
+        height = Math.max(0.12, res * 0.45);
+        centerZ = cell.elevation;
+      }
+
+      tempObject.position.set(cell.x, cell.y, centerZ);
+      tempObject.scale.set(res * 0.94, res * 0.94, height);
       tempObject.updateMatrix();
 
       instancedMeshRef.current.setMatrixAt(i, tempObject.matrix);
@@ -53,6 +69,8 @@ export function FoveatedGridMesh() {
         rgb = getElevationColor(cell.elevation);
       } else if (colorMode === 'traversability') {
         rgb = getTraversabilityColor(cell.traversability);
+      } else {
+        rgb = getSemanticColor(cell.semantic_class);
       }
 
       tempColor.setRGB(rgb[0], rgb[1], rgb[2]);
@@ -67,15 +85,17 @@ export function FoveatedGridMesh() {
     if (wireframeMeshRef.current) {
       wireframeMeshRef.current.instanceMatrix.needsUpdate = true;
     }
-  }, [displayCells, colorMode]);
+  }, [displayCells, colorMode, viewMode3D]);
 
   if (!layers.foveatedGrid && !layers.traversabilityMap && !layers.adaptiveGridWireframe) {
     return null;
   }
 
+  const effectiveOpacity = viewMode3D === 'foveated_elevation' ? 0.92 : gridOpacity;
+
   return (
     <group>
-      {/* 1. Solid Semi-Transparent Cell Blocks */}
+      {/* 1. Solid 2.5D Elevation & Foveated Cell Blocks */}
       <instancedMesh
         ref={instancedMeshRef}
         args={[undefined, undefined, displayCells.length]}
@@ -98,9 +118,9 @@ export function FoveatedGridMesh() {
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial
           transparent
-          opacity={gridOpacity}
-          roughness={0.35}
-          metalness={0.15}
+          opacity={effectiveOpacity}
+          roughness={0.3}
+          metalness={0.1}
         />
       </instancedMesh>
 
@@ -112,10 +132,10 @@ export function FoveatedGridMesh() {
         >
           <boxGeometry args={[1, 1, 1]} />
           <meshBasicMaterial
-            color="#38BDF8"
+            color={viewMode3D === 'foveated_elevation' ? '#60A5FA' : '#38BDF8'}
             wireframe
             transparent
-            opacity={0.35}
+            opacity={viewMode3D === 'foveated_elevation' ? 0.45 : 0.3}
           />
         </instancedMesh>
       )}

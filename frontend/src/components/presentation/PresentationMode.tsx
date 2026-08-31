@@ -3,81 +3,74 @@
 import React from 'react';
 import { useLidarStore } from '@/stores/useLidarStore';
 import {
-  ChevronLeft,
+  Sparkles,
   ChevronRight,
+  ChevronLeft,
   X,
   Radio,
-  Cpu,
-  Target,
-  Grid,
-  Mountain,
+  Layers,
   BarChart3,
-  Sparkles,
+  Cpu,
+  Eye,
+  MapPin,
 } from 'lucide-react';
 
-interface StepDetail {
+interface PresentationStep {
   step: number;
   title: string;
-  subtitle: string;
-  script: string;
-  icon: React.ElementType;
   tag: string;
+  script: string;
+  icon: any;
 }
 
-const PRESENTATION_STEPS: StepDetail[] = [
+const PRESENTATION_STEPS: PresentationStep[] = [
   {
     step: 1,
-    title: 'STEP 1 — RAW LiDAR SCAN',
-    subtitle: 'Massive Unfiltered Spatial Point Cloud',
+    title: '1. Raw Unfiltered LiDAR Stream',
+    tag: 'Stage 1 — Input Ingestion',
     script:
-      'This is the raw 3D LiDAR point cloud. It produces tens of thousands of unstructured (X, Y, Z, Intensity) measurements every second, posing heavy computational burdens.',
+      'Here is the unfiltered 3D LiDAR point cloud received directly from the sensor (10 Hz). Processing this raw volume uniformly causes severe memory bottlenecks.',
     icon: Radio,
-    tag: 'Raw 3D Scan',
   },
   {
     step: 2,
-    title: 'STEP 2 — AI PERCEPTION',
-    subtitle: 'Deep Learning Semantic Segmentation',
+    title: '2. Deep Learning Semantic Segmentation',
+    tag: 'Stage 2 — SPVCNN Inference',
     script:
-      'Our deep learning perception pipeline classifies every LiDAR point into semantic categories: drivable road surface, sidewalks, vehicles, pedestrians, poles, and terrain in real time.',
+      'Our deep neural network performs point-wise classification into 4 super-classes: Drivable (Blue), Non-Drivable (Yellow), Static Obstacles (Red), and Dynamic Vehicles (Green) with 53.59% mIoU.',
     icon: Cpu,
-    tag: 'PointNet++ / DL',
   },
   {
     step: 3,
-    title: 'STEP 3 — FOVEATED ATTENTION',
-    subtitle: 'Bio-Inspired Multi-Resolution Hierarchy',
+    title: '3. Distance-Adaptive Voxel Foveation',
+    tag: 'Stage 3 — Attention Geometry',
     script:
-      'We do not represent every region at the same spatial resolution. We mimic human foveal vision: dense attention near the ego vehicle, transitioning to coarser peripheral zones.',
-    icon: Target,
-    tag: 'Foveation Theory',
+      'We partition surrounding space into 3 foveated zones: Zone 0 (0-10m @ 5cm), Zone 1 (10-40m @ 15cm), and Zone 2 (40-100m @ 50cm) to mimic human vision focus.',
+    icon: Eye,
   },
   {
     step: 4,
-    title: 'STEP 4 — VARIABLE-RESOLUTION ADAPTIVE GRID',
-    subtitle: '5cm Near-Field to 50cm Peripheral Discretization',
+    title: '4. Variable-Resolution 2.5D Elevation Grid',
+    tag: 'Stage 4 — Spatial Quantization',
     script:
-      'The critical near/foveal region (0-10m) receives fine 5cm resolution for obstacle avoidance, while peripheral corridors use 10cm, 25cm, and 50cm cells to slash memory.',
-    icon: Grid,
-    tag: 'Adaptive Cells',
+      'Raw points are voxelized into a multi-resolution 2.5D elevation grid with heights and traversability scores, drastically compressing data while retaining crucial obstacle profiles.',
+    icon: Layers,
   },
   {
     step: 5,
-    title: 'STEP 5 — 2.5D SEMANTIC ELEVATION MAP',
-    subtitle: 'Ground Elevation, Surface Roughness & Traversability',
+    title: '5. 2.5D Semantic Elevation Map',
+    tag: 'Stage 5 — Navigation Surface',
     script:
-      'We aggregate points into a compact 2.5D representation storing ground elevation (Z), surface roughness, dominant semantic class, and drivability rating for navigation planners.',
-    icon: Mountain,
-    tag: '2.5D Elevation Map',
+      'The generated 2.5D elevation layer provides height gradients and traversability analysis for path planners, detecting curbs, ramps, potholes, and terrain slope.',
+    icon: MapPin,
   },
   {
     step: 6,
-    title: 'STEP 6 — BENCHMARK & EFFICIENCY ANALYSIS',
-    subtitle: 'Quantitative Comparison: Uniform vs. Foveated Grid',
+    title: '6. Quantitative Performance Benchmark',
+    tag: 'Stage 6 — Empirical Proof',
     script:
-      'We benchmark our foveated representation against a standard uniform 5cm grid, achieving ~82.8% memory reduction and 4.6x processing speedup with zero loss in near-field safety.',
+      'Comparing uniform 5cm mapping vs our 3-Zone Foveated model proves an 82.8% reduction in memory footprint and a 4.6x computational speedup at steady 10 Hz.',
     icon: BarChart3,
-    tag: 'Quantitative Proof',
   },
 ];
 
@@ -115,7 +108,7 @@ export function PresentationMode() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
             </span>
             <span className="text-xs font-bold text-sky-400 tracking-wider">
-              SIH PRESENTATION MODE — STEP {presentationStep} OF 6
+              PRESENTATION MODE — STEP {presentationStep} OF 6
             </span>
           </div>
 
@@ -182,7 +175,7 @@ export function PresentationMode() {
           </button>
 
           <span className="text-[10px] text-gray-400 font-sans">
-            Guided SIH Evaluation Flow
+            Guided Evaluation Flow
           </span>
 
           <button

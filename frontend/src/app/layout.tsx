@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Foveated LiDAR 2.5D Mapping Dashboard | SIH 2026',
+  title: 'Foveated LiDAR 2.5D Mapping Dashboard',
   description: 'Real-time multi-resolution foveated LiDAR perception & semantic elevation mapping platform',
 };
 

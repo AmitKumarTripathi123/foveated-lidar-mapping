@@ -252,7 +252,7 @@ interface LidarState {
 export const useLidarStore = create<LidarState>((set, get) => ({
   isConnected: false,
   datasets: [],
-  activeDatasetId: 'sih_urban_demo_01',
+  activeDatasetId: 'urban_driving_demo_01',
   totalFrames: 100,
   currentFrameIdx: 0,
   playbackState: 'running',
@@ -262,7 +262,7 @@ export const useLidarStore = create<LidarState>((set, get) => ({
     frame_id: 0,
     timestamp_ms: 1724544000000,
     total_points: initialScene.points.length,
-    sequence_id: 'sih_urban_demo_01',
+    sequence_id: 'urban_driving_demo_01',
     bounding_boxes: initialScene.boundingBoxes,
   },
   points: initialScene.points,
@@ -319,7 +319,115 @@ export const useLidarStore = create<LidarState>((set, get) => ({
     }),
 
   setActivePipelineStage: (stage) => set({ activePipelineStage: stage }),
-  setViewMode3D: (mode) => set({ viewMode3D: mode }),
+
+  setViewMode3D: (mode: ViewMode3D) => {
+    const currentLayers = get().layers;
+    switch (mode) {
+      case 'raw':
+        set({
+          viewMode3D: mode,
+          colorMode: 'intensity',
+          activePipelineStage: 'raw',
+          layers: {
+            ...currentLayers,
+            rawPoints: true,
+            semanticPoints: false,
+            foveatedGrid: false,
+            adaptiveGridWireframe: false,
+            zoneRings: false,
+            boundingBoxes: false,
+            traversabilityMap: false,
+          },
+        });
+        break;
+      case 'semantic':
+        set({
+          viewMode3D: mode,
+          colorMode: 'semantic',
+          activePipelineStage: 'semantic',
+          layers: {
+            ...currentLayers,
+            rawPoints: false,
+            semanticPoints: true,
+            foveatedGrid: false,
+            adaptiveGridWireframe: false,
+            zoneRings: false,
+            boundingBoxes: true,
+            traversabilityMap: false,
+          },
+        });
+        break;
+      case 'foveated':
+        set({
+          viewMode3D: mode,
+          colorMode: 'semantic',
+          activePipelineStage: 'foveation',
+          layers: {
+            ...currentLayers,
+            rawPoints: false,
+            semanticPoints: false,
+            foveatedGrid: true,
+            adaptiveGridWireframe: true,
+            zoneRings: true,
+            boundingBoxes: true,
+            traversabilityMap: false,
+          },
+        });
+        break;
+      case 'elevation':
+        set({
+          viewMode3D: mode,
+          colorMode: 'elevation',
+          activePipelineStage: 'data',
+          layers: {
+            ...currentLayers,
+            rawPoints: true,
+            semanticPoints: false,
+            foveatedGrid: false,
+            adaptiveGridWireframe: false,
+            zoneRings: false,
+            boundingBoxes: false,
+            traversabilityMap: false,
+          },
+        });
+        break;
+      case 'foveated_semantic':
+        set({
+          viewMode3D: mode,
+          colorMode: 'semantic',
+          activePipelineStage: 'variable_grid',
+          layers: {
+            ...currentLayers,
+            rawPoints: false,
+            semanticPoints: true,
+            foveatedGrid: true,
+            adaptiveGridWireframe: true,
+            zoneRings: true,
+            boundingBoxes: true,
+            traversabilityMap: false,
+          },
+        });
+        break;
+      case 'foveated_elevation':
+        set({
+          viewMode3D: mode,
+          colorMode: 'elevation',
+          activePipelineStage: 'elevation_25d',
+          layers: {
+            ...currentLayers,
+            rawPoints: false,
+            semanticPoints: false,
+            foveatedGrid: true,
+            adaptiveGridWireframe: true,
+            zoneRings: true,
+            boundingBoxes: false,
+            traversabilityMap: false,
+          },
+        });
+        break;
+    }
+  },
+
   setCameraPreset: (preset) => set({ cameraPreset: preset }),
   setColorMode: (mode) => set({ colorMode: mode }),
 
@@ -348,66 +456,20 @@ export const useLidarStore = create<LidarState>((set, get) => ({
     switch (stage) {
       case 'data':
       case 'raw':
-        set({
-          viewMode3D: 'raw',
-          colorMode: 'intensity',
-          layers: {
-            ...get().layers,
-            rawPoints: true,
-            semanticPoints: false,
-            foveatedGrid: false,
-            adaptiveGridWireframe: false,
-            zoneRings: false,
-            boundingBoxes: false,
-          },
-        });
+        get().setViewMode3D('raw');
         break;
       case 'ai':
       case 'semantic':
-        set({
-          viewMode3D: 'semantic',
-          colorMode: 'semantic',
-          layers: {
-            ...get().layers,
-            rawPoints: false,
-            semanticPoints: true,
-            foveatedGrid: false,
-            adaptiveGridWireframe: false,
-            zoneRings: false,
-            boundingBoxes: true,
-          },
-        });
+        get().setViewMode3D('semantic');
         break;
       case 'foveation':
+        get().setViewMode3D('foveated');
+        break;
       case 'variable_grid':
-        set({
-          viewMode3D: 'foveated_semantic',
-          colorMode: 'semantic',
-          layers: {
-            ...get().layers,
-            rawPoints: false,
-            semanticPoints: true,
-            foveatedGrid: true,
-            adaptiveGridWireframe: true,
-            zoneRings: true,
-            boundingBoxes: true,
-          },
-        });
+        get().setViewMode3D('foveated_semantic');
         break;
       case 'elevation_25d':
-        set({
-          viewMode3D: 'foveated_elevation',
-          colorMode: 'elevation',
-          layers: {
-            ...get().layers,
-            rawPoints: false,
-            semanticPoints: false,
-            foveatedGrid: true,
-            adaptiveGridWireframe: true,
-            zoneRings: true,
-            boundingBoxes: false,
-          },
-        });
+        get().setViewMode3D('foveated_elevation');
         break;
       case 'benchmark':
         set({ isComparisonOpen: true });
@@ -419,22 +481,22 @@ export const useLidarStore = create<LidarState>((set, get) => ({
     set({ isPresentationMode: true, presentationStep: step });
     switch (step) {
       case 1:
-        get().applyPipelinePreset('raw');
+        get().setViewMode3D('raw');
         break;
       case 2:
-        get().applyPipelinePreset('semantic');
+        get().setViewMode3D('semantic');
         break;
       case 3:
-        get().applyPipelinePreset('foveation');
+        get().setViewMode3D('foveated');
         break;
       case 4:
-        get().applyPipelinePreset('variable_grid');
+        get().setViewMode3D('foveated_semantic');
         break;
       case 5:
-        get().applyPipelinePreset('elevation_25d');
+        get().setViewMode3D('foveated_elevation');
         break;
       case 6:
-        get().applyPipelinePreset('benchmark');
+        set({ isComparisonOpen: true });
         break;
     }
   },

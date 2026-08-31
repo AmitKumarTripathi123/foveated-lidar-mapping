@@ -6,19 +6,19 @@ export const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:800
 export const CAMERA_POSITIONS: Record<CameraViewPreset, { pos: [number, number, number]; target: [number, number, number] }> = {
   perspective: {
     pos: [0, -38, 28],
-    target: [0, 0, -1],
+    target: [0, 10, -1],
   },
   top: {
-    pos: [0, 0.1, 95],
-    target: [0, 0, 0],
+    pos: [0, 15, 95],
+    target: [0, 15, 0],
   },
   front: {
-    pos: [0, -42, 4],
-    target: [0, 8, 0],
+    pos: [0, -32, 2.5],
+    target: [0, 25, -0.5],
   },
   side: {
-    pos: [-45, 0, 12],
-    target: [0, 0, 0],
+    pos: [-55, 15, 12],
+    target: [0, 15, 0],
   },
 };
 

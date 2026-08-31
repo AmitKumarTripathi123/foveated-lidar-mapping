@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useLidarStore } from '@/stores/useLidarStore';
-import { fetchDatasets, loadDataset } from '@/lib/api';
+import { fetchDatasets, switchDataset } from '@/lib/api';
 import { Database, Disc } from 'lucide-react';
 
 export function DatasetSelector() {
@@ -12,30 +12,36 @@ export function DatasetSelector() {
   const setActiveDatasetId = useLidarStore((state) => state.setActiveDatasetId);
 
   useEffect(() => {
-    fetchDatasets()
-      .then((data) => {
-        setDatasets(data);
-      })
-      .catch((err) => {
-        console.warn('Backend offline or using fallback mock datasets:', err);
-      });
+    async function load() {
+      try {
+        const data = await fetchDatasets();
+        if (data && data.datasets) {
+          setDatasets(data.datasets);
+        }
+      } catch (err) {
+        console.error('Failed to load dataset list:', err);
+      }
+    }
+    load();
   }, [setDatasets]);
 
   const handleSelect = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = e.target.value;
-    setActiveDatasetId(id);
+    const newId = e.target.value;
+    setActiveDatasetId(newId);
     try {
-      await loadDataset(id);
+      await switchDataset(newId);
     } catch (err) {
-      console.error('Failed to load dataset:', err);
+      console.error('Failed to switch dataset sequence:', err);
     }
   };
 
   return (
-    <div className="bg-surface/80 backdrop-blur-md border border-border-color rounded-xl p-3 shadow-lg flex flex-col gap-2 text-white font-mono text-xs">
-      <div className="flex items-center gap-1.5 text-gray-400">
-        <Database className="w-3.5 h-3.5 text-brand-500" />
-        <span className="font-bold tracking-wide">LiDAR Sequence:</span>
+    <div className="space-y-2 font-mono">
+      <div className="flex items-center justify-between text-xs text-gray-400 font-bold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5">
+          <Database className="w-3.5 h-3.5 text-brand-500" />
+          <span>LiDAR Sequence:</span>
+        </div>
       </div>
 
       <div className="relative">
@@ -47,11 +53,11 @@ export function DatasetSelector() {
           {datasets.length > 0 ? (
             datasets.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.name} ({d.total_frames} frames)
+                {d.name.replace(/^SIH\s+/i, '')} ({d.total_frames} frames)
               </option>
             ))
           ) : (
-            <option value="sih_urban_demo_01">SIH Urban Driving Sequence 01 (100 frames)</option>
+            <option value="sih_urban_demo_01">Urban Driving Sequence 01 (100 frames)</option>
           )}
         </select>
         <Disc className="w-4 h-4 text-gray-400 absolute right-2.5 top-2.5 pointer-events-none" />
