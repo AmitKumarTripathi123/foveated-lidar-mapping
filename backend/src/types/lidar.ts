@@ -33,17 +33,22 @@ export interface FrameMetadata {
 }
 
 export interface FoveatedCell {
+  id: string;
   x: number;
   y: number;
   elevation: number;
   resolution: number;
+  cellSize: number;
   zone_id: number;
+  zone_name: string;
   semantic_class: number;
   class_name: string;
   confidence: number;
   point_count: number;
+  sourcePointCount: number;
   traversability: number;
   roughness: number;
+  occupied: boolean;
 }
 
 export interface FoveatedMapFrame {

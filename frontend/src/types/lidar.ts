@@ -33,17 +33,22 @@ export interface FrameMetadata {
 }
 
 export interface FoveatedCell {
+  id: string;
   x: number;
   y: number;
   elevation: number;
   resolution: number;
+  cellSize: number;
   zone_id: number;
+  zone_name: string;
   semantic_class: number;
   class_name: string;
   confidence: number;
   point_count: number;
+  sourcePointCount: number;
   traversability: number;
   roughness: number;
+  occupied: boolean;
 }
 
 export interface FoveatedMapFrame {
@@ -102,6 +107,15 @@ export interface DatasetInfo {
   sensor_type: string;
 }
 
+export interface FoveatedZoneConfig {
+  zone_id: number;
+  name: string;
+  radius_min: number;
+  radius_max: number;
+  resolution: number;
+  description: string;
+}
+
 export type PipelineStageId = 
   | 'data'
   | 'raw'
@@ -119,6 +133,9 @@ export type ViewMode3D =
   | 'elevation'
   | 'foveated_semantic'
   | 'foveated_elevation';
+
+export type GridDisplayMode = 'grid' | 'points' | 'both';
+export type GridRenderStyle = 'top_down_2d' | 'extruded_3d';
 
 export type CameraViewPreset = 'perspective' | 'top' | 'front' | 'side';
 

@@ -448,10 +448,10 @@ export class RealDatasetLoader {
     return { rawPoints, semanticPoints, boundingBoxes };
   }
 
-  // 3-Zone Foveated Grid Generation following Amit's 2.5D Mapping Spec:
+  // 3-Zone Distance-Adaptive Foveated Grid Generation:
   // Zone 0 (0-10m): 0.05m (5cm)
-  // Zone 1 (10-40m): 0.15m (15cm)
-  // Zone 2 (40-100m): 0.50m (50cm)
+  // Zone 1 (10-50m): 0.25m (25cm)
+  // Zone 2 (50-100m): 0.50m (50cm)
   public generateFoveatedGrid(semanticPoints: SemanticPoint[]): {
     cells: FoveatedCell[];
     gridLatencyMs: number;
@@ -461,18 +461,20 @@ export class RealDatasetLoader {
 
     for (const pt of semanticPoints) {
       const dist = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+      if (dist > 100.0) continue; // 100m cutoff
+
       let zoneId = 0;
       let res = 0.05;
 
       if (dist <= 10.0) {
         zoneId = 0;
         res = 0.05; // 5 cm near-field
-      } else if (dist <= 40.0) {
+      } else if (dist <= 50.0) {
         zoneId = 1;
-        res = 0.15; // 15 cm mid-field
+        res = 0.25; // 25 cm intermediate
       } else {
         zoneId = 2;
-        res = 0.50; // 50 cm far-field
+        res = 0.50; // 50 cm peripheral
       }
 
       const cx = Number((Math.floor(pt.x / res) * res + res / 2.0).toFixed(3));
@@ -486,8 +488,10 @@ export class RealDatasetLoader {
     }
 
     const cells: FoveatedCell[] = [];
+    let counter = 0;
 
     for (const [, item] of cellMap.entries()) {
+      counter++;
       const { pts, zoneId, res, cx, cy } = item;
       let sumZ = 0;
       const classCounts: Record<number, number> = {};
@@ -519,18 +523,30 @@ export class RealDatasetLoader {
         traversability = Math.max(0.3, Number((traversability - roughness).toFixed(2)));
       }
 
+      const zoneName =
+        zoneId === 0
+          ? 'ZONE 0 — FOVEAL (0–10m @ 5cm)'
+          : zoneId === 1
+          ? 'ZONE 1 — INTERMEDIATE (10–50m @ ~25cm)'
+          : 'ZONE 2 — PERIPHERAL (50–100m @ 50cm)';
+
       cells.push({
+        id: `G${zoneId}_${String(counter).padStart(5, '0')}`,
         x: cx,
         y: cy,
         elevation: meanZ,
         resolution: res,
+        cellSize: res,
         zone_id: zoneId,
+        zone_name: zoneName,
         semantic_class: domClass,
         class_name: PROJECT_CLASSES[domClass] || 'drivable_terrain',
         confidence: 0.95,
         point_count: pts.length,
+        sourcePointCount: pts.length,
         traversability,
         roughness,
+        occupied: true,
       });
     }
 

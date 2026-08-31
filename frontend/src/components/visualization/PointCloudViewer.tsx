@@ -13,6 +13,7 @@ export function PointCloudViewer() {
   const points = useLidarStore((state) => state.points);
   const colorMode = useLidarStore((state) => state.colorMode);
   const layers = useLidarStore((state) => state.layers);
+  const gridDisplayMode = useLidarStore((state) => state.gridDisplayMode);
   const pointSize = useLidarStore((state) => state.pointSize);
 
   const geometryRef = useRef<THREE.BufferGeometry>(null);
@@ -30,16 +31,16 @@ export function PointCloudViewer() {
       pos[idx + 1] = pt.y;
       pos[idx + 2] = pt.z;
 
-      let rgb: [number, number, number] = [0.8, 0.8, 0.8];
+      let rgb: [number, number, number] = [0.13, 0.77, 0.37];
 
       if (colorMode === 'semantic') {
         rgb = getSemanticColor(pt.semantic_class);
       } else if (colorMode === 'elevation') {
         rgb = getElevationColor(pt.z);
       } else if (colorMode === 'traversability') {
-        rgb = getTraversabilityColor(pt.semantic_class === 1 ? 1.0 : (pt.semantic_class === 2 ? 0.4 : 0.0));
+        rgb = getTraversabilityColor(pt.semantic_class === 0 ? 1.0 : (pt.semantic_class === 1 ? 0.35 : 0.0));
       } else if (colorMode === 'intensity') {
-        const val = pt.intensity || 1.0;
+        const val = pt.intensity || 0.85;
         rgb = [val, val, val];
       }
 
@@ -65,7 +66,12 @@ export function PointCloudViewer() {
     }
   }, [positions, colors]);
 
-  if (!layers.semanticPoints && !layers.rawPoints) return null;
+  // If in pure GRID MAP mode, do not render point cloud so the clean 2.5D grid engine is highlighted
+  if (gridDisplayMode === 'grid') return null;
+  if (!layers.semanticPoints && !layers.rawPoints && gridDisplayMode !== 'both') return null;
+
+  const pointOpacity = gridDisplayMode === 'both' ? 0.38 : 0.92;
+  const renderedPointSize = gridDisplayMode === 'both' ? Math.max(2.0, pointSize * 0.8) : pointSize;
 
   return (
     <points>
@@ -80,11 +86,11 @@ export function PointCloudViewer() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={pointSize}
+        size={renderedPointSize}
         vertexColors
         sizeAttenuation={false}
         transparent
-        opacity={0.9}
+        opacity={pointOpacity}
       />
     </points>
   );
