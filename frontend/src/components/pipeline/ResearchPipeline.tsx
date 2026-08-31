@@ -12,8 +12,6 @@ import {
   Grid,
   Mountain,
   BarChart3,
-  CheckCircle2,
-  PlayCircle,
 } from 'lucide-react';
 
 interface StageDef {
@@ -21,13 +19,12 @@ interface StageDef {
   label: string;
   sublabel: string;
   icon: React.ElementType;
-  status: 'READY' | 'PROCESSING' | 'COMPLETE';
+  status: 'COMPLETE' | 'LIVE' | 'READY';
 }
 
 export function ResearchPipeline() {
   const activePipelineStage = useLidarStore((state) => state.activePipelineStage);
   const applyPipelinePreset = useLidarStore((state) => state.applyPipelinePreset);
-  const playbackState = useLidarStore((state) => state.playbackState);
 
   const stages: StageDef[] = [
     {
@@ -39,7 +36,7 @@ export function ResearchPipeline() {
     },
     {
       id: 'raw',
-      label: '2. RAW LiDAR SCAN',
+      label: '2. RAW LIDAR SCAN',
       sublabel: 'Unfiltered 3D Point Cloud',
       icon: Radio,
       status: 'COMPLETE',
@@ -49,7 +46,7 @@ export function ResearchPipeline() {
       label: '3. AI PERCEPTION',
       sublabel: 'Semantic Segmentation Model',
       icon: Cpu,
-      status: playbackState === 'running' ? 'PROCESSING' : 'COMPLETE',
+      status: 'COMPLETE',
     },
     {
       id: 'semantic',
@@ -68,7 +65,7 @@ export function ResearchPipeline() {
     {
       id: 'variable_grid',
       label: '6. VARIABLE GRID',
-      sublabel: '5cm Near to 50cm Peripheral',
+      sublabel: 'Foveated Grid Generation',
       icon: Grid,
       status: 'COMPLETE',
     },
@@ -77,7 +74,7 @@ export function ResearchPipeline() {
       label: '7. 2.5D ELEVATION MAP',
       sublabel: 'Terrain, Height & Traversability',
       icon: Mountain,
-      status: 'COMPLETE',
+      status: 'LIVE',
     },
     {
       id: 'benchmark',
@@ -89,36 +86,35 @@ export function ResearchPipeline() {
   ];
 
   return (
-    <div className="bg-[#0B0F19]/90 backdrop-blur-md border border-border-color rounded-xl p-3 shadow-lg flex flex-col gap-2 font-mono text-xs text-white">
-      <div className="flex items-center justify-between border-b border-border-color/60 pb-2">
-        <div className="flex items-center gap-1.5 font-bold text-[11px] text-sky-400">
-          <Target className="w-3.5 h-3.5 text-sky-400" />
-          <span className="uppercase tracking-wider">Research Pipeline</span>
+    <div className="bg-[#0B0F19]/90 backdrop-blur-md border border-[#1E293B] rounded-xl p-3 shadow-lg flex flex-col gap-2 font-mono text-xs text-white">
+      <div className="flex items-center justify-between border-b border-[#1E293B]/80 pb-2">
+        <div className="font-bold text-[11px] text-sky-400 tracking-wider">
+          RESEARCH PIPELINE
         </div>
         <span className="text-[9px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded font-bold">
-          LIVE SYSTEM
+          LIVE
         </span>
       </div>
 
       <div className="flex flex-col gap-1">
         {stages.map((stage) => {
           const Icon = stage.icon;
-          const isActive = activePipelineStage === stage.id;
+          const isActive = activePipelineStage === stage.id || (activePipelineStage === 'elevation_25d' && stage.id === 'elevation_25d');
 
           return (
             <button
               key={stage.id}
               onClick={() => applyPipelinePreset(stage.id)}
-              className={`flex items-center justify-between p-2 rounded-lg text-left transition-all border ${
+              className={`flex items-center justify-between p-2 rounded-xl text-left transition-all border ${
                 isActive
-                  ? 'bg-sky-950/60 border-sky-500/60 text-white shadow-md shadow-sky-950/40'
-                  : 'bg-surface-highlight/30 border-transparent hover:bg-surface-highlight/70 text-gray-300'
+                  ? 'bg-[#4338CA]/30 border-[#6366F1] text-white shadow-md shadow-indigo-950/50'
+                  : 'bg-[#0F172A]/40 border-transparent hover:bg-[#1E293B]/50 text-gray-300'
               }`}
             >
               <div className="flex items-center gap-2">
                 <div
-                  className={`p-1 rounded ${
-                    isActive ? 'bg-sky-600 text-white' : 'bg-surface text-gray-400'
+                  className={`p-1.5 rounded-lg ${
+                    isActive ? 'bg-[#6366F1] text-white' : 'bg-[#1E293B] text-gray-400'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -134,23 +130,14 @@ export function ResearchPipeline() {
               </div>
 
               {/* Status Indicator */}
-              <div className="flex items-center gap-1 shrink-0 ml-2">
+              <div className="flex items-center gap-1 shrink-0 ml-1.5">
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    stage.status === 'PROCESSING'
-                      ? 'bg-amber-400 animate-pulse'
+                  className={`text-[8px] font-bold px-1.5 py-0.2 rounded border ${
+                    stage.status === 'LIVE'
+                      ? 'bg-[#6366F1]/20 text-[#A5B4FC] border-[#6366F1]/40'
                       : stage.status === 'COMPLETE'
-                      ? 'bg-emerald-400'
-                      : 'bg-sky-400'
-                  }`}
-                />
-                <span
-                  className={`text-[9px] font-bold ${
-                    stage.status === 'PROCESSING'
-                      ? 'text-amber-400'
-                      : stage.status === 'COMPLETE'
-                      ? 'text-emerald-400'
-                      : 'text-sky-400'
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                      : 'bg-sky-500/10 text-sky-400 border-sky-500/20'
                   }`}
                 >
                   {stage.status}
