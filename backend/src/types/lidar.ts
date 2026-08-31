@@ -37,6 +37,9 @@ export interface FoveatedCell {
   x: number;
   y: number;
   elevation: number;
+  minElevation: number;
+  maxElevation: number;
+  meanElevation: number;
   resolution: number;
   cellSize: number;
   zone_id: number;
@@ -46,6 +49,7 @@ export interface FoveatedCell {
   confidence: number;
   point_count: number;
   sourcePointCount: number;
+  classHistogram: Record<number, number>;
   traversability: number;
   roughness: number;
   occupied: boolean;

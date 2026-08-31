@@ -37,6 +37,9 @@ export interface FoveatedCell {
   x: number;
   y: number;
   elevation: number;
+  minElevation: number;
+  maxElevation: number;
+  meanElevation: number;
   resolution: number;
   cellSize: number;
   zone_id: number;
@@ -46,9 +49,32 @@ export interface FoveatedCell {
   confidence: number;
   point_count: number;
   sourcePointCount: number;
+  classHistogram: Record<number, number>;
   traversability: number;
   roughness: number;
   occupied: boolean;
+  frame_id?: number;
+}
+
+export interface DistanceZoneBreakdown {
+  zoneId: number;
+  name: string;
+  radiusRange: string;
+  resolutionM: number;
+  cellCount: number;
+  occupiedCount: number;
+  memoryKb: number;
+  latencyMs: number;
+  avgPointsPerCell: number;
+}
+
+export interface GridValidationResult {
+  isValid: boolean;
+  duplicateCount: number;
+  misalignedCount: number;
+  coverageRadiusM: number;
+  totalOccupiedCells: number;
+  statusMessage: string;
 }
 
 export interface FoveatedMapFrame {
@@ -57,6 +83,8 @@ export interface FoveatedMapFrame {
   total_cells: number;
   zone_distribution: Record<number, number>;
   cells: FoveatedCell[];
+  validation: GridValidationResult;
+  zone_breakdowns: DistanceZoneBreakdown[];
 }
 
 export interface SystemMetrics {
@@ -95,6 +123,7 @@ export interface BenchmarkComparison {
   frame_id: number;
   uniform: UniformGridMetrics;
   foveated: FoveatedGridMetrics;
+  zone_breakdowns: DistanceZoneBreakdown[];
 }
 
 export interface DatasetInfo {

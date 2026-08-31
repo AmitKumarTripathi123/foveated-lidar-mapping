@@ -530,11 +530,21 @@ export class RealDatasetLoader {
           ? 'ZONE 1 — INTERMEDIATE (10–50m @ ~25cm)'
           : 'ZONE 2 — PERIPHERAL (50–100m @ 50cm)';
 
+      let minZ = Infinity;
+      let maxZ = -Infinity;
+      for (const p of pts) {
+        if (p.z < minZ) minZ = p.z;
+        if (p.z > maxZ) maxZ = p.z;
+      }
+
       cells.push({
         id: `G${zoneId}_${String(counter).padStart(5, '0')}`,
         x: cx,
         y: cy,
         elevation: meanZ,
+        minElevation: Number(minZ.toFixed(3)),
+        maxElevation: Number(maxZ.toFixed(3)),
+        meanElevation: meanZ,
         resolution: res,
         cellSize: res,
         zone_id: zoneId,
@@ -544,6 +554,7 @@ export class RealDatasetLoader {
         confidence: 0.95,
         point_count: pts.length,
         sourcePointCount: pts.length,
+        classHistogram: classCounts,
         traversability,
         roughness,
         occupied: true,

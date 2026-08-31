@@ -7,16 +7,18 @@ import { useLidarStore } from '@/stores/useLidarStore';
 export function useWebSocketStream() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const localTickerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const {
-    setIsConnected,
-    setFrameData,
-    playbackState,
-    targetFps,
-    setPlaybackState,
-  } = useLidarStore();
+  const isConnected = useLidarStore((state) => state.isConnected);
+  const setIsConnected = useLidarStore((state) => state.setIsConnected);
+  const setFrameData = useLidarStore((state) => state.setFrameData);
+  const playbackState = useLidarStore((state) => state.playbackState);
+  const targetFps = useLidarStore((state) => state.targetFps);
+  const setPlaybackState = useLidarStore((state) => state.setPlaybackState);
+  const stepFrame = useLidarStore((state) => state.stepFrame);
+  const setCurrentFrameIdx = useLidarStore((state) => state.setCurrentFrameIdx);
 
-  // Initial HTTP Fetch so data is loaded instantly even before WebSocket handshake
+  // Initial HTTP Fetch so data is loaded instantly
   const fetchInitialFrame = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/processing/frame/0`);
@@ -27,7 +29,7 @@ export function useWebSocketStream() {
         }
       }
     } catch (err) {
-      console.warn('Initial REST frame fetch failed, waiting for WebSocket:', err);
+      console.warn('Initial REST frame fetch, fallback to client-side engine');
     }
   }, [setFrameData]);
 
@@ -38,9 +40,7 @@ export function useWebSocketStream() {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('Connected to LiDAR WebSocket Stream');
         setIsConnected(true);
-        // Request play stream immediately
         ws.send(JSON.stringify({ action: 'play', payload: { fps: 10.0, mode: 'foveated' } }));
       };
 
@@ -59,17 +59,16 @@ export function useWebSocketStream() {
         setIsConnected(false);
         wsRef.current = null;
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = setTimeout(connect, 1500);
+        reconnectTimeoutRef.current = setTimeout(connect, 2000);
       };
 
-      ws.onerror = (err) => {
+      ws.onerror = () => {
         setIsConnected(false);
-        ws.close();
       };
     } catch (err) {
       setIsConnected(false);
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = setTimeout(connect, 1500);
+      reconnectTimeoutRef.current = setTimeout(connect, 2000);
     }
   }, [setIsConnected, setFrameData]);
 
@@ -85,6 +84,26 @@ export function useWebSocketStream() {
       }
     };
   }, [connect, fetchInitialFrame]);
+
+  // Local fallback ticker ensuring seamless real-time playback
+  useEffect(() => {
+    if (playbackState === 'running' && !isConnected) {
+      const intervalMs = Math.max(30, 1000 / targetFps);
+      localTickerRef.current = setInterval(() => {
+        stepFrame(1);
+      }, intervalMs);
+    } else {
+      if (localTickerRef.current) {
+        clearInterval(localTickerRef.current);
+        localTickerRef.current = null;
+      }
+    }
+    return () => {
+      if (localTickerRef.current) {
+        clearInterval(localTickerRef.current);
+      }
+    };
+  }, [playbackState, isConnected, targetFps, stepFrame]);
 
   const sendAction = useCallback((action: string, payload: any = {}) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -107,14 +126,16 @@ export function useWebSocketStream() {
 
   const stop = useCallback(() => {
     setPlaybackState('idle');
+    setCurrentFrameIdx(0);
     sendAction('stop');
-  }, [sendAction, setPlaybackState]);
+  }, [sendAction, setPlaybackState, setCurrentFrameIdx]);
 
   const seek = useCallback(
     (frameId: number) => {
+      setCurrentFrameIdx(frameId);
       sendAction('seek', { frame_id: frameId });
     },
-    [sendAction]
+    [sendAction, setCurrentFrameIdx]
   );
 
   const setFps = useCallback(
