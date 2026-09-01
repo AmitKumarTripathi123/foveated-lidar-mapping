@@ -134,13 +134,13 @@ export const METRIC_PROVENANCE_TABLE: MetricProvenanceEntry[] = [
     metric: 'Pipeline Throughput',
     value: '31.3\u201333.0 Hz',
     classification: 'DERIVED',
-    provenance: 'Calculated as 1000 / (AI + Grid Pipeline Latency); meets 30 Hz target',
+    provenance: 'Throughput = 1000 / Pipeline Latency(ms); 30.3 ms \u2192 33.0 Hz, 32.0 ms \u2192 31.3 Hz',
   },
   {
-    metric: 'LiDAR Spin Rate',
+    metric: 'LiDAR Acquisition Rate',
     value: '10.0 Hz',
     classification: 'SPECIFICATION',
-    provenance: 'Standard physical LiDAR sensor acquisition frequency (100 ms period)',
+    provenance: 'Configured/reference LiDAR acquisition rate: 10 Hz',
   },
   {
     metric: 'Buffer Footprint',
@@ -149,10 +149,10 @@ export const METRIC_PROVENANCE_TABLE: MetricProvenanceEntry[] = [
     provenance: '64 B/cell struct model: 340,549 \u00d7 64 B vs 12,566,370 \u00d7 64 B',
   },
   {
-    metric: 'Host Process RAM',
+    metric: 'Host Process Memory (Node RSS)',
     value: '134.8 MB',
-    classification: 'ESTIMATED',
-    provenance: 'Node.js process heap memory baseline',
+    classification: 'MEASURED (LIVE)',
+    provenance: 'process.memoryUsage().rss in backend Node.js process runtime',
   },
   {
     metric: 'WebGL FPS',

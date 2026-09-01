@@ -51,8 +51,8 @@ export function MappingAnalytics() {
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">LiDAR Spin Rate:</span>
-            <span className="font-bold text-gray-200">10.0 Hz (Sensor Rate)</span>
+            <span className="text-gray-400">LiDAR Acquisition Rate:</span>
+            <span className="font-bold text-gray-200">10.0 Hz (Configured Ref)</span>
           </div>
         </div>
       </div>

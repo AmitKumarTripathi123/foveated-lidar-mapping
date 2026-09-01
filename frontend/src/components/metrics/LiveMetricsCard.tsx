@@ -39,9 +39,9 @@ export function LiveMetricsCard() {
         <div className="flex items-center gap-2 bg-[#0B0F19] px-2.5 py-1 rounded-lg border border-[#1E293B]">
           <Activity className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-[8px] text-gray-400 leading-tight">SPIN RATE</span>
+            <span className="text-[8px] text-gray-400 leading-tight">LIDAR RATE</span>
             <span className="font-bold text-emerald-400 text-[10px] leading-tight">
-              10.0 <span className="text-[8px] text-gray-500">Hz</span>
+              10.0 <span className="text-[8px] text-gray-500">Hz (REF)</span>
             </span>
           </div>
         </div>

@@ -420,20 +420,29 @@ export function ComparisonModal() {
                     </span>
                   </div>
                   <div className="bg-[#070A12] p-3 rounded border border-border-color/60 font-mono text-[11px] text-gray-300 space-y-1.5">
-                    <div>Foveated Address Space Capacity (Annular Integration):</div>
-                    <div className="text-sky-300 pl-2">
-                      N_foveated = [&pi; &times; 10&sup2; / 0.05&sup2;] + [&pi; &times; (50&sup2; - 10&sup2;) / 0.25&sup2;] + [&pi; &times; (100&sup2; - 50&sup2;) / 0.50&sup2;]
+                    <div>
+                      <span className="text-sky-400 font-semibold">Zone 0:</span> N₀ = &pi;(10&sup2;) / (0.05&sup2;) &asymp; 125,664 cells
                     </div>
-                    <div className="text-gray-400 pl-2">
-                      = 125,664 + 120,637 + 94,248 = 340,549 cells
+                    <div>
+                      <span className="text-emerald-400 font-semibold">Zone 1:</span> N₁ = &pi;(50&sup2; &minus; 10&sup2;) / (0.25&sup2;) &asymp; 120,637 cells
                     </div>
-                    <div className="pt-1">Uniform 5 cm Baseline Capacity:</div>
-                    <div className="text-red-300 pl-2">
-                      N_uniform = [&pi; &times; 100&sup2; / 0.05&sup2;] = 12,566,370 cells
+                    <div>
+                      <span className="text-purple-400 font-semibold">Zone 2:</span> N₂ = &pi;(100&sup2; &minus; 50&sup2;) / (0.50&sup2;) &asymp; 94,248 cells
                     </div>
-                    <div className="pt-1">Theoretical Address Space Reduction:</div>
-                    <div className="text-emerald-300 pl-2 font-bold">
-                      &Delta;N = (12,566,370 - 340,549) / 12,566,370 &times; 100% = 97.29%
+                    <div className="pt-1 border-t border-border-color/40 text-white font-bold">
+                      Total: Nfoveated = N₀ + N₁ + N₂ = 340,549 cells
+                    </div>
+                    <div className="text-red-300">
+                      Uniform: Nuniform = &pi;(100&sup2;) / (0.05&sup2;) &asymp; 12,566,370 cells
+                    </div>
+                    <div className="text-emerald-300 font-bold">
+                      Reduction: ((12,566,370 &minus; 340,549) / 12,566,370) &times; 100 = 97.29%
+                    </div>
+                    <div className="pt-1 border-t border-border-color/40 text-amber-300">
+                      Throughput = 1000 / Pipeline Latency(ms) [DERIVED]
+                      <span className="text-gray-400 block text-[10px]">
+                        Range: 30.3 ms &rarr; 33.0 Hz | 32.0 ms &rarr; 31.3 Hz
+                      </span>
                     </div>
                   </div>
                 </div>
