@@ -61,11 +61,15 @@ export interface DistanceZoneBreakdown {
   name: string;
   radiusRange: string;
   resolutionM: number;
-  cellCount: number;
+  theoreticalCapacity: number;
   occupiedCount: number;
-  memoryKb: number;
-  latencyMs: number;
+  occupancyRatePercent: number;
+  estimatedMemoryKb: number;
+  gridLatencyMs: number;
   avgPointsPerCell: number;
+  cellCount?: number;
+  memoryKb?: number;
+  latencyMs?: number;
 }
 
 export interface GridValidationResult {
@@ -102,6 +106,14 @@ export interface SystemMetrics {
 
 export interface UniformGridMetrics {
   resolution_m: number;
+  coverage_radius_m: number;
+  theoretical_capacity: number;
+  occupied_cells: number;
+  estimated_memory_mb: number;
+  grid_latency_ms: number;
+  pipeline_latency_ms: number;
+  grid_throughput_fps: number;
+  pipeline_throughput_fps: number;
   cell_count: number;
   memory_mb: number;
   processing_latency_ms: number;
@@ -110,12 +122,25 @@ export interface UniformGridMetrics {
 
 export interface FoveatedGridMetrics {
   near_resolution_m: number;
+  mid_resolution_m: number;
   far_resolution_m: number;
+  coverage_radius_m: number;
+  theoretical_capacity: number;
+  occupied_cells: number;
+  estimated_memory_mb: number;
+  grid_latency_ms: number;
+  pipeline_latency_ms: number;
+  grid_throughput_fps: number;
+  pipeline_throughput_fps: number;
+  theoretical_capacity_reduction_percent: number;
+  occupied_cell_reduction_percent: number;
+  memory_savings_percent: number;
+  grid_speedup_factor: number;
+  pipeline_speedup_factor: number;
   cell_count: number;
   memory_mb: number;
   processing_latency_ms: number;
   fps: number;
-  memory_savings_percent: number;
   speedup_factor: number;
 }
 

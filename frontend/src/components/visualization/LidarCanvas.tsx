@@ -163,21 +163,21 @@ export function LidarCanvas() {
             <span className="w-3 h-3 rounded-sm bg-[#0284C7] shrink-0" />
             <div>
               <div className="font-bold text-white text-[10px]">ZONE 0 — FOVEAL (NEAR)</div>
-              <div className="text-[9px] text-gray-400">Res: 0.10m / cell</div>
+              <div className="text-[9px] text-gray-400">0–10m @ 0.05m (5cm) / cell</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-sm bg-[#16A34A] shrink-0" />
             <div>
               <div className="font-bold text-white text-[10px]">ZONE 1 — INTERMEDIATE</div>
-              <div className="text-[9px] text-gray-400">Res: 0.20m / cell</div>
+              <div className="text-[9px] text-gray-400">10–50m @ ~0.25m (25cm) / cell</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-sm bg-[#F59E0B] shrink-0" />
             <div>
               <div className="font-bold text-white text-[10px]">ZONE 2 — PERIPHERAL</div>
-              <div className="text-[9px] text-gray-400">Res: 0.50m / cell</div>
+              <div className="text-[9px] text-gray-400">50–100m @ 0.50m (50cm) / cell</div>
             </div>
           </div>
           <div className="flex items-center gap-2 pt-1 border-t border-border-color/40">

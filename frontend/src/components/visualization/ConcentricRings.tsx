@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import * as THREE from 'three';
 import { Html } from '@react-three/drei';
 import { useLidarStore } from '@/stores/useLidarStore';
 import { FOVEATED_ZONE_COLORS } from '@/lib/semanticColors';
@@ -67,7 +68,7 @@ export function ConcentricRings() {
                 }
                 geo.setAttribute(
                   'position',
-                  new Float32BufferAttribute(points, 3)
+                  new THREE.Float32BufferAttribute(points, 3)
                 );
               }}
             />

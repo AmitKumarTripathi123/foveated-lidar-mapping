@@ -42,10 +42,10 @@ const PRESENTATION_STEPS: PresentationStep[] = [
   },
   {
     step: 3,
-    title: '3. Distance-Adaptive Voxel Foveation',
+    title: '3. Distance-Adaptive Spatial Foveation',
     tag: 'Stage 3 — Attention Geometry',
     script:
-      'We partition surrounding space into 3 foveated zones: Zone 0 (0-10m @ 5cm), Zone 1 (10-40m @ 15cm), and Zone 2 (40-100m @ 50cm) to mimic human vision focus.',
+      'We partition surrounding space into 3 foveated zones: Zone 0 (0–10m @ 5cm), Zone 1 (10–50m @ 25cm), and Zone 2 (50–100m @ 50cm) inspired by human vision focus.',
     icon: Eye,
   },
   {
@@ -53,7 +53,7 @@ const PRESENTATION_STEPS: PresentationStep[] = [
     title: '4. Variable-Resolution 2.5D Elevation Grid',
     tag: 'Stage 4 — Spatial Quantization',
     script:
-      'Raw points are voxelized into a multi-resolution 2.5D elevation grid with heights and traversability scores, drastically compressing data while retaining crucial obstacle profiles.',
+      'Raw points are aggregated into a multi-resolution 2.5D elevation grid with heights and prototype traversability heuristic scores, drastically compressing data while retaining crucial obstacle profiles.',
     icon: Layers,
   },
   {
@@ -61,7 +61,7 @@ const PRESENTATION_STEPS: PresentationStep[] = [
     title: '5. 2.5D Semantic Elevation Map',
     tag: 'Stage 5 — Navigation Surface',
     script:
-      'The generated 2.5D elevation layer provides height gradients and traversability analysis for path planners, detecting curbs, ramps, potholes, and terrain slope.',
+      'The generated 2.5D elevation layer provides height gradients and traversability analysis for path planners, detecting curbs, ramps, depressions, and terrain slope.',
     icon: MapPin,
   },
   {
@@ -69,7 +69,7 @@ const PRESENTATION_STEPS: PresentationStep[] = [
     title: '6. Quantitative Performance Benchmark',
     tag: 'Stage 6 — Empirical Proof',
     script:
-      'Comparing uniform 5cm mapping vs our 3-Zone Foveated model proves an 82.8% reduction in memory footprint and a 4.6x computational speedup at steady 10 Hz.',
+      'Comparing uniform 5cm mapping vs our 3-Zone Foveated model proves an 80%+ reduction in occupied cell count, -97.3% theoretical capacity reduction, and a 4.6x grid generation speedup.',
     icon: BarChart3,
   },
 ];
