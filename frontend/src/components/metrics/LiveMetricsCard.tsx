@@ -52,7 +52,7 @@ export function LiveMetricsCard() {
           <div className="flex flex-col">
             <span className="text-[8px] text-gray-400 leading-tight">AI + GRID LATENCY</span>
             <span className="font-bold text-amber-400 text-[10px] leading-tight">
-              {latency} <span className="text-[8px] text-gray-500">ms</span>
+              {latency} <span className="text-[8px] text-gray-500">ms (HYBRID)</span>
             </span>
           </div>
         </div>
@@ -63,7 +63,7 @@ export function LiveMetricsCard() {
           <div className="flex flex-col">
             <span className="text-[8px] text-gray-400 leading-tight">AI INFERENCE</span>
             <span className="font-bold text-sky-400 text-[10px] leading-tight">
-              {aiLatency} <span className="text-[8px] text-gray-500">ms</span>
+              {aiLatency} <span className="text-[8px] text-gray-500">ms (REF)</span>
             </span>
           </div>
         </div>
@@ -74,7 +74,7 @@ export function LiveMetricsCard() {
           <div className="flex flex-col">
             <span className="text-[8px] text-gray-400 leading-tight">GRID GENERATION</span>
             <span className="font-bold text-amber-300 text-[10px] leading-tight">
-              {gridLatency} <span className="text-[8px] text-gray-500">ms</span>
+              {gridLatency} <span className="text-[8px] text-gray-500">ms (LIVE)</span>
             </span>
           </div>
         </div>
@@ -101,9 +101,9 @@ export function LiveMetricsCard() {
         <div className="flex items-center gap-2 bg-[#0B0F19] px-2.5 py-1 rounded-lg border border-[#1E293B]">
           <HardDrive className="w-3.5 h-3.5 text-purple-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-[8px] text-gray-400 leading-tight">PROCESS RAM</span>
+            <span className="text-[8px] text-gray-400 leading-tight">HOST RAM</span>
             <span className="font-bold text-purple-400 text-[10px] leading-tight">
-              {memory} <span className="text-[8px] text-gray-500">MB</span>
+              {memory} <span className="text-[8px] text-gray-500">MB (EST)</span>
             </span>
           </div>
         </div>
@@ -181,12 +181,15 @@ export function LiveMetricsCard() {
             <Target className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-bold text-purple-300 text-[10px] leading-tight tracking-wider">
-              FOVEATED BENEFIT
+            <div className="font-bold text-purple-300 text-[10px] leading-tight tracking-wider flex items-center gap-2">
+              <span>FOVEATED BENEFIT</span>
+              <span className="text-[8px] px-1.5 py-0.2 rounded bg-purple-900/60 text-purple-200 border border-purple-700/50">
+                BENCHMARK REF: 9,169 CELLS
+              </span>
             </div>
             <div className="text-[9px] text-gray-300 leading-tight">
-              High detail where it matters (near vehicle: 5cm)<br />
-              Efficient coverage in far range (50cm, -97.29% capacity)
+              Near-field spatial resolution retained (5cm @ 0–10m)<br />
+              Efficient coarse coverage in far range (50cm, -97.29% capacity)
             </div>
           </div>
         </div>

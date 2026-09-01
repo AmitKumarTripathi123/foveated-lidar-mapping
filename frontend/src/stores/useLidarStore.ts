@@ -267,6 +267,8 @@ interface LidarState {
   setLayer: (layer: keyof LayerVisibility, value: boolean) => void;
   setPointSize: (size: number) => void;
   setGridOpacity: (opacity: number) => void;
+  measuredFps: number;
+  setMeasuredFps: (fps: number) => void;
   setSelectedCell: (cell: FoveatedCell | null) => void;
   setSelectedBox: (box: BoundingBox3D | null) => void;
   setHoveredCell: (cell: FoveatedCell | null) => void;
@@ -282,6 +284,8 @@ interface LidarState {
 export const useLidarStore = create<LidarState>((set, get) => ({
   isConnected: false,
   connectionState: 'dataset_replay',
+  measuredFps: 60,
+  setMeasuredFps: (fps) => set({ measuredFps: fps }),
   datasets: [],
   activeDatasetId: 'urban_driving_demo_01',
   totalFrames: 100,

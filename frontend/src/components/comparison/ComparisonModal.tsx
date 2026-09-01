@@ -5,6 +5,7 @@ import { useLidarStore } from '@/stores/useLidarStore';
 import { fetchBenchmark } from '@/lib/api';
 import { BenchmarkComparison } from '@/types/lidar';
 import { formatInt } from '@/lib/formatters';
+import { SCIENTIFIC_BENCHMARKS, METRIC_PROVENANCE_TABLE } from '@/lib/benchmarkConstants';
 import {
   X,
   Sparkles,
@@ -24,7 +25,7 @@ export function ComparisonModal() {
   const currentFrameIdx = useLidarStore((state) => state.currentFrameIdx);
   const storeBenchmark = useLidarStore((state) => state.benchmark);
   const [data, setData] = useState<BenchmarkComparison | null>(null);
-  const [activeTab, setActiveTab] = useState<'side_by_side' | 'zone_breakdown' | 'scientific_audit'>('side_by_side');
+  const [activeTab, setActiveTab] = useState<'side_by_side' | 'zone_breakdown' | 'scientific_audit' | 'provenance'>('side_by_side');
 
   useEffect(() => {
     if (isComparisonOpen) {
@@ -94,10 +95,10 @@ export function ComparisonModal() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 px-6 pt-4 border-b border-border-color/60 bg-[#0A0E18]/50">
+        <div className="flex items-center gap-2 px-6 pt-4 border-b border-border-color/60 bg-[#0A0E18]/50 overflow-x-auto">
           <button
             onClick={() => setActiveTab('side_by_side')}
-            className={`pb-2.5 text-xs font-bold transition-all border-b-2 ${
+            className={`pb-2.5 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
               activeTab === 'side_by_side'
                 ? 'border-sky-500 text-sky-400'
                 : 'border-transparent text-gray-400 hover:text-gray-200'
@@ -107,7 +108,7 @@ export function ComparisonModal() {
           </button>
           <button
             onClick={() => setActiveTab('zone_breakdown')}
-            className={`pb-2.5 text-xs font-bold transition-all border-b-2 ${
+            className={`pb-2.5 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
               activeTab === 'zone_breakdown'
                 ? 'border-sky-500 text-sky-400'
                 : 'border-transparent text-gray-400 hover:text-gray-200'
@@ -117,13 +118,23 @@ export function ComparisonModal() {
           </button>
           <button
             onClick={() => setActiveTab('scientific_audit')}
-            className={`pb-2.5 text-xs font-bold transition-all border-b-2 ${
+            className={`pb-2.5 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
               activeTab === 'scientific_audit'
                 ? 'border-sky-500 text-sky-400'
                 : 'border-transparent text-gray-400 hover:text-gray-200'
             }`}
           >
             3. SCIENTIFIC AUDIT &amp; FORMULATION
+          </button>
+          <button
+            onClick={() => setActiveTab('provenance')}
+            className={`pb-2.5 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
+              activeTab === 'provenance'
+                ? 'border-sky-500 text-sky-400'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            4. METRIC PROVENANCE TABLE
           </button>
         </div>
 
@@ -140,7 +151,7 @@ export function ComparisonModal() {
                   CURRENT-FRAME OCCUPIED CELL REDUCTION: -{occupiedReduction}% | GRID SPEEDUP: {gridSpeedup}×
                 </div>
                 <div className="text-xs text-gray-300">
-                  THEORETICAL SPATIAL CELL CAPACITY REDUCTION: -{theorReduction}% (12.57M down to 340.55K cells). 100% of near-field (0-10m) 5cm obstacle fidelity preserved.
+                  THEORETICAL SPATIAL CELL CAPACITY REDUCTION: -{theorReduction}% (12.57M down to 340.55K cells). Near-field (0–10m) 5cm spatial representation preserved.
                 </div>
               </div>
             </div>
@@ -259,7 +270,7 @@ export function ComparisonModal() {
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Near-Field Resolution (0–10m):</span>
-                    <span className="font-bold text-emerald-400">5 cm (0.05m) [100% Detail]</span>
+                    <span className="font-bold text-emerald-400">5 cm (0.05m) [Near-Field Preservation]</span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Far-Field Resolution (50–100m):</span>
@@ -298,13 +309,13 @@ export function ComparisonModal() {
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Grid Generation Throughput:</span>
                     <span className="font-bold text-emerald-400">
-                      {(1000 / foveatedGridLatency).toFixed(1)} Hz (Ultra Fast)
+                      {(1000 / foveatedGridLatency).toFixed(1)} Hz (Live Computed)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">End-to-End Pipeline Throughput:</span>
                     <span className="font-bold text-emerald-400">
-                      {(1000 / foveatedPipeLatency).toFixed(1)} Hz (Real-Time Capable)
+                      {(1000 / foveatedPipeLatency).toFixed(1)} Hz (Meets 30 Hz Target Criterion)
                     </span>
                   </div>
                 </div>
@@ -386,13 +397,13 @@ export function ComparisonModal() {
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">
                   <div className="text-emerald-400 font-bold mb-1">2. Theoretical Capacity vs. Occupied Cells</div>
                   <p className="text-gray-300 text-[11px] font-sans leading-relaxed">
-                    Theoretical capacity represents the total possible discrete grid address space (12.57M vs 340.55k cells, -97.29% reduction). Current-frame occupied cells represent spatial locations where actual LiDAR returns exist (45.8k vs 9.1k cells, ~80% reduction).
+                    Theoretical capacity represents total possible discrete grid address space (12.57M vs 340.55k cells, -97.29% reduction). Current-frame occupied cells represent spatial locations where actual LiDAR returns exist (45.8k vs 9.1k cells, ~80% reduction).
                   </p>
                 </div>
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">
                   <div className="text-amber-400 font-bold mb-1">3. Prototype Traversability Heuristic</div>
                   <p className="text-gray-300 text-[11px] font-sans leading-relaxed">
-                    Formulated dimensionlessly: tau = tau_base * exp(-sigma_z / 0.15m), modulating semantic drivability by vertical roughness standard deviation. Clearly labeled as a prototype heuristic.
+                    Formulated dimensionlessly: &tau; = &tau;_base(C*) &times; exp(-&sigma;_z / 0.15m), modulating semantic drivability by vertical roughness standard deviation. Clearly labeled as a prototype heuristic.
                   </p>
                 </div>
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">
@@ -401,6 +412,86 @@ export function ComparisonModal() {
                     Dynamic objects (cars, pedestrians) are classified per-frame by the semantic neural network and bounded with 3D extents; temporal multi-frame Kalman tracking is not claimed.
                   </p>
                 </div>
+                <div className="bg-surface-highlight/30 p-3.5 rounded-lg border border-border-color col-span-1 md:col-span-2">
+                  <div className="text-sky-400 font-bold mb-1.5 flex items-center gap-1.5">
+                    <span>5. Analytical Theoretical Capacity Formulation</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-800 font-normal">
+                      THEORETICAL DERIVATION
+                    </span>
+                  </div>
+                  <div className="bg-[#070A12] p-3 rounded border border-border-color/60 font-mono text-[11px] text-gray-300 space-y-1.5">
+                    <div>Foveated Address Space Capacity (Annular Integration):</div>
+                    <div className="text-sky-300 pl-2">
+                      N_foveated = [&pi; &times; 10&sup2; / 0.05&sup2;] + [&pi; &times; (50&sup2; - 10&sup2;) / 0.25&sup2;] + [&pi; &times; (100&sup2; - 50&sup2;) / 0.50&sup2;]
+                    </div>
+                    <div className="text-gray-400 pl-2">
+                      = 125,664 + 120,637 + 94,248 = 340,549 cells
+                    </div>
+                    <div className="pt-1">Uniform 5 cm Baseline Capacity:</div>
+                    <div className="text-red-300 pl-2">
+                      N_uniform = [&pi; &times; 100&sup2; / 0.05&sup2;] = 12,566,370 cells
+                    </div>
+                    <div className="pt-1">Theoretical Address Space Reduction:</div>
+                    <div className="text-emerald-300 pl-2 font-bold">
+                      &Delta;N = (12,566,370 - 340,549) / 12,566,370 &times; 100% = 97.29%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'provenance' && (
+            <div className="bg-[#0A0E18] border border-border-color rounded-xl p-5 space-y-4 text-xs">
+              <div className="flex items-center justify-between border-b border-border-color/60 pb-2">
+                <div className="flex items-center gap-2 text-sky-400 font-bold">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>SCIENTIFIC METRIC PROVENANCE &amp; TRACEABILITY TABLE</span>
+                </div>
+                <span className="text-[10px] text-gray-400">
+                  Strict Single Source of Truth Classification
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border border-border-color/40 rounded-lg">
+                  <thead>
+                    <tr className="border-b border-border-color/80 bg-surface-highlight/40 text-gray-300 font-bold uppercase text-[10px]">
+                      <th className="py-2.5 px-3">Metric</th>
+                      <th className="py-2.5 px-3">Value</th>
+                      <th className="py-2.5 px-3">Scientific Classification</th>
+                      <th className="py-2.5 px-3">Provenance / Derivation</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border-color/30 font-mono text-[11px]">
+                    {METRIC_PROVENANCE_TABLE.map((row, idx) => (
+                      <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors">
+                        <td className="py-2 px-3 font-bold text-gray-200">{row.metric}</td>
+                        <td className="py-2 px-3 text-emerald-300 font-bold">{row.value}</td>
+                        <td className="py-2 px-3">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
+                              row.classification === 'MEASURED (LIVE)'
+                                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
+                                : row.classification === 'REFERENCE BENCHMARK'
+                                ? 'bg-sky-950/80 text-sky-300 border-sky-800'
+                                : row.classification === 'THEORETICAL'
+                                ? 'bg-purple-950/80 text-purple-300 border-purple-800'
+                                : row.classification === 'ESTIMATED'
+                                ? 'bg-amber-950/80 text-amber-300 border-amber-800'
+                                : row.classification === 'DERIVED'
+                                ? 'bg-indigo-950/80 text-indigo-300 border-indigo-800'
+                                : 'bg-slate-900 text-slate-300 border-slate-700'
+                            }`}
+                          >
+                            {row.classification}
+                          </span>
+                        </td>
+                        <td className="py-2 px-3 text-gray-400 font-sans text-[11px]">{row.provenance}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

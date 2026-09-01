@@ -3,14 +3,15 @@
 import React from 'react';
 import { useLidarStore } from '@/stores/useLidarStore';
 import { formatInt } from '@/lib/formatters';
+import { SCIENTIFIC_BENCHMARKS } from '@/lib/benchmarkConstants';
 
 export function MappingAnalytics() {
   const points = useLidarStore((state) => state.points);
   const cells = useLidarStore((state) => state.cells);
   const metrics = useLidarStore((state) => state.metrics);
 
-  const occupiedCount = cells.length > 0 ? cells.length : 9169;
-  const theoreticalCapacity = 340549;
+  const occupiedCount = cells.length > 0 ? cells.length : SCIENTIFIC_BENCHMARKS.referenceFoveatedOccupiedCells;
+  const theoreticalCapacity = SCIENTIFIC_BENCHMARKS.theoreticalFoveatedCapacity;
   const occupancyRate = ((occupiedCount / theoreticalCapacity) * 100).toFixed(2);
 
   return (
@@ -21,8 +22,8 @@ export function MappingAnalytics() {
           <div className="font-bold text-[11px] text-sky-400 tracking-wider">
             AI PERCEPTION TELEMETRY
           </div>
-          <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[9px] px-1.5 py-0.2 rounded font-bold">
-            LIVE
+          <span className="bg-sky-500/10 text-sky-400 border border-sky-500/30 text-[9px] px-1.5 py-0.2 rounded font-bold">
+            REFERENCE
           </span>
         </div>
 
@@ -46,7 +47,7 @@ export function MappingAnalytics() {
           <div className="flex justify-between">
             <span className="text-gray-400">AI Inference Latency:</span>
             <span className="font-bold text-emerald-400">
-              {metrics ? `${metrics.ai_latency_ms.toFixed(1)} ms` : '18.2 ms'}
+              18.2 ms <span className="text-[9px] font-normal text-sky-400">(RTX 3070 Ref)</span>
             </span>
           </div>
           <div className="flex justify-between">
@@ -138,7 +139,7 @@ export function MappingAnalytics() {
           <div className="flex justify-between">
             <span className="text-gray-400">Grid Engine Latency:</span>
             <span className="font-bold text-emerald-400">
-              {metrics ? `${metrics.grid_latency_ms.toFixed(1)} ms` : '12.1 ms'}
+              {metrics ? `${metrics.grid_latency_ms.toFixed(1)} ms` : '12.1 ms'} <span className="text-[9px] font-normal text-emerald-300">(LIVE)</span>
             </span>
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import { useLidarStore } from '@/stores/useLidarStore';
 import { PointCloudViewer } from './PointCloudViewer';
@@ -18,11 +18,31 @@ import {
 import { CAMERA_POSITIONS } from '@/lib/constants';
 import { CameraViewPreset } from '@/types/lidar';
 
+function FpsTracker() {
+  const frameCount = useRef(0);
+  const lastTime = useRef(performance.now());
+  const setMeasuredFps = useLidarStore((state) => state.setMeasuredFps);
+
+  useFrame(() => {
+    frameCount.current++;
+    const now = performance.now();
+    if (now - lastTime.current >= 1000) {
+      const realFps = Math.round((frameCount.current * 1000) / (now - lastTime.current));
+      setMeasuredFps(realFps);
+      frameCount.current = 0;
+      lastTime.current = now;
+    }
+  });
+
+  return null;
+}
+
 export function LidarCanvas() {
   const cameraPreset = useLidarStore((state) => state.cameraPreset);
   const setCameraPreset = useLidarStore((state) => state.setCameraPreset);
   const metadata = useLidarStore((state) => state.metadata);
   const cells = useLidarStore((state) => state.cells);
+  const measuredFps = useLidarStore((state) => state.measuredFps);
 
   const controlsRef = useRef<any>(null);
 
@@ -85,6 +105,7 @@ export function LidarCanvas() {
         />
 
         {/* 3D Visualized Sub-Components */}
+        <FpsTracker />
         <PointCloudViewer />
         <FoveatedGridMesh />
         <ConcentricRings />
@@ -103,6 +124,9 @@ export function LidarCanvas() {
             <span>2.5D FOVEATED ELEVATION GRID MAP</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">
               VARIABLE RESOLUTION
+            </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800">
+              GPU: ~{measuredFps} FPS (LIVE)
             </span>
           </div>
           <div className="text-[10px] text-sky-400 font-semibold tracking-wide">

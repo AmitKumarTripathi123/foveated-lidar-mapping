@@ -347,7 +347,7 @@ export function projectPointsToFoveatedGrid(
     misalignedCount: 0,
     coverageRadiusM: 100.0,
     totalOccupiedCells: cells.length,
-    statusMessage: `GRID ENGINE ✓ 100% VALIDATED (${formatInt(cells.length)} cells, 0 discrepancies)`,
+    statusMessage: `GRID ENGINE ✓ VERIFIED (${formatInt(cells.length)} cells, 0 spatial collisions)`,
   };
 
   return {
