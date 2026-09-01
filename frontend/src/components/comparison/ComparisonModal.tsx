@@ -58,10 +58,8 @@ export function ComparisonModal() {
     (((uniformOccupied - foveatedOccupied) / uniformOccupied) * 100).toFixed(1)
   );
   const theorReduction = Number(
-    (((uniformTheorCapacity - foveatedTheorCapacity) / uniformTheorCapacity) * 100).toFixed(1)
+    (((uniformTheorCapacity - foveatedTheorCapacity) / uniformTheorCapacity) * 100).toFixed(2)
   );
-
-  const zoneBreakdowns = data?.zone_breakdowns || [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-150 select-none font-mono">
@@ -138,10 +136,10 @@ export function ComparisonModal() {
               </div>
               <div>
                 <div className="text-sm font-bold text-emerald-300">
-                  -{occupiedReduction}% Frame Occupied Cells &amp; {gridSpeedup}× Grid Latency Speedup
+                  CURRENT-FRAME OCCUPIED CELL REDUCTION: -{occupiedReduction}% | GRID SPEEDUP: {gridSpeedup}×
                 </div>
                 <div className="text-xs text-gray-300">
-                  Foveated spatial quantization reduces occupied cells from {uniformOccupied.toLocaleString()} down to {foveatedOccupied.toLocaleString()} while preserving 100% 5cm near-field obstacle fidelity.
+                  THEORETICAL SPATIAL CELL CAPACITY REDUCTION: -{theorReduction}% (12.57M down to 340.55K cells). 100% of near-field (0-10m) 5cm obstacle fidelity preserved.
                 </div>
               </div>
             </div>
@@ -172,7 +170,7 @@ export function ComparisonModal() {
                 {/* Spatial Discretization Model */}
                 <div className="bg-[#070A10] p-2 rounded-lg border border-border-color/60 text-center text-[10px] text-gray-400">
                   <div className="text-sky-400 font-bold mb-0.5">Fixed 5cm Discretization (0–100m)</div>
-                  <div className="text-gray-500 font-mono">┌─┬─┬─┬─┬─┬─┬─┬─┐ (Millions of empty far voxels)</div>
+                  <div className="text-gray-500 font-mono">┌─┬─┬─┬─┬─┬─┬─┬─┐ (Millions of redundant far-field cells)</div>
                 </div>
 
                 <div className="space-y-2 text-xs divide-y divide-border-color/30">
@@ -181,23 +179,27 @@ export function ComparisonModal() {
                     <span className="font-bold text-gray-200">100m Radius Circle</span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Grid Cell Size:</span>
-                    <span className="font-bold text-gray-200">5 cm (Fixed Everywhere)</span>
+                    <span className="text-gray-400">Near-Field Resolution (0–10m):</span>
+                    <span className="font-bold text-gray-200">5 cm (0.05m)</span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Theoretical Grid Capacity:</span>
+                    <span className="text-gray-400">Far-Field Resolution (50–100m):</span>
+                    <span className="font-bold text-gray-200">5 cm (0.05m)</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-1.5">
+                    <span className="text-gray-400">Theoretical Spatial Cell Capacity:</span>
                     <span className="font-bold text-red-400">
-                      {uniformTheorCapacity.toLocaleString()} cells
+                      {uniformTheorCapacity.toLocaleString()} cells (12.57M)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Current Frame Occupied Cells:</span>
+                    <span className="text-gray-400">Current-Frame Occupied Cells:</span>
                     <span className="font-bold text-gray-200">
                       {uniformOccupied.toLocaleString()} cells
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Estimated Buffer Footprint:</span>
+                    <span className="text-gray-400">Estimated Buffer Footprint (64B/cell):</span>
                     <span className="font-bold text-red-400">
                       785.4 MB (Capacity) | 2.93 MB (Occupied)
                     </span>
@@ -215,7 +217,13 @@ export function ComparisonModal() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Max Compute Throughput:</span>
+                    <span className="text-gray-400">Grid Generation Throughput:</span>
+                    <span className="font-bold text-gray-400">
+                      {(1000 / uniformGridLatency).toFixed(1)} Hz
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-1.5">
+                    <span className="text-gray-400">End-to-End Pipeline Throughput:</span>
                     <span className="font-bold text-gray-400">
                       {(1000 / uniformPipeLatency).toFixed(1)} Hz (Bottleneck)
                     </span>
@@ -240,7 +248,7 @@ export function ComparisonModal() {
                 {/* Spatial Discretization Model */}
                 <div className="bg-[#070A10] p-2 rounded-lg border border-emerald-500/30 text-center text-[10px] text-gray-400">
                   <div className="text-emerald-400 font-bold mb-0.5">3-Zone Spatial Hierarchy</div>
-                  <div className="text-emerald-300 font-mono">Near: 5cm | Mid: 25cm | Far: 50cm</div>
+                  <div className="text-emerald-300 font-mono">Near: 5cm | Mid: 25cm | Far: 50cm (100× Larger Area)</div>
                 </div>
 
                 <div className="space-y-2 text-xs divide-y divide-border-color/30">
@@ -249,23 +257,27 @@ export function ComparisonModal() {
                     <span className="font-bold text-emerald-400">100m Radius Circle (Identical)</span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Grid Cell Size:</span>
-                    <span className="font-bold text-emerald-400">5cm (Near) → 25cm → 50cm (Far)</span>
+                    <span className="text-gray-400">Near-Field Resolution (0–10m):</span>
+                    <span className="font-bold text-emerald-400">5 cm (0.05m) [100% Detail]</span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Theoretical Grid Capacity:</span>
+                    <span className="text-gray-400">Far-Field Resolution (50–100m):</span>
+                    <span className="font-bold text-emerald-400">50 cm (0.50m) [10× Coarser Spatial]</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-1.5">
+                    <span className="text-gray-400">Theoretical Spatial Cell Capacity:</span>
                     <span className="font-bold text-emerald-400">
                       {foveatedTheorCapacity.toLocaleString()} cells (-{theorReduction}%)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Current Frame Occupied Cells:</span>
+                    <span className="text-gray-400">Current-Frame Occupied Cells:</span>
                     <span className="font-bold text-emerald-400">
                       {foveatedOccupied.toLocaleString()} cells (-{occupiedReduction}%)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Estimated Buffer Footprint:</span>
+                    <span className="text-gray-400">Estimated Buffer Footprint (64B/cell):</span>
                     <span className="font-bold text-emerald-400">
                       21.8 MB (Capacity) | 0.59 MB (Occupied)
                     </span>
@@ -283,7 +295,13 @@ export function ComparisonModal() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
-                    <span className="text-gray-400">Max Compute Throughput:</span>
+                    <span className="text-gray-400">Grid Generation Throughput:</span>
+                    <span className="font-bold text-emerald-400">
+                      {(1000 / foveatedGridLatency).toFixed(1)} Hz (Ultra Fast)
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-1.5">
+                    <span className="text-gray-400">End-to-End Pipeline Throughput:</span>
                     <span className="font-bold text-emerald-400">
                       {(1000 / foveatedPipeLatency).toFixed(1)} Hz (Real-Time Capable)
                     </span>
@@ -359,7 +377,7 @@ export function ComparisonModal() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">
-                  <div className="text-sky-400 font-bold mb-1">1. Centimeter-Scale Near-Field Safety</div>
+                  <div className="text-sky-400 font-bold mb-1">1. Centimeter-Scale Near-Field Representation</div>
                   <p className="text-gray-300 text-[11px] font-sans leading-relaxed">
                     Within Zone 0 (0–10m), 5cm cells provide centimeter-scale terrain representation, preserving curb boundaries, road drop-offs, and pedestrian footfall profiles where reaction time is minimal.
                   </p>
@@ -367,13 +385,13 @@ export function ComparisonModal() {
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">
                   <div className="text-emerald-400 font-bold mb-1">2. Theoretical Capacity vs. Occupied Cells</div>
                   <p className="text-gray-300 text-[11px] font-sans leading-relaxed">
-                    Theoretical capacity represents the total possible discrete grid address space (12.5M vs 340k cells). Occupied cells represent spatial locations where actual LiDAR returns exist (45.8k vs 9.1k cells).
+                    Theoretical capacity represents the total possible discrete grid address space (12.57M vs 340.55k cells, -97.29% reduction). Current-frame occupied cells represent spatial locations where actual LiDAR returns exist (45.8k vs 9.1k cells, ~80% reduction).
                   </p>
                 </div>
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">
                   <div className="text-amber-400 font-bold mb-1">3. Prototype Traversability Heuristic</div>
                   <p className="text-gray-300 text-[11px] font-sans leading-relaxed">
-                    Formulated dimensionlessly: tau = tau_base * exp(-sigma_z / 0.15m), modulating semantic drivability by vertical roughness standard deviation.
+                    Formulated dimensionlessly: tau = tau_base * exp(-sigma_z / 0.15m), modulating semantic drivability by vertical roughness standard deviation. Clearly labeled as a prototype heuristic.
                   </p>
                 </div>
                 <div className="bg-surface-highlight/30 p-3 rounded-lg border border-border-color">

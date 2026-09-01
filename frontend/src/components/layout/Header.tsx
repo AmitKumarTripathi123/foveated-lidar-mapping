@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLidarStore } from '@/stores/useLidarStore';
-import { Radio } from 'lucide-react';
+import { Radio, Layers } from 'lucide-react';
 import { GridDisplayMode, GridRenderStyle } from '@/types/lidar';
 
 export function Header() {
@@ -17,17 +17,23 @@ export function Header() {
   const currentMode =
     gridDisplayMode === 'points'
       ? 'point_cloud'
+      : gridDisplayMode === 'both'
+      ? 'both'
       : gridRenderStyle === 'extruded_3d'
       ? '3d_elevation'
       : '25d_grid';
 
-  const handleModeChange = (mode: 'point_cloud' | '25d_grid' | '3d_elevation') => {
+  const handleModeChange = (mode: 'point_cloud' | '25d_grid' | 'both' | '3d_elevation') => {
     if (mode === 'point_cloud') {
       setGridDisplayMode('points');
       setGridRenderStyle('top_down_2d');
       setViewMode3D('semantic');
     } else if (mode === '25d_grid') {
       setGridDisplayMode('grid');
+      setGridRenderStyle('top_down_2d');
+      setViewMode3D('foveated_elevation');
+    } else if (mode === 'both') {
+      setGridDisplayMode('both');
       setGridRenderStyle('top_down_2d');
       setViewMode3D('foveated_elevation');
     } else if (mode === '3d_elevation') {
@@ -46,58 +52,76 @@ export function Header() {
         </div>
         <div>
           <h1 className="text-xs sm:text-sm font-bold tracking-wider text-white">
-            FOVEATED LiDAR 2.5D MAPPING
+            ADAPTIVE VARIABLE-RESOLUTION 2.5D LiDAR MAPPING
           </h1>
           <p className="text-[10px] text-gray-400 hidden md:block">
-            Variable-Resolution Perception &amp; Semantic Elevation Map Engine
+            Variable-Resolution 2.5D Grid Engine for Dynamic Environment Perception
           </p>
         </div>
       </div>
 
-      {/* 2. Center Pill Group: [ POINT CLOUD ] [ 2.5D GRID MAP ] [ 3D ELEVATION ] */}
-      <div className="flex items-center bg-[#0F172A] border border-[#1E293B] p-1 rounded-xl shadow-lg">
+      {/* 2. Center Pill Group: [ POINT CLOUD ] [ 2.5D GRID MAP ] [ BOTH (AGGREGATION) ] [ 3D ELEVATION ] */}
+      <div className="flex items-center bg-[#0F172A] border border-[#1E293B] p-1 rounded-xl shadow-lg gap-1">
         <button
           onClick={() => handleModeChange('point_cloud')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
             currentMode === 'point_cloud'
               ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-900/50'
               : 'text-gray-400 hover:text-gray-200'
           }`}
+          title="Raw & Semantic 3D Point Cloud"
         >
           POINT CLOUD
         </button>
 
         <button
           onClick={() => handleModeChange('25d_grid')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
             currentMode === '25d_grid'
               ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-900/50'
               : 'text-gray-400 hover:text-gray-200'
           }`}
+          title="Variable-Resolution 2.5D Elevation Grid"
         >
           2.5D GRID MAP
         </button>
 
         <button
+          onClick={() => handleModeChange('both')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            currentMode === 'both'
+              ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-900/50'
+              : 'text-gray-400 hover:text-gray-200'
+          }`}
+          title="Demonstrate points aggregated into 2.5D spatial cells"
+        >
+          BOTH (PROOF)
+        </button>
+
+        <button
           onClick={() => handleModeChange('3d_elevation')}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
             currentMode === '3d_elevation'
               ? 'bg-[#6366F1] text-white shadow-md shadow-indigo-900/50'
               : 'text-gray-400 hover:text-gray-200'
           }`}
+          title="3D Extruded Surface Columns"
         >
           3D ELEVATION
         </button>
       </div>
 
-      {/* 3. Right Status Badge: SYSTEM STATUS [ LIVE • ] */}
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] text-gray-400 font-bold hidden sm:inline">
-          SYSTEM STATUS
-        </span>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-          <span>LIVE</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+      {/* 3. Right Status Indicator */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-surface-highlight/50 border border-border-color text-xs">
+          <span
+            className={`w-2 h-2 rounded-full ${
+              isConnected ? 'bg-[#22C55E] animate-pulse' : 'bg-[#EF4444]'
+            }`}
+          />
+          <span className="text-gray-300 font-medium">
+            {isConnected ? 'STREAM 10Hz' : 'DISCONNECTED'}
+          </span>
         </div>
       </div>
     </header>

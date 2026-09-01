@@ -159,9 +159,10 @@ export function projectPointsToFoveatedGrid(
     // Formulated as dimensionless exponential decay: tau = tau_base * exp(-roughness / sigma_ref)
     // where sigma_ref = 0.15m is the reference micro-roughness scale.
     const sigmaRef = 0.15;
-    const traversability = Number(
+    const rawTraversability = Number(
       (semanticDef.traversability * Math.exp(-roughness / sigmaRef)).toFixed(3)
     );
+    const traversability = Math.max(0.0, Math.min(1.0, rawTraversability));
 
     const cellId = `G${zoneId}_${String(cellCounter).padStart(5, '0')}`;
 

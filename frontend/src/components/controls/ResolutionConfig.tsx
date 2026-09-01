@@ -41,7 +41,7 @@ export function ResolutionConfig() {
       <div className="flex items-start gap-1.5 text-[10px] text-gray-300 bg-surface-highlight/30 p-2 rounded-lg border border-border-color/40">
         <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
         <span>
-          5cm foveal voxelization preserves exact curb & obstacle boundaries while 50cm far-field drops memory by ~82.8%.
+          5cm near-field grid cells preserve exact curb &amp; obstacle boundaries, while 50cm far-field reduces theoretical spatial cell capacity by 97.29% and frame occupied cells by ~80%.
         </span>
       </div>
     </div>
