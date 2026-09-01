@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useLidarStore } from '@/stores/useLidarStore';
 import { fetchBenchmark } from '@/lib/api';
 import { BenchmarkComparison } from '@/types/lidar';
+import { formatInt } from '@/lib/formatters';
 import {
   X,
   Sparkles,
@@ -189,13 +190,13 @@ export function ComparisonModal() {
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Theoretical Spatial Cell Capacity:</span>
                     <span className="font-bold text-red-400">
-                      {uniformTheorCapacity.toLocaleString()} cells (12.57M)
+                      {formatInt(uniformTheorCapacity)} cells (12.57M)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Current-Frame Occupied Cells:</span>
                     <span className="font-bold text-gray-200">
-                      {uniformOccupied.toLocaleString()} cells
+                      {formatInt(uniformOccupied)} cells
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
@@ -267,13 +268,13 @@ export function ComparisonModal() {
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Theoretical Spatial Cell Capacity:</span>
                     <span className="font-bold text-emerald-400">
-                      {foveatedTheorCapacity.toLocaleString()} cells (-{theorReduction}%)
+                      {formatInt(foveatedTheorCapacity)} cells (-{theorReduction}%)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">
                     <span className="text-gray-400">Current-Frame Occupied Cells:</span>
                     <span className="font-bold text-emerald-400">
-                      {foveatedOccupied.toLocaleString()} cells (-{occupiedReduction}%)
+                      {formatInt(foveatedOccupied)} cells (-{occupiedReduction}%)
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-1.5">

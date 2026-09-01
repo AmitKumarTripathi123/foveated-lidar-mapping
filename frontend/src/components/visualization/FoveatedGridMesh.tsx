@@ -26,9 +26,7 @@ export function FoveatedGridMesh() {
   const instancedMeshRef = useRef<THREE.InstancedMesh>(null);
   const wireframeMeshRef = useRef<THREE.InstancedMesh>(null);
 
-  const displayCells = useMemo(() => {
-    return cells.slice(0, 25000);
-  }, [cells]);
+  const displayCells = cells;
 
   useEffect(() => {
     if (!instancedMeshRef.current || displayCells.length === 0) return;
@@ -39,22 +37,22 @@ export function FoveatedGridMesh() {
       const cell = displayCells[i];
       const res = cell.cellSize || cell.resolution || 0.10;
 
-      let height = 0.08;
+      let height = 0.10;
       let centerZ = -1.56;
 
-      if (gridRenderStyle === 'extruded_3d' || viewMode3D === 'foveated_elevation' && colorMode === 'elevation') {
+      if (gridRenderStyle === 'extruded_3d' || (viewMode3D === 'foveated_elevation' && colorMode === 'elevation')) {
         // 3D Column Extrusion
-        height = Math.max(0.12, cell.elevation - zBase);
+        height = Math.max(0.18, (cell.elevation - zBase) * 1.5);
         centerZ = zBase + height / 2;
       } else {
         // 2.5D Planar Grid Tile on Ground
-        height = 0.08;
+        height = 0.10;
         centerZ = -1.56;
       }
 
-      // Exact square cell dimensions: res x res
+      // Exact square cell dimensions with 8% margin for crisp cell-to-cell separation
       tempObject.position.set(cell.x, cell.y, centerZ);
-      tempObject.scale.set(res * 0.94, res * 0.94, height);
+      tempObject.scale.set(res * 0.92, res * 0.92, height);
       tempObject.updateMatrix();
 
       instancedMeshRef.current.setMatrixAt(i, tempObject.matrix);
@@ -140,18 +138,20 @@ export function FoveatedGridMesh() {
       </instancedMesh>
 
       {/* 2. Crisp Dark Cell Outlines (Grid Boundaries) */}
-      <instancedMesh
-        ref={wireframeMeshRef}
-        args={[undefined, undefined, displayCells.length]}
-      >
-        <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial
-          color="#05070D"
-          wireframe
-          transparent
-          opacity={0.85}
-        />
-      </instancedMesh>
+      {layers.adaptiveGridWireframe && (
+        <instancedMesh
+          ref={wireframeMeshRef}
+          args={[undefined, undefined, displayCells.length]}
+        >
+          <boxGeometry args={[1, 1, 1]} />
+          <meshBasicMaterial
+            color="#020617"
+            wireframe
+            transparent
+            opacity={0.65}
+          />
+        </instancedMesh>
+      )}
 
       {/* 3. Selected Cell Glowing Border Highlight */}
       {selectedCell && (

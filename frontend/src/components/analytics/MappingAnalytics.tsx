@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useLidarStore } from '@/stores/useLidarStore';
+import { formatInt } from '@/lib/formatters';
 
 export function MappingAnalytics() {
   const points = useLidarStore((state) => state.points);
@@ -99,13 +100,13 @@ export function MappingAnalytics() {
           <div className="flex justify-between">
             <span className="text-gray-400">Current Occupied Cells:</span>
             <span className="font-bold text-sky-300">
-              {occupiedCount.toLocaleString()}
+              {formatInt(occupiedCount)}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">Theoretical Capacity:</span>
             <span className="font-bold text-gray-200">
-              {theoreticalCapacity.toLocaleString()} cells
+              {formatInt(theoreticalCapacity)} cells
             </span>
           </div>
           <div className="flex justify-between">

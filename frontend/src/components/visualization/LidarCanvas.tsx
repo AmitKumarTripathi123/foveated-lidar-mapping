@@ -88,10 +88,22 @@ export function LidarCanvas() {
         <CoordinateGizmo />
       </Canvas>
 
-      {/* Top-Left Title Overlay */}
-      <div className="absolute top-3 left-4 text-xs font-bold text-gray-300 tracking-wider flex items-center gap-2 pointer-events-none z-20">
-        <span className="text-sky-400">⤢</span>
-        <span>2.5D FOVEATED ELEVATION GRID MAP (TOP VIEW)</span>
+      {/* Top-Left Title Overlay for SIH Jury */}
+      <div className="absolute top-3 left-4 flex items-center gap-2.5 pointer-events-none z-20 font-mono">
+        <div className="flex items-center justify-center w-6 h-6 rounded bg-sky-500/20 text-sky-400 border border-sky-500/40">
+          <span className="text-xs">⤢</span>
+        </div>
+        <div>
+          <div className="text-xs font-bold text-white tracking-wider flex items-center gap-2">
+            <span>2.5D FOVEATED ELEVATION GRID MAP</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">
+              VARIABLE RESOLUTION
+            </span>
+          </div>
+          <div className="text-[10px] text-sky-400 font-semibold tracking-wide">
+            5 cm near-field (0–10m) → 25 cm mid-field (10–50m) → 50 cm far-field (50–100m)
+          </div>
+        </div>
       </div>
 
       {/* Top Floating Camera Presets Toolbar */}

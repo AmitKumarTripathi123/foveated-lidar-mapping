@@ -63,70 +63,83 @@ export function generateStructuredFramePoints(frameIdx: number = 0): {
     });
   };
 
-  // 1. North-South Multi-Lane Arterial Road (cls: 0, Z = -1.60m)
-  for (let y = -95; y <= 95; y += 0.05) {
-    for (let x = -4.5; x <= 4.5; x += 0.05) {
-      if (prng() > 0.035) continue;
+  // 1. Zone 0 (0–10m @ 5cm): Near-field contiguous high-resolution road corridor
+  for (let y = -1.5; y <= 1.5; y += 0.05) {
+    for (let x = -1.5; x <= 1.5; x += 0.05) {
       const z = -1.60 + (prng() - 0.5) * 0.02;
       addPt(x, y, z, 0, 0.98);
     }
   }
-
-  // 2. East-West Crossing Intersection (cls: 0, Z = -1.60m)
-  for (let x = -85; x <= 85; x += 0.06) {
-    for (let y = -4.5; y <= 4.5; y += 0.06) {
-      if (prng() > 0.04) continue;
-      const z = -1.60 + (prng() - 0.5) * 0.02;
-      addPt(x, y, z, 0, 0.97);
+  // Zone 0 Curbs & Sidewalks (Yellow cls: 1)
+  for (let y = -1.5; y <= 1.5; y += 0.05) {
+    for (let x of [-1.65, -1.55, 1.55, 1.65]) {
+      const z = -1.45 + (prng() - 0.5) * 0.03;
+      addPt(x, y, z, 1, 0.95);
     }
   }
 
-  // 3. Sidewalks & Elevated Curbs (cls: 1, Z = -1.45m elevated curb)
-  for (let y = -90; y <= 90; y += 0.07) {
-    // East Sidewalk
-    for (let x = 4.8; x <= 8.0; x += 0.08) {
-      if (Math.abs(y) < 5.0 || prng() > 0.05) continue;
-      const z = -1.45 + (prng() - 0.5) * 0.03;
-      addPt(x, y, z, 1, 0.95);
+  // 2. Zone 1 (10–50m @ 25cm): Mid-field contiguous road corridor (Green cls: 0)
+  for (let y = 1.75; y <= 24.5; y += 0.25) {
+    for (let x = -2.25; x <= 2.25; x += 0.25) {
+      const z = -1.60 + (prng() - 0.5) * 0.02;
+      addPt(x, y, z, 0, 0.98);
     }
-    // West Sidewalk
-    for (let x = -8.0; x <= -4.8; x += 0.08) {
-      if (Math.abs(y) < 5.0 || prng() > 0.05) continue;
-      const z = -1.45 + (prng() - 0.5) * 0.03;
-      addPt(x, y, z, 1, 0.95);
+  }
+  for (let y = -24.5; y <= -1.75; y += 0.25) {
+    for (let x = -2.25; x <= 2.25; x += 0.25) {
+      const z = -1.60 + (prng() - 0.5) * 0.02;
+      addPt(x, y, z, 0, 0.98);
+    }
+  }
+  // Zone 1 Crossing Intersection
+  for (let x = -18.0; x <= 18.0; x += 0.25) {
+    for (let y = -1.5; y <= 1.5; y += 0.25) {
+      const dist = Math.sqrt(x * x + y * y);
+      if (dist > 1.8 && dist <= 24.5) {
+        const z = -1.60 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 0, 0.97);
+      }
+    }
+  }
+
+  // 3. Zone 2 (50–100m @ 50cm): Far-field road corridor (Orange cls: 0)
+  for (let y = 25.0; y <= 65.0; y += 0.50) {
+    for (let x = -2.5; x <= 2.5; x += 0.50) {
+      const z = -1.60 + (prng() - 0.5) * 0.02;
+      addPt(x, y, z, 0, 0.96);
+    }
+  }
+  for (let y = -65.0; y <= -25.0; y += 0.50) {
+    for (let x = -2.5; x <= 2.5; x += 0.50) {
+      const z = -1.60 + (prng() - 0.5) * 0.02;
+      addPt(x, y, z, 0, 0.96);
     }
   }
 
   // 4. Urban Vegetation & Trees (cls: 4, Z = -1.4m to +3.5m)
   const trees = [
-    { x: 9.0, y: 15.0 },
-    { x: 9.0, y: 35.0 },
-    { x: 9.0, y: -25.0 },
-    { x: -9.0, y: 18.0 },
-    { x: -9.0, y: -30.0 },
-    { x: 28.0, y: 9.0 },
-    { x: -32.0, y: 9.0 },
+    { x: 5.0, y: 12.0 },
+    { x: 5.0, y: 22.0 },
+    { x: -5.0, y: 12.0 },
+    { x: -5.0, y: 22.0 },
   ];
   for (const tree of trees) {
-    for (let i = 0; i < 80; i++) {
-      const rx = tree.x + (prng() - 0.5) * 2.2;
-      const ry = tree.y + (prng() - 0.5) * 2.2;
-      const rz = -1.4 + prng() * 3.6;
+    for (let i = 0; i < 40; i++) {
+      const rx = tree.x + (prng() - 0.5) * 1.5;
+      const ry = tree.y + (prng() - 0.5) * 1.5;
+      const rz = -1.4 + prng() * 3.0;
       addPt(rx, ry, rz, 4, 0.93);
     }
   }
 
-  // 5. Static Obstacles & Building Envelopes in 4 Quadrants (cls: 2, Z = -1.5m to +4.2m)
+  // 5. Static Obstacles & Building Envelopes (cls: 2, Z = -1.5m to +3.5m)
   const buildings = [
-    { x1: 12, x2: 45, y1: 10, y2: 60, h: 4.2 },
-    { x1: -45, x2: -12, y1: 10, y2: 60, h: 3.8 },
-    { x1: 12, x2: 45, y1: -60, y2: -10, h: 3.6 },
-    { x1: -45, x2: -12, y1: -60, y2: -10, h: 4.5 },
+    { x1: 6, x2: 18, y1: 8, y2: 24, h: 3.5 },
+    { x1: -18, x2: -6, y1: 8, y2: 24, h: 3.5 },
   ];
   for (const b of buildings) {
-    for (let x = b.x1; x <= b.x2; x += 0.9) {
-      for (let y = b.y1; y <= b.y2; y += 0.9) {
-        if (prng() > 0.08) continue;
+    for (let x = b.x1; x <= b.x2; x += 1.0) {
+      for (let y = b.y1; y <= b.y2; y += 1.0) {
         const z = -1.5 + prng() * b.h;
         addPt(x, y, z, 2, 0.96);
       }
@@ -135,30 +148,27 @@ export function generateStructuredFramePoints(frameIdx: number = 0): {
 
   // 6. Dynamic Objects with frame-wise kinematics (cls: 3)
   // Ahead Vehicle moving forward
-  const v1Y = 12.0 + ((frameIdx * 0.45) % 55.0);
-  for (let i = 0; i < 200; i++) {
-    const x = 2.2 + (prng() - 0.5) * 1.8;
-    const y = v1Y + (prng() - 0.5) * 4.4;
-    const z = -1.55 + prng() * 1.6;
-    addPt(x, y, z, 3, 0.97);
+  const v1Y = 10.0 + ((frameIdx * 0.45) % 35.0);
+  for (let dy = -2.0; dy <= 2.0; dy += 0.3) {
+    for (let dx = -0.8; dx <= 0.8; dx += 0.3) {
+      addPt(1.8 + dx, v1Y + dy, -0.75 + prng() * 0.5, 3, 0.97);
+    }
   }
 
   // Oncoming Vehicle moving south
-  const v2Y = 50.0 - ((frameIdx * 0.5) % 45.0);
-  for (let i = 0; i < 180; i++) {
-    const x = -2.2 + (prng() - 0.5) * 1.8;
-    const y = v2Y + (prng() - 0.5) * 4.2;
-    const z = -1.55 + prng() * 1.5;
-    addPt(x, y, z, 3, 0.95);
+  const v2Y = 32.0 - ((frameIdx * 0.5) % 28.0);
+  for (let dy = -2.0; dy <= 2.0; dy += 0.3) {
+    for (let dx = -0.8; dx <= 0.8; dx += 0.3) {
+      addPt(-1.8 + dx, v2Y + dy, -0.8 + prng() * 0.5, 3, 0.95);
+    }
   }
 
   // Rear Trailing Vehicle
-  const v3Y = -14.0 - ((frameIdx * 0.35) % 30.0);
-  for (let i = 0; i < 160; i++) {
-    const x = -2.2 + (prng() - 0.5) * 1.8;
-    const y = v3Y + (prng() - 0.5) * 4.2;
-    const z = -1.55 + prng() * 1.5;
-    addPt(x, y, z, 3, 0.94);
+  const v3Y = -8.0 - ((frameIdx * 0.35) % 18.0);
+  for (let dy = -2.0; dy <= 2.0; dy += 0.3) {
+    for (let dx = -0.8; dx <= 0.8; dx += 0.3) {
+      addPt(-1.8 + dx, v3Y + dy, -0.8 + prng() * 0.5, 3, 0.94);
+    }
   }
 
   const boundingBoxes: BoundingBox3D[] = [
@@ -197,6 +207,7 @@ const initialGridResult = projectPointsToFoveatedGrid(initialData.points, 0);
 
 interface LidarState {
   isConnected: boolean;
+  connectionState: 'connected' | 'connecting' | 'reconnecting' | 'simulated' | 'disconnected';
   datasets: DatasetInfo[];
   activeDatasetId: string;
   totalFrames: number;
@@ -233,6 +244,7 @@ interface LidarState {
   isSettingsOpen: boolean;
 
   setIsConnected: (connected: boolean) => void;
+  setConnectionState: (state: 'connected' | 'connecting' | 'reconnecting' | 'simulated' | 'disconnected') => void;
   setDatasets: (datasets: DatasetInfo[]) => void;
   setActiveDatasetId: (id: string) => void;
   setPlaybackState: (state: 'idle' | 'running' | 'paused') => void;
@@ -269,6 +281,7 @@ interface LidarState {
 
 export const useLidarStore = create<LidarState>((set, get) => ({
   isConnected: false,
+  connectionState: 'simulated',
   datasets: [],
   activeDatasetId: 'urban_driving_demo_01',
   totalFrames: 100,
@@ -334,6 +347,7 @@ export const useLidarStore = create<LidarState>((set, get) => ({
   isSettingsOpen: false,
 
   setIsConnected: (connected) => set({ isConnected: connected }),
+  setConnectionState: (state) => set({ connectionState: state }),
   setDatasets: (datasets) => set({ datasets }),
   setActiveDatasetId: (id) => set({ activeDatasetId: id }),
   setPlaybackState: (state) => set({ playbackState: state }),

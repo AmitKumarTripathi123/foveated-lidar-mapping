@@ -11,6 +11,7 @@ export function useWebSocketStream() {
 
   const isConnected = useLidarStore((state) => state.isConnected);
   const setIsConnected = useLidarStore((state) => state.setIsConnected);
+  const setConnectionState = useLidarStore((state) => state.setConnectionState);
   const setFrameData = useLidarStore((state) => state.setFrameData);
   const playbackState = useLidarStore((state) => state.playbackState);
   const targetFps = useLidarStore((state) => state.targetFps);
@@ -35,12 +36,14 @@ export function useWebSocketStream() {
 
   const connect = useCallback(() => {
     try {
+      setConnectionState('connecting');
       const wsUrl = `${WS_BASE_URL}/ws/stream`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
         setIsConnected(true);
+        setConnectionState('connected');
         ws.send(JSON.stringify({ action: 'play', payload: { fps: 10.0, mode: 'foveated' } }));
       };
 
@@ -57,20 +60,29 @@ export function useWebSocketStream() {
 
       ws.onclose = () => {
         setIsConnected(false);
+        setConnectionState('simulated');
         wsRef.current = null;
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = setTimeout(connect, 2000);
+        reconnectTimeoutRef.current = setTimeout(() => {
+          setConnectionState('reconnecting');
+          connect();
+        }, 3000);
       };
 
       ws.onerror = () => {
         setIsConnected(false);
+        setConnectionState('simulated');
       };
     } catch (err) {
       setIsConnected(false);
+      setConnectionState('simulated');
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = setTimeout(connect, 2000);
+      reconnectTimeoutRef.current = setTimeout(() => {
+        setConnectionState('reconnecting');
+        connect();
+      }, 3000);
     }
-  }, [setIsConnected, setFrameData]);
+  }, [setIsConnected, setConnectionState, setFrameData]);
 
   useEffect(() => {
     fetchInitialFrame();

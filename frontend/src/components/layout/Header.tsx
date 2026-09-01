@@ -7,6 +7,7 @@ import { GridDisplayMode, GridRenderStyle } from '@/types/lidar';
 
 export function Header() {
   const isConnected = useLidarStore((state) => state.isConnected);
+  const connectionState = useLidarStore((state) => state.connectionState);
   const gridDisplayMode = useLidarStore((state) => state.gridDisplayMode);
   const setGridDisplayMode = useLidarStore((state) => state.setGridDisplayMode);
   const gridRenderStyle = useLidarStore((state) => state.gridRenderStyle);
@@ -116,11 +117,33 @@ export function Header() {
         <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-surface-highlight/50 border border-border-color text-xs">
           <span
             className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-[#22C55E] animate-pulse' : 'bg-[#EF4444]'
+              connectionState === 'connected'
+                ? 'bg-[#22C55E] animate-pulse'
+                : connectionState === 'connecting'
+                ? 'bg-[#EAB308] animate-ping'
+                : connectionState === 'reconnecting'
+                ? 'bg-[#F59E0B] animate-pulse'
+                : 'bg-[#38BDF8] animate-pulse'
             }`}
           />
-          <span className="text-gray-300 font-medium">
-            {isConnected ? 'STREAM 10Hz' : 'DISCONNECTED'}
+          <span
+            className={`font-medium ${
+              connectionState === 'connected'
+                ? 'text-emerald-300'
+                : connectionState === 'connecting'
+                ? 'text-yellow-300'
+                : connectionState === 'reconnecting'
+                ? 'text-amber-300'
+                : 'text-sky-300'
+            }`}
+          >
+            {connectionState === 'connected'
+              ? 'LIVE BACKEND (10 Hz)'
+              : connectionState === 'connecting'
+              ? 'CONNECTING...'
+              : connectionState === 'reconnecting'
+              ? 'RECONNECTING...'
+              : 'SIMULATION STREAM (10 Hz)'}
           </span>
         </div>
       </div>
