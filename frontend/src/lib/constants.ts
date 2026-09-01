@@ -22,9 +22,9 @@ export const CAMERA_POSITIONS: Record<CameraViewPreset, { pos: [number, number, 
   },
 };
 
-export const DEFAULT_CAMERA_POSITION = CAMERA_POSITIONS.perspective.pos;
+export const DEFAULT_CAMERA_POSITION = CAMERA_POSITIONS.top.pos;
 export const TOP_DOWN_CAMERA_POSITION = CAMERA_POSITIONS.top.pos;
-export const CAMERA_TARGET = CAMERA_POSITIONS.perspective.target;
+export const CAMERA_TARGET = CAMERA_POSITIONS.top.target;
 
 export const INITIAL_LAYERS: LayerVisibility = {
   rawPoints: false,

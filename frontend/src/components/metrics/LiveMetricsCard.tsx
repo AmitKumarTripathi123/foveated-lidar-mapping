@@ -15,16 +15,19 @@ import {
   MapPin,
   TrendingDown,
 } from 'lucide-react';
+import { formatInt } from '@/lib/formatters';
 
 export function LiveMetricsCard() {
   const metrics = useLidarStore((state) => state.metrics);
+  const cellsList = useLidarStore((state) => state.cells);
 
   const fps = metrics ? metrics.fps.toFixed(1) : '10.0';
   const latency = metrics ? metrics.total_latency_ms.toFixed(1) : '30.3';
   const aiLatency = metrics ? metrics.ai_latency_ms.toFixed(1) : '18.2';
   const gridLatency = metrics ? metrics.grid_latency_ms.toFixed(1) : '12.1';
   const points = metrics ? '1,248,531' : '1,248,531';
-  const cells = metrics ? '9,169' : '9,169';
+  const cellCount = cellsList.length > 0 ? cellsList.length : (metrics?.cell_count || 11086);
+  const cells = formatInt(cellCount);
   const memory = metrics ? '134.8' : '134.8';
   const savings = metrics ? '80.0' : '80.0';
 
@@ -47,7 +50,7 @@ export function LiveMetricsCard() {
         <div className="flex items-center gap-2 bg-[#0B0F19] px-2.5 py-1 rounded-lg border border-[#1E293B]">
           <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-[8px] text-gray-400 leading-tight">PIPELINE LATENCY</span>
+            <span className="text-[8px] text-gray-400 leading-tight">AI + GRID LATENCY</span>
             <span className="font-bold text-amber-400 text-[10px] leading-tight">
               {latency} <span className="text-[8px] text-gray-500">ms</span>
             </span>
@@ -89,8 +92,8 @@ export function LiveMetricsCard() {
         <div className="flex items-center gap-2 bg-[#0B0F19] px-2.5 py-1 rounded-lg border border-[#1E293B]">
           <Grid className="w-3.5 h-3.5 text-sky-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-[8px] text-gray-400 leading-tight">OCCUPIED CELLS</span>
-            <span className="font-bold text-gray-200 text-[10px] leading-tight">{cells} cells</span>
+            <span className="text-[8px] text-gray-400 leading-tight">CURRENT OCCUPIED</span>
+            <span className="font-bold text-sky-300 text-[10px] leading-tight">{cells} cells</span>
           </div>
         </div>
 

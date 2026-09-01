@@ -100,11 +100,17 @@ export function MappingAnalytics() {
           <div className="flex justify-between">
             <span className="text-gray-400">Current Occupied Cells:</span>
             <span className="font-bold text-sky-300">
-              {formatInt(occupiedCount)}
+              {formatInt(occupiedCount)} cells
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Theoretical Capacity:</span>
+            <span className="text-gray-400">Benchmark Reference Frame:</span>
+            <span className="font-bold text-gray-300">
+              9,169 cells (Frame 0 Ref)
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Theoretical Spatial Capacity:</span>
             <span className="font-bold text-gray-200">
               {formatInt(theoreticalCapacity)} cells
             </span>

@@ -119,10 +119,6 @@ export function Header() {
             className={`w-2 h-2 rounded-full ${
               connectionState === 'connected'
                 ? 'bg-[#22C55E] animate-pulse'
-                : connectionState === 'connecting'
-                ? 'bg-[#EAB308] animate-ping'
-                : connectionState === 'reconnecting'
-                ? 'bg-[#F59E0B] animate-pulse'
                 : 'bg-[#38BDF8] animate-pulse'
             }`}
           />
@@ -130,20 +126,12 @@ export function Header() {
             className={`font-medium ${
               connectionState === 'connected'
                 ? 'text-emerald-300'
-                : connectionState === 'connecting'
-                ? 'text-yellow-300'
-                : connectionState === 'reconnecting'
-                ? 'text-amber-300'
                 : 'text-sky-300'
             }`}
           >
             {connectionState === 'connected'
               ? 'LIVE BACKEND (10 Hz)'
-              : connectionState === 'connecting'
-              ? 'CONNECTING...'
-              : connectionState === 'reconnecting'
-              ? 'RECONNECTING...'
-              : 'SIMULATION STREAM (10 Hz)'}
+              : 'DATASET REPLAY (10 Hz)'}
           </span>
         </div>
       </div>

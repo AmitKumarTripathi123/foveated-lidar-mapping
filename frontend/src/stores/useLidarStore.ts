@@ -207,7 +207,7 @@ const initialGridResult = projectPointsToFoveatedGrid(initialData.points, 0);
 
 interface LidarState {
   isConnected: boolean;
-  connectionState: 'connected' | 'connecting' | 'reconnecting' | 'simulated' | 'disconnected';
+  connectionState: 'connected' | 'connecting' | 'reconnecting' | 'simulated' | 'disconnected' | 'dataset_replay';
   datasets: DatasetInfo[];
   activeDatasetId: string;
   totalFrames: number;
@@ -244,7 +244,7 @@ interface LidarState {
   isSettingsOpen: boolean;
 
   setIsConnected: (connected: boolean) => void;
-  setConnectionState: (state: 'connected' | 'connecting' | 'reconnecting' | 'simulated' | 'disconnected') => void;
+  setConnectionState: (state: 'connected' | 'connecting' | 'reconnecting' | 'simulated' | 'disconnected' | 'dataset_replay') => void;
   setDatasets: (datasets: DatasetInfo[]) => void;
   setActiveDatasetId: (id: string) => void;
   setPlaybackState: (state: 'idle' | 'running' | 'paused') => void;
@@ -281,7 +281,7 @@ interface LidarState {
 
 export const useLidarStore = create<LidarState>((set, get) => ({
   isConnected: false,
-  connectionState: 'simulated',
+  connectionState: 'dataset_replay',
   datasets: [],
   activeDatasetId: 'urban_driving_demo_01',
   totalFrames: 100,

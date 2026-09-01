@@ -36,7 +36,6 @@ export function useWebSocketStream() {
 
   const connect = useCallback(() => {
     try {
-      setConnectionState('connecting');
       const wsUrl = `${WS_BASE_URL}/ws/stream`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
@@ -60,27 +59,21 @@ export function useWebSocketStream() {
 
       ws.onclose = () => {
         setIsConnected(false);
-        setConnectionState('simulated');
+        setConnectionState('dataset_replay');
         wsRef.current = null;
         if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = setTimeout(() => {
-          setConnectionState('reconnecting');
-          connect();
-        }, 3000);
+        reconnectTimeoutRef.current = setTimeout(connect, 10000);
       };
 
       ws.onerror = () => {
         setIsConnected(false);
-        setConnectionState('simulated');
+        setConnectionState('dataset_replay');
       };
     } catch (err) {
       setIsConnected(false);
-      setConnectionState('simulated');
+      setConnectionState('dataset_replay');
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = setTimeout(() => {
-        setConnectionState('reconnecting');
-        connect();
-      }, 3000);
+      reconnectTimeoutRef.current = setTimeout(connect, 10000);
     }
   }, [setIsConnected, setConnectionState, setFrameData]);
 

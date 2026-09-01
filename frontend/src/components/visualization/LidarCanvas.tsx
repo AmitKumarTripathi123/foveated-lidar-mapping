@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import { useLidarStore } from '@/stores/useLidarStore';
@@ -38,6 +38,11 @@ export function LidarCanvas() {
       controlsRef.current.update();
     }
   };
+
+  // Guarantee that initial page mount starts in Top-Down Bird's Eye View (BEV)
+  useEffect(() => {
+    setCameraView('top');
+  }, []);
 
   const resetCamera = () => {
     setCameraView('top');
