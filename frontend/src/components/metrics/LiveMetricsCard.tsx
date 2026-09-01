@@ -25,20 +25,20 @@ export function LiveMetricsCard() {
   const gridLatency = metrics ? metrics.grid_latency_ms.toFixed(1) : '12.1';
   const points = metrics ? '1,248,531' : '1,248,531';
   const cells = metrics ? '9,169' : '9,169';
-  const memory = metrics ? '134' : '134';
-  const savings = metrics ? '82.8' : '82.8';
+  const memory = metrics ? '134.8' : '134.8';
+  const savings = metrics ? '80.0' : '80.0';
 
   return (
     <div className="flex flex-col bg-[#070A12] border-t border-[#1E293B] px-4 py-2 text-white font-mono text-xs select-none gap-2">
       {/* 1. Top Row: 8 Live Telemetry Badges */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-        {/* Frame Rate */}
+        {/* Sensor Acquisition Spin Rate */}
         <div className="flex items-center gap-2 bg-[#0B0F19] px-2.5 py-1 rounded-lg border border-[#1E293B]">
           <Activity className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-[8px] text-gray-400 leading-tight">FRAME RATE</span>
+            <span className="text-[8px] text-gray-400 leading-tight">SPIN RATE</span>
             <span className="font-bold text-emerald-400 text-[10px] leading-tight">
-              {fps} <span className="text-[8px] text-gray-500">Hz</span>
+              10.0 <span className="text-[8px] text-gray-500">Hz</span>
             </span>
           </div>
         </div>
@@ -81,7 +81,7 @@ export function LiveMetricsCard() {
           <Database className="w-3.5 h-3.5 text-gray-400 shrink-0" />
           <div className="flex flex-col">
             <span className="text-[8px] text-gray-400 leading-tight">INPUT POINTS</span>
-            <span className="font-bold text-gray-200 text-[10px] leading-tight">{points}</span>
+            <span className="font-bold text-gray-200 text-[10px] leading-tight">{points} pts</span>
           </div>
         </div>
 
@@ -90,27 +90,27 @@ export function LiveMetricsCard() {
           <Grid className="w-3.5 h-3.5 text-sky-400 shrink-0" />
           <div className="flex flex-col">
             <span className="text-[8px] text-gray-400 leading-tight">OCCUPIED CELLS</span>
-            <span className="font-bold text-gray-200 text-[10px] leading-tight">{cells}</span>
+            <span className="font-bold text-gray-200 text-[10px] leading-tight">{cells} cells</span>
           </div>
         </div>
 
-        {/* Memory Usage */}
+        {/* Measured Process Memory */}
         <div className="flex items-center gap-2 bg-[#0B0F19] px-2.5 py-1 rounded-lg border border-[#1E293B]">
           <HardDrive className="w-3.5 h-3.5 text-purple-400 shrink-0" />
           <div className="flex flex-col">
-            <span className="text-[8px] text-gray-400 leading-tight">MEMORY USAGE</span>
+            <span className="text-[8px] text-gray-400 leading-tight">PROCESS RAM</span>
             <span className="font-bold text-purple-400 text-[10px] leading-tight">
               {memory} <span className="text-[8px] text-gray-500">MB</span>
             </span>
           </div>
         </div>
 
-        {/* Memory Reduction */}
+        {/* Occupied Cell Reduction */}
         <div className="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/40 px-2.5 py-1 rounded-lg">
           <TrendingDown className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <div className="flex flex-col">
             <span className="text-[8px] text-emerald-300/80 font-bold leading-tight">
-              MEMORY REDUCTION
+              OCCUPIED REDUCTION
             </span>
             <span className="font-bold text-emerald-400 text-[10px] leading-tight">
               -{savings}%
@@ -158,7 +158,7 @@ export function LiveMetricsCard() {
             </div>
             <div>
               <div className="font-bold text-white leading-tight">Cell Size Varies by Zone</div>
-              <div className="text-[9px] text-gray-400 leading-tight">Near: High Resolution (0.10m) | Far: Low Resolution (0.50m)</div>
+              <div className="text-[9px] text-gray-400 leading-tight">Near: 5cm (0.05m) | Mid: 25cm (0.25m) | Far: 50cm (0.50m)</div>
             </div>
           </div>
 
@@ -167,7 +167,7 @@ export function LiveMetricsCard() {
             <div className="w-4 h-4 bg-[#8B5CF6] rounded border border-[#8B5CF6]/50" />
             <div>
               <div className="font-bold text-white leading-tight">Semantic Class</div>
-              <div className="text-[9px] text-gray-400 leading-tight">Each cell colored by predicted class</div>
+              <div className="text-[9px] text-gray-400 leading-tight">Each cell colored by dominant class</div>
             </div>
           </div>
         </div>
@@ -182,8 +182,8 @@ export function LiveMetricsCard() {
               FOVEATED BENEFIT
             </div>
             <div className="text-[9px] text-gray-300 leading-tight">
-              High detail where it matters (near vehicle)<br />
-              Efficient coverage in far range
+              High detail where it matters (near vehicle: 5cm)<br />
+              Efficient coverage in far range (50cm, -97.29% capacity)
             </div>
           </div>
         </div>
