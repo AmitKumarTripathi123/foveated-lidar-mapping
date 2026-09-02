@@ -42,17 +42,20 @@ export function FoveatedGridMesh() {
 
       if (gridRenderStyle === 'extruded_3d' || (viewMode3D === 'foveated_elevation' && colorMode === 'elevation')) {
         // 3D Column Extrusion
-        height = Math.max(0.18, (cell.elevation - zBase) * 1.5);
+        height = Math.max(0.12, (cell.elevation - zBase) * 1.2);
         centerZ = zBase + height / 2;
       } else {
-        // 2.5D Planar Grid Tile on Ground
-        height = 0.10;
-        centerZ = -1.56;
+        // 2.5D Elevation Plane:
+        // Elevation is visually represented by cell height and vertical position:
+        const elevationOffset = Math.max(0, cell.elevation - zBase);
+        height = Math.max(0.06, elevationOffset * 0.45 + 0.06);
+        centerZ = zBase + height / 2;
       }
 
-      // Exact square cell dimensions with 8% margin for crisp cell-to-cell separation
+      // Spatially continuous cells: 0.985 scale ensures adjacent cells meet seamlessly
+      // while subtle wireframe outlines preserve crisp variable-resolution boundaries
       tempObject.position.set(cell.x, cell.y, centerZ);
-      tempObject.scale.set(res * 0.92, res * 0.92, height);
+      tempObject.scale.set(res * 0.985, res * 0.985, height);
       tempObject.updateMatrix();
 
       instancedMeshRef.current.setMatrixAt(i, tempObject.matrix);
@@ -68,24 +71,19 @@ export function FoveatedGridMesh() {
         const rgb = getTraversabilityColor(cell.traversability);
         tempColor.setRGB(rgb[0], rgb[1], rgb[2]);
       } else {
-        // Check for purple static obstacles / red dynamic vehicles
+        // True Semantic Coloring matching the Semantic Legend
         if (cell.semantic_class === 2) {
-          tempColor.setHex(0x8B5CF6); // Purple
+          tempColor.setHex(0x8B5CF6); // Static Obstacle / Building (Purple)
         } else if (cell.semantic_class === 3) {
-          tempColor.setHex(0xEF4444); // Red
+          tempColor.setHex(0xEF4444); // Dynamic Object / Vehicle (Red)
         } else if (cell.semantic_class === 1) {
-          tempColor.setHex(0xCA8A04); // Yellow Non-Drivable
+          tempColor.setHex(0xCA8A04); // Non-Drivable Curb / Sidewalk (Amber)
         } else if (cell.semantic_class === 4) {
-          tempColor.setHex(0x15803D); // Vegetation
+          tempColor.setHex(0x15803D); // Vegetation (Dark Green)
         } else {
-          // Drivable Terrain colored by Foveation Zone (matching reference image)
-          if (cell.zone_id === 0) {
-            tempColor.setHex(0x0284C7); // Blue Zone 0
-          } else if (cell.zone_id === 1) {
-            tempColor.setHex(0x16A34A); // Green Zone 1
-          } else {
-            tempColor.setHex(0xF59E0B); // Orange/Yellow Zone 2
-          }
+          // Drivable Terrain: Unified Green across all zones!
+          // This ensures the roadway reads as ONE continuous ground plane!
+          tempColor.setHex(0x22C55E); // Green (#22C55E)
         }
       }
 

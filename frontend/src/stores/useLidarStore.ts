@@ -63,111 +63,168 @@ export function generateStructuredFramePoints(frameIdx: number = 0): {
     });
   };
 
-  // 1. Zone 0 (0–10m @ 5cm): Near-field contiguous high-resolution road corridor
-  for (let y = -1.5; y <= 1.5; y += 0.05) {
-    for (let x = -1.5; x <= 1.5; x += 0.05) {
-      const z = -1.60 + (prng() - 0.5) * 0.02;
-      addPt(x, y, z, 0, 0.98);
-    }
-  }
-  // Zone 0 Curbs & Sidewalks (Yellow cls: 1)
-  for (let y = -1.5; y <= 1.5; y += 0.05) {
-    for (let x of [-1.65, -1.55, 1.55, 1.65]) {
-      const z = -1.45 + (prng() - 0.5) * 0.03;
-      addPt(x, y, z, 1, 0.95);
+  // 1. Zone 0 (0–10m @ 5cm): Near-field continuous high-resolution road network
+  // Continuous Main Road (-2.2m to +2.2m, full 0-10m radius)
+  for (let y = -9.8; y <= 9.8; y += 0.12) {
+    for (let x = -2.2; x <= 2.2; x += 0.12) {
+      const dist = Math.hypot(x, y);
+      if (dist <= 10.0) {
+        const z = -1.60 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 0, 0.98);
+      }
     }
   }
 
-  // 2. Zone 1 (10–50m @ 25cm): Mid-field contiguous road corridor (Green cls: 0)
-  for (let y = 1.75; y <= 24.5; y += 0.25) {
-    for (let x = -2.25; x <= 2.25; x += 0.25) {
-      const z = -1.60 + (prng() - 0.5) * 0.02;
-      addPt(x, y, z, 0, 0.98);
+  // Zone 0 Continuous Curbs & Sidewalks (bordering road at x in [-3.4, -2.25] and [2.25, 3.4])
+  for (let y = -9.8; y <= 9.8; y += 0.12) {
+    for (let x of [-3.2, -2.8, -2.4, 2.4, 2.8, 3.2]) {
+      const dist = Math.hypot(x, y);
+      if (dist <= 10.0) {
+        const z = -1.45 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 1, 0.95);
+      }
     }
   }
-  for (let y = -24.5; y <= -1.75; y += 0.25) {
-    for (let x = -2.25; x <= 2.25; x += 0.25) {
-      const z = -1.60 + (prng() - 0.5) * 0.02;
-      addPt(x, y, z, 0, 0.98);
-    }
-  }
-  // Zone 1 Crossing Intersection
-  for (let x = -18.0; x <= 18.0; x += 0.25) {
-    for (let y = -1.5; y <= 1.5; y += 0.25) {
-      const dist = Math.sqrt(x * x + y * y);
-      if (dist > 1.8 && dist <= 24.5) {
+
+  // Zone 0 Continuous Crossing Street (y in [-2.0, 2.0], x in [-9.8, 9.8])
+  for (let x = -9.8; x <= 9.8; x += 0.12) {
+    for (let y = -2.0; y <= 2.0; y += 0.12) {
+      const dist = Math.hypot(x, y);
+      if (dist <= 10.0) {
         const z = -1.60 + (prng() - 0.5) * 0.02;
         addPt(x, y, z, 0, 0.97);
       }
     }
   }
 
-  // 3. Zone 2 (50–100m @ 50cm): Far-field road corridor (Orange cls: 0)
-  for (let y = 25.0; y <= 65.0; y += 0.50) {
-    for (let x = -2.5; x <= 2.5; x += 0.50) {
-      const z = -1.60 + (prng() - 0.5) * 0.02;
-      addPt(x, y, z, 0, 0.96);
+  // 2. Zone 1 (10–50m @ 25cm): Mid-field continuous road corridor & environment
+  // Main Road continues seamlessly into Zone 1 (North y in [9.8, 48.5] and South y in [-48.5, -9.8])
+  for (let y = -48.0; y <= 48.0; y += 0.25) {
+    if (Math.abs(y) < 9.75) continue; // handoff smoothly to Zone 0
+    for (let x = -2.25; x <= 2.25; x += 0.25) {
+      const dist = Math.hypot(x, y);
+      if (dist > 10.0 && dist <= 50.0) {
+        const z = -1.60 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 0, 0.98);
+      }
     }
-  }
-  for (let y = -65.0; y <= -25.0; y += 0.50) {
-    for (let x = -2.5; x <= 2.5; x += 0.50) {
-      const z = -1.60 + (prng() - 0.5) * 0.02;
-      addPt(x, y, z, 0, 0.96);
-    }
-  }
-
-  // 4. Urban Vegetation & Trees (cls: 4, Z = -1.4m to +3.5m)
-  const trees = [
-    { x: 5.0, y: 12.0 },
-    { x: 5.0, y: 22.0 },
-    { x: -5.0, y: 12.0 },
-    { x: -5.0, y: 22.0 },
-  ];
-  for (const tree of trees) {
-    for (let i = 0; i < 40; i++) {
-      const rx = tree.x + (prng() - 0.5) * 1.5;
-      const ry = tree.y + (prng() - 0.5) * 1.5;
-      const rz = -1.4 + prng() * 3.0;
-      addPt(rx, ry, rz, 4, 0.93);
-    }
-  }
-
-  // 5. Static Obstacles & Building Envelopes (cls: 2, Z = -1.5m to +3.5m)
-  const buildings = [
-    { x1: 6, x2: 18, y1: 8, y2: 24, h: 3.5 },
-    { x1: -18, x2: -6, y1: 8, y2: 24, h: 3.5 },
-  ];
-  for (const b of buildings) {
-    for (let x = b.x1; x <= b.x2; x += 1.0) {
-      for (let y = b.y1; y <= b.y2; y += 1.0) {
-        const z = -1.5 + prng() * b.h;
-        addPt(x, y, z, 2, 0.96);
+    // Curbs & Sidewalks continue seamlessly
+    for (let x of [-3.25, -2.75, 2.75, 3.25]) {
+      const dist = Math.hypot(x, y);
+      if (dist > 10.0 && dist <= 50.0) {
+        const z = -1.45 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 1, 0.95);
       }
     }
   }
 
-  // 6. Dynamic Objects with frame-wise kinematics (cls: 3)
-  // Ahead Vehicle moving forward
-  const v1Y = 10.0 + ((frameIdx * 0.45) % 35.0);
-  for (let dy = -2.0; dy <= 2.0; dy += 0.3) {
-    for (let dx = -0.8; dx <= 0.8; dx += 0.3) {
-      addPt(1.8 + dx, v1Y + dy, -0.75 + prng() * 0.5, 3, 0.97);
+  // Zone 1 Crossing Street continues seamlessly (y in [-2.0, 2.0], x in [-38.0, 38.0])
+  for (let x = -38.0; x <= 38.0; x += 0.25) {
+    if (Math.abs(x) < 9.75) continue; // handoff smoothly to Zone 0
+    for (let y = -2.0; y <= 2.0; y += 0.25) {
+      const dist = Math.hypot(x, y);
+      if (dist > 10.0 && dist <= 50.0) {
+        const z = -1.60 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 0, 0.97);
+      }
     }
   }
 
-  // Oncoming Vehicle moving south
-  const v2Y = 32.0 - ((frameIdx * 0.5) % 28.0);
-  for (let dy = -2.0; dy <= 2.0; dy += 0.3) {
-    for (let dx = -0.8; dx <= 0.8; dx += 0.3) {
-      addPt(-1.8 + dx, v2Y + dy, -0.8 + prng() * 0.5, 3, 0.95);
+  // Roadside Buildings & Envelopes in Zone 1 (directly adjoining the sidewalks with zero gap!)
+  for (let side of [-1, 1]) {
+    for (let y of [14, 26, -14, -26]) {
+      for (let bx = 3.5; bx <= 7.5; bx += 0.5) {
+        for (let by = -3.5; by <= 3.5; by += 0.5) {
+          const px = side * bx;
+          const py = y + by;
+          const dist = Math.hypot(px, py);
+          if (dist > 10.0 && dist <= 50.0) {
+            const z = -1.50 + prng() * 3.5; // building elevation profile
+            addPt(px, py, z, 2, 0.96);
+          }
+        }
+      }
+    }
+  }
+
+  // Urban Vegetation & Trees in Zone 1 (along sidewalk edge)
+  const trees = [
+    { x: 3.2, y: 12.0 },
+    { x: 3.2, y: 22.0 },
+    { x: -3.2, y: 12.0 },
+    { x: -3.2, y: 22.0 },
+  ];
+  for (const tree of trees) {
+    for (let i = 0; i < 35; i++) {
+      const rx = tree.x + (prng() - 0.5) * 0.8;
+      const ry = tree.y + (prng() - 0.5) * 0.8;
+      const rz = -1.3 + prng() * 2.8;
+      addPt(rx, ry, rz, 4, 0.93);
+    }
+  }
+
+  // 3. Zone 2 (50–100m @ 50cm): Far-field continuous road corridor
+  // Far Main Road continues seamlessly into Zone 2 (North y in [48.0, 75.0] and South y in [-75.0, -48.0])
+  for (let y = -75.0; y <= 75.0; y += 0.50) {
+    if (Math.abs(y) < 48.0) continue; // handoff smoothly to Zone 1
+    for (let x = -2.5; x <= 2.5; x += 0.50) {
+      const dist = Math.hypot(x, y);
+      if (dist > 50.0 && dist <= 100.0) {
+        const z = -1.60 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 0, 0.96);
+      }
+    }
+    // Road boundaries
+    for (let x of [-3.5, 3.5]) {
+      const dist = Math.hypot(x, y);
+      if (dist > 50.0 && dist <= 100.0) {
+        const z = -1.45 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 1, 0.94);
+      }
+    }
+  }
+
+  // Far Crossing Street in Zone 2
+  for (let x = -60.0; x <= 60.0; x += 0.50) {
+    if (Math.abs(x) < 38.0) continue;
+    for (let y = -2.0; y <= 2.0; y += 0.50) {
+      const dist = Math.hypot(x, y);
+      if (dist > 50.0 && dist <= 100.0) {
+        const z = -1.60 + (prng() - 0.5) * 0.02;
+        addPt(x, y, z, 0, 0.95);
+      }
+    }
+  }
+
+  // 4. Dynamic Objects with frame-wise kinematics (cls: 3, Red)
+  // Ahead Vehicle moving forward in northbound lane
+  const v1Y = 10.0 + ((frameIdx * 0.45) % 30.0);
+  for (let dy = -1.8; dy <= 1.8; dy += 0.25) {
+    for (let dx = -0.75; dx <= 0.75; dx += 0.25) {
+      addPt(1.2 + dx, v1Y + dy, -0.75 + prng() * 0.4, 3, 0.97);
+    }
+  }
+
+  // Oncoming Vehicle moving south in southbound lane
+  const v2Y = 32.0 - ((frameIdx * 0.5) % 26.0);
+  for (let dy = -1.8; dy <= 1.8; dy += 0.25) {
+    for (let dx = -0.75; dx <= 0.75; dx += 0.25) {
+      addPt(-1.2 + dx, v2Y + dy, -0.8 + prng() * 0.4, 3, 0.95);
     }
   }
 
   // Rear Trailing Vehicle
-  const v3Y = -8.0 - ((frameIdx * 0.35) % 18.0);
-  for (let dy = -2.0; dy <= 2.0; dy += 0.3) {
-    for (let dx = -0.8; dx <= 0.8; dx += 0.3) {
-      addPt(-1.8 + dx, v3Y + dy, -0.8 + prng() * 0.5, 3, 0.94);
+  const v3Y = -8.0 - ((frameIdx * 0.35) % 15.0);
+  for (let dy = -1.8; dy <= 1.8; dy += 0.25) {
+    for (let dx = -0.75; dx <= 0.75; dx += 0.25) {
+      addPt(1.2 + dx, v3Y + dy, -0.8 + prng() * 0.4, 3, 0.94);
+    }
+  }
+
+  // Pedestrian on sidewalk
+  for (let dy = -0.25; dy <= 0.25; dy += 0.15) {
+    for (let dx = -0.25; dx <= 0.25; dx += 0.15) {
+      addPt(3.0 + dx, 5.0 + dy, -0.6 + prng() * 0.6, 3, 0.94);
     }
   }
 
@@ -176,24 +233,24 @@ export function generateStructuredFramePoints(frameIdx: number = 0): {
       id: 'dyn_veh_01',
       class_name: 'Dynamic Object (Ahead Vehicle)',
       confidence: 0.97,
-      center: [2.2, Number(v1Y.toFixed(2)), -0.75],
-      size: [1.8, 4.4, 1.6],
+      center: [1.2, Number(v1Y.toFixed(2)), -0.75],
+      size: [1.8, 4.2, 1.5],
       rotation_yaw: 0.0,
     },
     {
       id: 'dyn_veh_02',
       class_name: 'Dynamic Object (Oncoming Car)',
       confidence: 0.95,
-      center: [-2.2, Number(v2Y.toFixed(2)), -0.8],
+      center: [-1.2, Number(v2Y.toFixed(2)), -0.8],
       size: [1.8, 4.2, 1.5],
       rotation_yaw: Math.PI,
     },
     {
       id: 'dyn_veh_03',
-      class_name: 'Dynamic Object (Rear Vehicle)',
+      class_name: 'Dynamic Object (Trailing Car)',
       confidence: 0.94,
-      center: [-2.2, Number(v3Y.toFixed(2)), -0.8],
-      size: [1.8, 4.2, 1.5],
+      center: [1.2, Number(v3Y.toFixed(2)), -0.8],
+      size: [1.8, 4.0, 1.5],
       rotation_yaw: 0.0,
     },
   ];

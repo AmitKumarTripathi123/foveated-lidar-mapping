@@ -54,17 +54,17 @@ export function BoundingBoxOverlay() {
               />
             </mesh>
 
-            {/* 3D Label */}
-            <Html position={[0, 0, sz / 2 + 0.4]} center>
+            {/* 3D Compact Label */}
+            <Html position={[0, 0, sz / 2 + 0.35]} center>
               <div
-                className="px-2 py-0.5 rounded text-[11px] font-mono font-bold tracking-tight shadow-md border whitespace-nowrap cursor-pointer hover:scale-105 transition-transform"
+                className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-tight shadow-md border whitespace-nowrap cursor-pointer hover:scale-105 transition-transform"
                 style={{
-                  backgroundColor: '#111827ee',
+                  backgroundColor: '#0a0e18dd',
                   borderColor: color,
                   color: color,
                 }}
               >
-                {box.class_name.toUpperCase()} {Math.round(box.confidence * 100)}%
+                {box.class_name.replace(/^Dynamic Object \((.+)\)$/, '$1').toUpperCase()} {Math.round(box.confidence * 100)}%
               </div>
             </Html>
           </group>

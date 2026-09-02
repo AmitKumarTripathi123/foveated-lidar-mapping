@@ -76,32 +76,28 @@ export function ConcentricRings() {
               attach="material"
               color={ring.color}
               transparent
-              opacity={ring.radius === 100 ? 0.75 : 0.6}
-              linewidth={ring.radius === 10 ? 2 : 1}
+              opacity={ring.radius === 100 ? 0.45 : 0.35}
+              linewidth={1}
             />
           </lineLoop>
 
-          {/* Floating Scientific HUD Tag */}
+          {/* Compact Non-Blocking Perimeter HUD Tag */}
           <Html
             position={[
-              ring.radius * 0.707,
-              ring.radius * 0.707,
+              ring.radius * 0.95,
+              ring.radius * 0.3,
               0.2,
             ]}
             center
             distanceFactor={55}
           >
-            <div className="bg-[#0A0E18]/90 backdrop-blur-md border border-white/20 px-2 py-1 rounded-lg text-[9px] font-mono text-white shadow-xl pointer-events-none select-none flex flex-col whitespace-nowrap">
-              <div className="flex items-center gap-1.5 font-bold">
-                <span
-                  className="w-2 h-2 rounded-full inline-block"
-                  style={{ backgroundColor: ring.color }}
-                />
-                <span style={{ color: ring.color }}>{ring.zone}</span>
-              </div>
-              <div className="text-gray-300 text-[8px] pl-3.5">
-                Radius: {ring.label} | Res: {ring.res}
-              </div>
+            <div className="bg-[#0A0E18]/85 backdrop-blur-md border border-white/20 px-2 py-0.5 rounded text-[8.5px] font-mono text-white shadow-xl pointer-events-none select-none flex items-center gap-1.5 whitespace-nowrap">
+              <span
+                className="w-1.5 h-1.5 rounded-full inline-block"
+                style={{ backgroundColor: ring.color }}
+              />
+              <span className="font-bold" style={{ color: ring.color }}>{ring.label}</span>
+              <span className="text-gray-300">({ring.res})</span>
             </div>
           </Html>
         </group>

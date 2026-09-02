@@ -14,6 +14,8 @@ import { CellInspectorTooltip } from './CellInspectorTooltip';
 import { CellDetailDrawer } from './CellDetailDrawer';
 import {
   RotateCcw,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import { CAMERA_POSITIONS } from '@/lib/constants';
 import { CameraViewPreset } from '@/types/lidar';
@@ -45,6 +47,32 @@ export function LidarCanvas() {
   const measuredFps = useLidarStore((state) => state.measuredFps);
 
   const controlsRef = useRef<any>(null);
+  const [cameraDistance, setCameraDistance] = React.useState(95);
+  const [panTargetY, setPanTargetY] = React.useState(15);
+
+  const updateCameraDistance = (newDist: number) => {
+    const clampedDist = Math.max(12, Math.min(240, newDist));
+    setCameraDistance(clampedDist);
+    if (controlsRef.current && controlsRef.current.object) {
+      const camera = controlsRef.current.object;
+      const target = controlsRef.current.target;
+      const dir = camera.position.clone().sub(target).normalize();
+      camera.position.copy(target).add(dir.multiplyScalar(clampedDist));
+      controlsRef.current.update();
+    }
+  };
+
+  const setPanTarget = (newY: number) => {
+    setPanTargetY(newY);
+    if (controlsRef.current && controlsRef.current.object) {
+      const camera = controlsRef.current.object;
+      const target = controlsRef.current.target;
+      const deltaY = newY - target.y;
+      target.y = newY;
+      camera.position.y += deltaY;
+      controlsRef.current.update();
+    }
+  };
 
   const setCameraView = (preset: CameraViewPreset) => {
     setCameraPreset(preset);
@@ -56,6 +84,11 @@ export function LidarCanvas() {
       }
       controlsRef.current.target.set(...config.target);
       controlsRef.current.update();
+      setPanTargetY(config.target[1]);
+      if (controlsRef.current.object) {
+        const d = Math.round(controlsRef.current.object.position.distanceTo(controlsRef.current.target));
+        setCameraDistance(d);
+      }
     }
   };
 
@@ -135,63 +168,137 @@ export function LidarCanvas() {
         </div>
       </div>
 
-      {/* Top Floating Camera Presets Toolbar */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-[#0A0E18]/90 backdrop-blur-md border border-border-color p-1 rounded-xl shadow-2xl">
-        <button
-          onClick={() => setCameraView('top')}
-          className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
-            cameraPreset === 'top'
-              ? 'bg-brand-600 text-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-          title="Top-Down Bird's Eye View (BEV)"
-        >
-          TOP (BEV)
-        </button>
-        <button
-          onClick={() => setCameraView('perspective')}
-          className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
-            cameraPreset === 'perspective'
-              ? 'bg-brand-600 text-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-          title="Perspective 3D Orbit View"
-        >
-          3D ORBIT
-        </button>
-        <button
-          onClick={() => setCameraView('front')}
-          className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
-            cameraPreset === 'front'
-              ? 'bg-brand-600 text-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-          title="Front Windshield View"
-        >
-          FRONT
-        </button>
-        <button
-          onClick={() => setCameraView('side')}
-          className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
-            cameraPreset === 'side'
-              ? 'bg-brand-600 text-white'
-              : 'text-gray-400 hover:text-white'
-          }`}
-          title="Side Cross-Section Elevation View"
-        >
-          SIDE
-        </button>
+      {/* Top Floating Camera Presets & Interactive Zoom / Pan Navigation Toolbar */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5 pointer-events-auto">
+        {/* Presets Row */}
+        <div className="flex items-center gap-1 bg-[#0A0E18]/90 backdrop-blur-md border border-border-color p-1 rounded-xl shadow-2xl">
+          <button
+            onClick={() => setCameraView('top')}
+            className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
+              cameraPreset === 'top'
+                ? 'bg-brand-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+            title="Top-Down Bird's Eye View (BEV)"
+          >
+            TOP (BEV)
+          </button>
+          <button
+            onClick={() => setCameraView('perspective')}
+            className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
+              cameraPreset === 'perspective'
+                ? 'bg-brand-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+            title="Perspective 3D Orbit View"
+          >
+            3D ORBIT
+          </button>
+          <button
+            onClick={() => setCameraView('front')}
+            className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
+              cameraPreset === 'front'
+                ? 'bg-brand-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+            title="Front Windshield View"
+          >
+            FRONT
+          </button>
+          <button
+            onClick={() => setCameraView('side')}
+            className={`px-2.5 py-1 rounded text-xs font-mono font-bold transition-colors ${
+              cameraPreset === 'side'
+                ? 'bg-brand-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+            title="Side Cross-Section Elevation View"
+          >
+            SIDE
+          </button>
 
-        <div className="w-[1px] h-4 bg-border-color mx-0.5" />
+          <div className="w-[1px] h-4 bg-border-color mx-0.5" />
 
-        {/* Reset Camera Button */}
-        <button
-          onClick={resetCamera}
-          className="p-1 rounded text-gray-400 hover:text-white hover:bg-surface-highlight transition-colors"
-          title="Reset to Top-Down View"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-        </button>
+          {/* Reset Camera Button */}
+          <button
+            onClick={resetCamera}
+            className="p-1 rounded text-gray-400 hover:text-white hover:bg-surface-highlight transition-colors"
+            title="Reset to Top-Down View"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Zoom & Road Corridor Pan Navigation Bar */}
+        <div className="flex items-center gap-2 bg-[#0A0E18]/90 backdrop-blur-md border border-border-color/80 px-2.5 py-1 rounded-xl shadow-2xl text-[10px] font-mono">
+          {/* Zoom In Button */}
+          <button
+            onClick={() => updateCameraDistance(cameraDistance - 15)}
+            className="p-1 rounded hover:bg-white/10 text-sky-400 hover:text-white transition-colors"
+            title="Zoom In (+15m closer)"
+          >
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Distance Slider */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-400 text-[9px] uppercase font-bold">Zoom</span>
+            <input
+              type="range"
+              min="15"
+              max="220"
+              step="5"
+              value={cameraDistance}
+              onChange={(e) => updateCameraDistance(Number(e.target.value))}
+              className="w-24 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-400"
+              title="Camera Orbit Distance (meters)"
+            />
+            <span className="text-sky-300 font-bold w-9 text-right">{cameraDistance}m</span>
+          </div>
+
+          {/* Zoom Out Button */}
+          <button
+            onClick={() => updateCameraDistance(cameraDistance + 15)}
+            className="p-1 rounded hover:bg-white/10 text-sky-400 hover:text-white transition-colors"
+            title="Zoom Out (+15m farther)"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+
+          <div className="w-[1px] h-3 bg-border-color mx-0.5" />
+
+          {/* Road Corridor Focus Targets */}
+          <span className="text-gray-400 text-[9px] uppercase font-bold">Focus</span>
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={() => setPanTarget(0)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition-colors ${
+                panTargetY === 0 ? 'bg-sky-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+              title="Focus on Ego Vehicle (0, 0, 0)"
+            >
+              Ego
+            </button>
+            <button
+              onClick={() => setPanTarget(15)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition-colors ${
+                panTargetY === 15 ? 'bg-sky-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+              title="Focus Corridor Midpoint (Y = 15m)"
+            >
+              Center
+            </button>
+            <button
+              onClick={() => setPanTarget(32)}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-bold transition-colors ${
+                panTargetY === 32 ? 'bg-sky-600 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+              title="Focus Forward Ahead Path (Y = 32m)"
+            >
+              Ahead
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Top-Right FOVEATED ZONES Legend Card */}
