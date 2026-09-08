@@ -1,7 +1,19 @@
 import { FoveatedZoneConfig } from './types/lidar';
 import path from 'path';
+import fs from 'fs';
 
-export const REPO_ROOT = path.resolve(__dirname, '../../amit_repo');
+const resolveDataRoot = (): string => {
+  if (process.env.DATA_DIR && fs.existsSync(process.env.DATA_DIR)) {
+    return path.resolve(process.env.DATA_DIR);
+  }
+  const repoCandidate = path.resolve(__dirname, '../../amit_repo');
+  if (fs.existsSync(repoCandidate)) {
+    return repoCandidate;
+  }
+  return path.resolve(__dirname, '..');
+};
+
+export const REPO_ROOT = resolveDataRoot();
 
 export const CONFIG = {
   appName: 'SIH 3D LiDAR Foveated Mapping Platform',

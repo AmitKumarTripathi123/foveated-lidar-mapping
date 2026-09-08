@@ -36,7 +36,13 @@ export function useWebSocketStream() {
 
   const connect = useCallback(() => {
     try {
-      const wsUrl = `${WS_BASE_URL}/ws/stream`;
+      let wsBase = WS_BASE_URL;
+      if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+        wsBase = wsBase.replace(/^http:\/\//i, 'wss://').replace(/^https:\/\//i, 'wss://').replace(/^ws:\/\//i, 'wss://');
+      } else {
+        wsBase = wsBase.replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
+      }
+      const wsUrl = `${wsBase.replace(/\/+$/, '')}/ws/stream`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 

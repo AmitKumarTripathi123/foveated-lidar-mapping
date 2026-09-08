@@ -20,6 +20,7 @@ app.use(express.json());
 
 // API Routes
 app.use('/api/v1/health', healthRouter);
+app.use('/health', healthRouter); // Hosting provider root health probe alias
 app.use('/api/v1/datasets', datasetsRouter);
 app.use('/api/v1/processing', processingRouter);
 app.use('/api/v1/map', mapsRouter);

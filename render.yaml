@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: foveated-lidar-backend
+    runtime: node
+    plan: free
+    buildCommand: npm --prefix backend install && npm --prefix backend run build
+    startCommand: npm --prefix backend run start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
