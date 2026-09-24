@@ -1,6 +1,6 @@
 # Foveated 2.5D LiDAR Mapping & Semantic Segmentation for Autonomous Navigation 
-<a href="https://frontend-henna-chi-pu2t4bz6wk.vercel.app/" target="_blank">
-  <img src="https://img.shields.io/badge/Live_App-brightgreen?style=for-the-badge" alt="https://foveated-lidar-mapping.vercel.app/">
+<a href="https://foveated-lidar-mapping.vercel.app/" target="_blank">
+  <img src="https://img.shields.io/badge/Live_App-brightgreen?style=for-the-badge" alt="Live Web App">
 </a>
 
 **Project**: Smart India Hackathon (SIH) — Problem Statement PS 26130  
