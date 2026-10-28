@@ -13,7 +13,6 @@
 ## 1. System Architecture Overview
 
 This repository implements the canonical end-to-end foveated perception and 2.5D grid mapping architecture:
-
 ```text
 Raw LiDAR (.bin / sensor_msgs/PointCloud2)
                  │
